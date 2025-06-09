@@ -1,21 +1,19 @@
-enum NavTab: Equatable, Encodable {
-    case play
-    case edit
-}
-
-
 import ComposableArchitecture
 import Foundation
 import CrosscodeDataLibrary
 
 @Reducer
-struct RouteFeature {
+struct RootFeature {
+    @Dependency(\.uuid) var uu
+    
     @ObservableState
     struct State: Equatable {
+        var layoutsList =  LayoutsTabFeature.State()
         var tab: NavTab = .edit
     }
     
     enum Action: Equatable {
+        case layoutsListAction(LayoutsTabFeature.Action)
         case setTab(NavTab)
     }
     
@@ -25,8 +23,18 @@ struct RouteFeature {
                 case .setTab(let tab):
                     state.tab = tab
                     return .none
+                case .layoutsListAction(_):
+                    return .none
             }
         }
+        
+        Scope(
+            state: \.layoutsList,
+            action: \.layoutsListAction
+        ) {
+            LayoutsTabFeature()
+        }        
     }
 }
+
 

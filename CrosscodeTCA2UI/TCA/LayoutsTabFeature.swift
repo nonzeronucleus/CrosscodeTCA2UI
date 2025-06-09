@@ -3,29 +3,34 @@ import Foundation
 import CrosscodeDataLibrary
 
 @Reducer
-struct LayoutsListFeature {
+struct LayoutsTabFeature {
     @Dependency(\.uuid) var uuid
 
     @ObservableState
     struct State: Equatable {
         var layouts: [Layout] = []
-        var error: LayoutError?
+        @Presents var editLayout: EditLayoutFeature.State?
+        var error: EquatableError?
     }
     
     enum Action: Equatable {
+        case pageLoaded
+        case itemSelected(UUID)
+
         case addLayout(AddLayout)
         case fetchAll(FetchAll)
+        case editLayout(PresentationAction<EditLayoutFeature.Action>)
         
         enum AddLayout: Equatable {
             case start
             case success
-            case failure(LayoutError)
+            case failure(EquatableError)
         }
         
         enum FetchAll: Equatable {
             case start
             case success([Layout])
-            case failure(LayoutError)
+            case failure(EquatableError)
         }
     }
     
@@ -33,11 +38,21 @@ struct LayoutsListFeature {
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
+                case .pageLoaded:
+                    return .send(.fetchAll(.start))
+                case .itemSelected(let id):
+                    state.editLayout = EditLayoutFeature.State(layoutID: id)
+                    return .none
                 case .addLayout(let subAction):
                     return handleAddLayout(&state, action: subAction)
                 case .fetchAll(let subAction):
                     return handleFetchAll(&state, action: subAction)
+                case .editLayout(_):
+                    return .none
             }
+        }
+        .ifLet(\.$editLayout, action: \.editLayout) {
+            EditLayoutFeature()
         }
     }
 }
@@ -45,7 +60,7 @@ struct LayoutsListFeature {
 
 // Add Layout
 
-extension LayoutsListFeature {
+extension LayoutsTabFeature {
     private func handleAddLayout(_ state: inout State, action:Action.AddLayout) -> Effect<Action> {
         switch action {
             case .start:
@@ -69,7 +84,7 @@ extension LayoutsListFeature {
                 await send(.addLayout(.success))
             }
             catch {
-                await send(.fetchAll(.failure(error as! LayoutError)))
+                await send(.fetchAll(.failure(error as! EquatableError)))
             }
         }
     }
@@ -83,7 +98,7 @@ extension LayoutsListFeature {
 
 // Fetch all layouts
 
-extension LayoutsListFeature {
+extension LayoutsTabFeature {
     private func handleFetchAll(_ state: inout State, action:Action.FetchAll) -> Effect<Action> {
         switch action {
             case .start:
@@ -107,20 +122,12 @@ extension LayoutsListFeature {
 
                 await send(.fetchAll(.success(result)))
             }
-            catch let error as LayoutError {
+            catch let error as EquatableError {
                 await send(.fetchAll(.failure(error)))
             }
             catch {
-                await send(.fetchAll(.failure(.wrappedError(error.localizedDescription)))) // Fallback
+                await send(.fetchAll(.failure(EquatableError(error)))) // Fallback
             }
         }
     }
 }
-
-enum LayoutError: Error, Equatable {
-    case networkUnavailable
-    case invalidData
-    case wrappedError(String)
-}
-
-

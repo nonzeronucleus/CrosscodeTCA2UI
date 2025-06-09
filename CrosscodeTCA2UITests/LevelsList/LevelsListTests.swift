@@ -15,9 +15,9 @@ struct LevelsListTests {
             @Dependency(\.uuid) var uuid
             
             let store = await TestStore(
-                initialState: LayoutsListFeature.State()
+                initialState: LayoutsTabFeature.State()
             ) {
-                LayoutsListFeature()
+                LayoutsTabFeature()
             }
             
             let layouts = [Layout(
@@ -28,7 +28,7 @@ struct LevelsListTests {
             
             await #expect(store.state.layouts.count == 0)
 
-            await store.send(LayoutsListFeature.Action.fetchAll(.success(layouts))) {
+            await store.send(LayoutsTabFeature.Action.fetchAll(.success(layouts))) {
                 $0.layouts = layouts
             }
             
@@ -54,9 +54,9 @@ struct LevelsListTests {
             @Dependency(\.uuid) var uuid
             
             let store = await TestStore(
-                initialState: LayoutsListFeature.State()
+                initialState: LayoutsTabFeature.State()
             ) {
-                LayoutsListFeature()
+                LayoutsTabFeature()
             }
             
             let layouts = [Layout(
@@ -71,9 +71,9 @@ struct LevelsListTests {
             
             await #expect(store.state.layouts.count == 0)
 
-            await store.send(LayoutsListFeature.Action.fetchAll(.start))
+            await store.send(LayoutsTabFeature.Action.fetchAll(.start))
             
-            await store.receive(LayoutsListFeature.Action.fetchAll(.success(layouts))) {
+            await store.receive(LayoutsTabFeature.Action.fetchAll(.success(layouts))) {
                 $0.layouts = layouts
             }
 

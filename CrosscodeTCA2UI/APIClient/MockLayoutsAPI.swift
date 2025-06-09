@@ -32,7 +32,7 @@ class MockLayoutsAPI: LayoutsAPI {
             Layout(
                 id: uuid(),
                 number: 1,
-                gridText: "--|--|"
+                gridText: "A-|--|"
             )
         )
     }
@@ -42,7 +42,9 @@ class MockLayoutsAPI: LayoutsAPI {
     }
     
     func fetchLevel(id: UUID) async throws -> (any Level)? {
-        fatalError("\(#function) not implemented")
+        if self.levels.isEmpty { return nil }
+        
+        return self.levels.first! 
     }
     
     func fetchAllLevels() async throws -> [any Level] {
@@ -73,7 +75,8 @@ extension Layout {
         return Layout(
             id: uuid(),
             number: 1,
-            gridText: "--|--|"
+            gridText:"    .    .. ...| ..  .. ... . .| .. ... ...    |    ..    ... .|. .  ... .... .|. ....   .... .|       .      .|...... . ......|.      .       |. ....   .... .|. .... ...  . .|. ...    ..    |    ... ... .. |. . ... ..  .. |... ..    .    |"
+            
         )
     }
 }

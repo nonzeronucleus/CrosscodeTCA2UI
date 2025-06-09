@@ -5,7 +5,7 @@ import CrosscodeDataLibrary
 
 
 struct RootView: View {
-    let store: StoreOf<AppFeature>
+    let store: StoreOf<RootFeature>
 //    let navStore: StoreOf<RouteFeature>
 
 //    // MARK: - Computed binding for sheet
@@ -24,8 +24,8 @@ struct RootView: View {
         VStack {
             TabView(
                 selection: Binding(
-                    get: { store.route.tab },
-                    set: { store.send(.routeAction(.setTab($0))) }
+                    get: { store.tab },
+                    set: { store.send(.setTab($0)) }
                 )
             ) {
                 // MARK: - Play Tab
@@ -58,11 +58,11 @@ struct RootView: View {
                         TitleBarView(
                             title: "Layouts",
                             color: .cyan,
-                            addItemAction: { /*store.dispatch(action: LevelListActions<LevelLayout>.CreateLayout.start())*/ },
+                            addItemAction: { store.send( .layoutsListAction(.addLayout(.start)) ) },
                             showSettingsAction: { /*store.dispatch(action: NavigationActions.showSettings())*/ }
                         )
                         
-                        LayoutsListView(store:store.scope(state:\.layoutsList , action: \.layoutsListAction))
+                        LayoutsTabView(store:store.scope(state:\.layoutsList , action: \.layoutsListAction))
                             .navigationDestination(for: UUID.self) { id in
                                 VStack {
                                     Text("\(id)")

@@ -3,8 +3,8 @@ import ComposableArchitecture
 
 @main
 struct CrosscodeTCA2UIApp: App {
-    let store = Store(initialState: AppFeature.State()) {
-        AppFeature()
+    let store = Store(initialState: RootFeature.State()) {
+        RootFeature()
     }
     
     
