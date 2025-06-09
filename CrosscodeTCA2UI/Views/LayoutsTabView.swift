@@ -19,7 +19,7 @@ struct LayoutsTabView: View {
                         }
                         .swipeActions(edge: .trailing) {
                             Button(role: .destructive) {
-                                // Deletion logic here
+                                store.send(.deleteButtonPressed(layout.id))
                             } label: {
                                 Label("Delete", systemImage: "trash")
                             }

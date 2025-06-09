@@ -16,21 +16,27 @@ struct LayoutsTabFeature {
     enum Action: Equatable {
         case pageLoaded
         case itemSelected(UUID)
+        case deleteButtonPressed(UUID)
 
         case addLayout(AddLayout)
         case fetchAll(FetchAll)
+        case deleteLayout(DeleteLayout)
         case editLayout(PresentationAction<EditLayoutFeature.Action>)
+        case failure(EquatableError)
         
         enum AddLayout: Equatable {
             case start
             case success
-            case failure(EquatableError)
         }
         
         enum FetchAll: Equatable {
             case start
             case success([Layout])
-            case failure(EquatableError)
+        }
+        
+        enum DeleteLayout: Equatable {
+            case start(UUID)
+            case success
         }
     }
     
@@ -40,13 +46,32 @@ struct LayoutsTabFeature {
             switch action {
                 case .pageLoaded:
                     return .send(.fetchAll(.start))
+                    
                 case .itemSelected(let id):
                     state.editLayout = EditLayoutFeature.State(layoutID: id)
                     return .none
+                    
+                case .failure(let error):
+                    if let wrappedError = error.wrappedError as? EquatableError {
+                        state.error = wrappedError
+                    }
+                    else {
+                        state.error = error
+                    }
+                    return .none
+                    
+                case .deleteButtonPressed(let id):
+                    return .send(.deleteLayout(.start(id)))
+                    
                 case .addLayout(let subAction):
                     return handleAddLayout(&state, action: subAction)
+                    
                 case .fetchAll(let subAction):
                     return handleFetchAll(&state, action: subAction)
+                    
+                case .deleteLayout(let subAction):
+                    return handleDelete(&state, action: subAction)
+                    
                 case .editLayout(_):
                     return .none
             }
@@ -67,11 +92,7 @@ extension LayoutsTabFeature {
                 return addLayout(&state)
                 
             case .success:
-                return handleAddLayoutSuccess(&state)
-                
-            case .failure(let error):
-                state.error = error
-                return .none
+                return .send(Action.fetchAll(.start))
         }
     }
     
@@ -84,7 +105,7 @@ extension LayoutsTabFeature {
                 await send(.addLayout(.success))
             }
             catch {
-                await send(.fetchAll(.failure(error as! EquatableError)))
+                await send(.failure(EquatableError(error)))
             }
         }
     }
@@ -107,10 +128,6 @@ extension LayoutsTabFeature {
             case .success(let layouts):
                 state.layouts = layouts
                 return .none
-                
-            case .failure(let error):
-                debugPrint("Error: \(error)")
-                return .none
         }
     }
     
@@ -122,12 +139,39 @@ extension LayoutsTabFeature {
 
                 await send(.fetchAll(.success(result)))
             }
-            catch let error as EquatableError {
-                await send(.fetchAll(.failure(error)))
-            }
             catch {
-                await send(.fetchAll(.failure(EquatableError(error)))) // Fallback
+                await send(.failure(EquatableError(error)))
             }
         }
     }
 }
+
+
+// Delete layout
+
+extension LayoutsTabFeature {
+    private func handleDelete(_ state: inout State, action:Action.DeleteLayout) -> Effect<Action> {
+        switch action {
+            case .start(let id):
+                return deleteLayout(&state, id: id)
+                
+            case .success:
+                return .send(Action.fetchAll(.start))
+        }
+    }
+    
+    private func deleteLayout(_ state: inout State, id:UUID) -> Effect<Action> {
+        @Dependency(\.apiClient) var apiClient
+        return .run { send in
+            do {
+                try await apiClient.layoutsAPI.deleteLevel(id: id, )
+
+                await send(.fetchAll(.start))
+            }
+            catch {
+                await send(.failure(EquatableError(error)))
+            }
+        }
+    }
+}
+

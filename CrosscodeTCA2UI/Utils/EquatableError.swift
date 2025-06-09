@@ -1,11 +1,11 @@
 class EquatableError: Error, Equatable {
-    let error: Error
+    let wrappedError: Error
     
     init(_ error: Error) {
-        self.error = error
+        self.wrappedError = error
     }
     
     static func == (lhs: EquatableError, rhs: EquatableError) -> Bool {
-        return lhs.error.localizedDescription == rhs.error.localizedDescription
+        return lhs.wrappedError.localizedDescription == rhs.wrappedError.localizedDescription
     }
 }

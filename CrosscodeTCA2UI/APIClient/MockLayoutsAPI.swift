@@ -3,13 +3,13 @@ import Foundation
 import CrosscodeDataLibrary
 
 
-protocol LayoutsAPI {
-    func fetchAllLevels() async throws -> [any Level]
-    func addNewLayout() async throws
-    func importLevels() async throws
-    func fetchLevel(id: UUID) async throws -> (any Level)?
-}
-
+//protocol LayoutsAPI {
+//    func fetchAllLevels() async throws -> [any Level]
+//    func addNewLayout() async throws
+//    func importLevels() async throws
+//    func fetchLevel(id: UUID) async throws -> (any Level)?
+//}
+//
 class MockLayoutsAPI: LayoutsAPI {
     @Dependency(\.uuid) var uuid
     
@@ -51,7 +51,7 @@ class MockLayoutsAPI: LayoutsAPI {
         return levels
     }
     
-    func deleteLevel(id: UUID) async throws -> [any Level] {
+    func deleteLevel(id: UUID) async throws {
         fatalError("\(#function) not implemented")
     }
     
