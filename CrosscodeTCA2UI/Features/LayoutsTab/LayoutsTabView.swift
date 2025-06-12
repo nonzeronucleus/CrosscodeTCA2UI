@@ -13,7 +13,7 @@ struct LayoutsTabView: View {
                         Button {
                             store.send(.itemSelected(layout.id))
                         } label: {
-                            Text("\(layout.id)")
+                            Text("\(layout.name)")
                                 .frame(maxWidth: .infinity, alignment: .leading)
                                 .contentShape(Rectangle())
                         }

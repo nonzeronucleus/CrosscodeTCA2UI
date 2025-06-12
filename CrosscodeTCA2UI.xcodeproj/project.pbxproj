@@ -10,6 +10,7 @@
 		2803A1212DF4E63E00744E83 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 2803A1202DF4E63E00744E83 /* ComposableArchitecture */; };
 		2803A1652DF4EC3800744E83 /* CrosscodeDataLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 2803A1642DF4EC3800744E83 /* CrosscodeDataLibrary */; };
 		2803A1852DF58DE700744E83 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 2803A1842DF58DE700744E83 /* Factory */; };
+		28A1C28B2DFB56580036ABFC /* CrosscodeDataLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 28A1C28A2DFB56580036ABFC /* CrosscodeDataLibrary */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -35,9 +36,32 @@
 		2803A0F52DF4E5DF00744E83 /* CrosscodeTCA2UIUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = CrosscodeTCA2UIUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		284FFA5C2DF77B3B001468E3 /* Exceptions for "CrosscodeTCA2UI" folder in "CrosscodeTCA2UI" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Features/EditLayout/Tests/EditLayoutTests.swift,
+				Features/LayoutsTab/Tests/LevelsTabTests.swift,
+			);
+			target = 2803A0DD2DF4E5DE00744E83 /* CrosscodeTCA2UI */;
+		};
+		284FFA5D2DF77B3B001468E3 /* Exceptions for "CrosscodeTCA2UI" folder in "CrosscodeTCA2UITests" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Features/EditLayout/Tests/EditLayoutTests.swift,
+				Features/LayoutsTab/Tests/LevelsTabTests.swift,
+			);
+			target = 2803A0EA2DF4E5DF00744E83 /* CrosscodeTCA2UITests */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		2803A0E02DF4E5DE00744E83 /* CrosscodeTCA2UI */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				284FFA5C2DF77B3B001468E3 /* Exceptions for "CrosscodeTCA2UI" folder in "CrosscodeTCA2UI" target */,
+				284FFA5D2DF77B3B001468E3 /* Exceptions for "CrosscodeTCA2UI" folder in "CrosscodeTCA2UITests" target */,
+			);
 			path = CrosscodeTCA2UI;
 			sourceTree = "<group>";
 		};
@@ -67,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				28A1C28B2DFB56580036ABFC /* CrosscodeDataLibrary in Frameworks */,
 				2803A1852DF58DE700744E83 /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -155,6 +180,7 @@
 			name = CrosscodeTCA2UITests;
 			packageProductDependencies = (
 				2803A1842DF58DE700744E83 /* Factory */,
+				28A1C28A2DFB56580036ABFC /* CrosscodeDataLibrary */,
 			);
 			productName = CrosscodeTCA2UITests;
 			productReference = 2803A0EB2DF4E5DF00744E83 /* CrosscodeTCA2UITests.xctest */;
@@ -190,8 +216,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
+				KnownAssetTags = (
+					New,
+					"New-1",
+				);
 				LastSwiftUpdateCheck = 1630;
-				LastUpgradeCheck = 1630;
+				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					2803A0DD2DF4E5DE00744E83 = {
 						CreatedOnToolsVersion = 16.3;
@@ -352,6 +382,7 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -409,6 +440,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				VALIDATE_PRODUCT = YES;
 			};
@@ -616,6 +648,10 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2803A1832DF58DE700744E83 /* XCRemoteSwiftPackageReference "Factory" */;
 			productName = Factory;
+		};
+		28A1C28A2DFB56580036ABFC /* CrosscodeDataLibrary */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = CrosscodeDataLibrary;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

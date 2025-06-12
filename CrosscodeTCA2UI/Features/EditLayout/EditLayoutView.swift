@@ -63,28 +63,28 @@ struct EditLayoutView: View {
     }
 
     private func crosswordView(geometry: GeometryProxy) -> some View {
-        WithViewStore(store, observe: { $0 }) { viewStore in
-            if let layout = viewStore.layout {
-                return AnyView(
-                    CrosswordView(
-                        grid: layout.crossword,
-                        viewMode: .actualValue,
-                        letterValues: layout.letterMap,
-                        attemptedletterValues: nil
-                    ) { _ in }
-                        .frame(
-                            width: Layout.crosswordSize(geometry),
-                            height: Layout.crosswordSize(geometry)
-                        )
-                        .clipShape(RoundedRectangle(cornerRadius: Layout.cornerRadius))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: Layout.cornerRadius)
-                                .stroke(Color.gray, lineWidth: 2)
-                        )
-                        .shadow(radius: 5)
+        WithViewStore(store, observe: { $0.layout }) { layoutStore in
+            if let layout = layoutStore.state {
+                CrosswordView(
+                    grid: layout.crossword,
+                    viewMode: .actualValue,
+                    letterValues: layout.letterMap,
+                    attemptedletterValues: nil
+                ) { cell in
+                    layoutStore.send(.toggle(cell))
+                }
+                .frame(
+                    width: Layout.crosswordSize(geometry),
+                    height: Layout.crosswordSize(geometry)
                 )
+                .clipShape(RoundedRectangle(cornerRadius: Layout.cornerRadius))
+                .overlay(
+                    RoundedRectangle(cornerRadius: Layout.cornerRadius)
+                        .stroke(Color.gray, lineWidth: 2)
+                )
+                .shadow(radius: 5)
             } else {
-                return AnyView(EmptyView())
+                EmptyView()
             }
         }
     }

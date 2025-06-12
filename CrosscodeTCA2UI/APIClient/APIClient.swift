@@ -7,12 +7,13 @@ struct APIClient {
 
 extension APIClient: DependencyKey {
     static let liveValue = Self(
-      layoutsAPI: //MockLayoutsAPI()
+      layoutsAPI:
+//        MockLayoutsAPI(levels: [Layout.mock])
       LayoutsAPIImpl()
     )
     
     static let mock = Self (
-        layoutsAPI: MockLayoutsAPI()
+        layoutsAPI: MockLayoutsAPI(levels: [Layout.mock])
     )
 }
 

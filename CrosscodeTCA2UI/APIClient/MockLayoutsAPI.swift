@@ -2,21 +2,18 @@ import Dependencies
 import Foundation
 import CrosscodeDataLibrary
 
-
-//protocol LayoutsAPI {
-//    func fetchAllLevels() async throws -> [any Level]
-//    func addNewLayout() async throws
-//    func importLevels() async throws
-//    func fetchLevel(id: UUID) async throws -> (any Level)?
-//}
-//
 class MockLayoutsAPI: LayoutsAPI {
     @Dependency(\.uuid) var uuid
     
     var levels: [any Level] = []
     
-    init() {
-        levels = [Layout.mock()]
+    init(levels: [any Level]) {
+//        if let levels {
+            self.levels = levels
+//        }
+//        else {
+//            self.levels = [Layout.mock]
+//        }
     }
     
     func populateCrossword(crosswordLayout: String) async throws -> (String, String) {
@@ -69,13 +66,24 @@ class MockLayoutsAPI: LayoutsAPI {
 }
 
 extension Layout {
-    static func mock() -> Layout {
+    static var mock: Layout { get {
+        @Dependency(\.uuid) var uuid
+        
+        return Layout(
+            id: uuid(),
+            number: 1,
+            gridText:"    .    .. ...| ..  .. ... . .| .. ... ...    |    ..    ... .|. .  ... .... .|. ....   .... .|       .      .|...... . ......|.      .       |. ....   .... .|. .... ...  . .|. ...    ..    |    ... ... .. |. . ... ..  .. |... ..    .    |"
+            
+        )
+    }}
+    
+    static func shortMock() -> Layout {
         @Dependency(\.uuid) var uuid
 
         return Layout(
             id: uuid(),
             number: 1,
-            gridText:"    .    .. ...| ..  .. ... . .| .. ... ...    |    ..    ... .|. .  ... .... .|. ....   .... .|       .      .|...... . ......|.      .       |. ....   .... .|. .... ...  . .|. ...    ..    |    ... ... .. |. . ... ..  .. |... ..    .    |"
+            gridText:". | .|"
             
         )
     }
