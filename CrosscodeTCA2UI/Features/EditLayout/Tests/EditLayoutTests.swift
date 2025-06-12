@@ -70,19 +70,15 @@ struct EditLayoutTests {
         
         let cellID = (state.layout?.crossword[0,0].id)!
         
-        await store.send(EditLayoutFeature.Action.toggle(cellID))
+        await store.send(EditLayoutFeature.Action.toggle(cellID)) {
+            $0.layout!.crossword[0,0].letter = " "
+            $0.layout?.crossword[2,2].letter = " "
+        }
         
-        // Top left and bottom right should toggle on.
-        await #expect(store.state.layout?.crossword[0,0].letter == " ")
-        await #expect(store.state.layout?.crossword[1,1].letter == nil)
-        await #expect(store.state.layout?.crossword[2,2].letter == " ")
-
-        await store.send(EditLayoutFeature.Action.toggle(cellID))
-
-        // Top left and bottom right should toggle back off.
-        await #expect(store.state.layout?.crossword[0,0].letter == nil)
-        await #expect(store.state.layout?.crossword[1,1].letter == nil)
-        await #expect(store.state.layout?.crossword[2,2].letter == nil)
+        await store.send(EditLayoutFeature.Action.toggle(cellID)) {
+            $0.layout!.crossword[0,0].letter = nil
+            $0.layout?.crossword[2,2].letter = nil
+        }
     }
 
 }

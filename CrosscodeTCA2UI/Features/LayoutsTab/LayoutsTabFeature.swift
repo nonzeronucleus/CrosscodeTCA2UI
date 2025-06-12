@@ -9,6 +9,7 @@ struct LayoutsTabFeature {
     @ObservableState
     struct State: Equatable {
         var layouts: [Layout] = []
+//        var layouts: IdentifiedArrayOf<Layout> = []
         @Presents var editLayout: EditLayoutFeature.State?
         var error: EquatableError?
     }
@@ -72,6 +73,10 @@ struct LayoutsTabFeature {
                 case .deleteLayout(let subAction):
                     return handleDelete(&state, action: subAction)
                     
+                case .editLayout(.dismiss):
+                    debugPrint("Edit layout dismissed \(String(describing: state.editLayout?.layoutID))")
+                    return .none
+                    
                 case .editLayout(_):
                     return .none
             }
@@ -126,6 +131,7 @@ extension LayoutsTabFeature {
                 return fetchAll(&state)
                 
             case .success(let layouts):
+//                state.layouts = IdentifiedArray(uniqueElements: layouts)
                 state.layouts = layouts
                 return .none
         }

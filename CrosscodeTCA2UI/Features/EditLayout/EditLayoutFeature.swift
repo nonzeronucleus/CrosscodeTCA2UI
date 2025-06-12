@@ -14,7 +14,6 @@ struct EditLayoutFeature {
         var layout: Layout?
         var isBusy = false
         var isPopulated: Bool = false
-        var debug: String?
         var error: EquatableError?
     }
 
@@ -93,29 +92,6 @@ extension EditLayoutFeature {
 }
 
 
-//func handleToggle(_ state: inout EditLayoutFeature.State, id:UUID) -> Effect<EditLayoutFeature.Action> {
-//    if state.isPopulated { return .none } // Don't allow the squares to be clicked while the grid's been populated
-//
-//    guard var level = state.layout else { return .none }
-//
-//    if let location = level.crossword.locationOfElement(byID: id ) {
-//        level.crossword.updateElement(byPos: location) { cell in
-//            cell.toggle()
-//        }
-//        let opposite = Pos(row: level.crossword.columns - 1 - location.row, column: level.crossword.rows - 1 - location.column)
-//        
-//        if opposite != location {
-//            level.crossword.updateElement(byPos: opposite) { cell in
-//                cell.toggle()
-//            }
-//        }
-//    }
-//    
-//    state.layout = level
-//    
-//    return .none
-//}
-
 func handleToggle(_ state: inout EditLayoutFeature.State, id: UUID) -> Effect<EditLayoutFeature.Action> {
     guard !state.isPopulated, let level = state.layout,
           let location = level.crossword.locationOfElement(byID: id) else {
@@ -136,7 +112,6 @@ func handleToggle(_ state: inout EditLayoutFeature.State, id: UUID) -> Effect<Ed
     }
     
     state.layout = level.withUpdatedCrossword(crossword)
-    state.debug = state.layout?.gridText
     return .none
 }
 
