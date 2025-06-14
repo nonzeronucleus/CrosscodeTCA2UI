@@ -35,7 +35,9 @@ struct EditLayoutFeature {
             switch action {
                 case .backButtonTapped:
                     if isPresented {
-                        return .run { _ in await dismiss() }
+                        debugPrint("Running")
+//                        return .run { _ in await dismiss() }
+                        return .none
                     } else {
                         return .none
                     }

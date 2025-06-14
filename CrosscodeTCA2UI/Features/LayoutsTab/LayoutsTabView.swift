@@ -3,7 +3,7 @@ import ComposableArchitecture
 import CrosscodeDataLibrary
 
 struct LayoutsTabView: View {
-    let store: StoreOf<LayoutsTabFeature>
+    @Bindable var store: StoreOf<LayoutsTabFeature>
     
     var body: some View {
         WithViewStore(store, observe: \.layouts) { viewStore in
@@ -32,32 +32,96 @@ struct LayoutsTabView: View {
             }
         }
         .fullScreenCover(
-            store: store.scope(state: \.$editLayout, action: \.editLayout)
+            item: $store.scope(state: \.editLayout, action: \.editLayout)
         ) { editStore in
             EditLayoutView(store: editStore)
+//            CoverView(store: coverStore)
         }
+//        .fullScreenCover(
+//            store: store.scope(state: \.$editLayout, action: \.editLayout)
+//        ) { editStore in
+//            EditLayoutView(store: editStore)
+//                .presentationBackground(LinearGradient(
+//                    gradient: Gradient(colors: [.purple.opacity(1.0), .blue.opacity(1.0)]),
+//                                    startPoint: .topLeading,
+//                                    endPoint: .bottomTrailing
+//                                ))
+//        }
     }
 }
 
-#Preview {
-    let mock:APIClient = withDependencies {
-        $0.uuid = UUIDGenerator.incrementing
-    } operation: {
-        .mock
-    }
+//struct LayoutsTabView: View {
+//    let store: StoreOf<LayoutsTabFeature>
+//    
+//    var body: some View {
+//        WithViewStore(store, observe: { $0 }) { viewStore in
+//            ZStack {
+//                // Main content
+//                VStack {
+//                    List {
+//                        ForEach(viewStore.layouts, id: \.id) { layout in
+//                            Button {
+//                                viewStore.send(.itemSelected(layout.id))
+//                            } label: {
+//                                Text(layout.name)
+//                                    .frame(maxWidth: .infinity, alignment: .leading)
+//                                    .contentShape(Rectangle())
+//                            }
+//                            .swipeActions(edge: .trailing) {
+//                                Button(role: .destructive) {
+//                                    viewStore.send(.deleteButtonPressed(layout.id))
+//                                } label: {
+//                                    Label("Delete", systemImage: "trash")
+//                                }
+//                            }
+//                        }
+//                    }
+//                }
+//                .onAppear { viewStore.send(.pageLoaded) }
+//                
+//                // Custom presentation
+//                IfLetStore(
+//                    store.scope(
+//                        state: \.$editLayout,
+//                        action: \.editLayout
+//                    )
+//                ) { editStore in
+//                    EditLayoutView(store: editStore)
+//                        .transition(.move(edge: .trailing))
+//                        .zIndex(1)
+//                }
+//            }
+//            .animation(.default, value: viewStore.editLayout)
+//        }
+//    }
+//}
+//
+//#Preview {
+//    let mock:APIClient = withDependencies {
+//        $0.uuid = UUIDGenerator.incrementing
+//    } operation: {
+//        .mock
+//    }
+//
+//    let store = Store(initialState: .init()) {
+//        LayoutsTabFeature()
+//    } withDependencies: {
+//        $0.uuid = .incrementing
+//        $0.apiClient = mock
+//    }
+//    
+//    LayoutsTabView(store: store)
+//}
 
-    let store = Store(initialState: .init()) {
-        LayoutsTabFeature()
-    } withDependencies: {
-        $0.uuid = .incrementing
-        $0.apiClient = mock
+
+extension AnyTransition {
+    static var slideInOut: AnyTransition {
+        .asymmetric(
+            insertion: .move(edge: .trailing),
+            removal: .move(edge: .trailing)
+        )
     }
-    
-    LayoutsTabView(store: store)
 }
-
-
-
 
 //        .alert("Delete Layout",
 //               isPresented: $showDeleteAlert,

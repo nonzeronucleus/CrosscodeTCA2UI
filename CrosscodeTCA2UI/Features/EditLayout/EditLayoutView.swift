@@ -4,6 +4,8 @@ import CrosscodeDataLibrary
 
 struct EditLayoutView: View {
     let store: StoreOf<EditLayoutFeature>
+    @Environment(\.dismiss) private var dismiss
+
 
     var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
@@ -15,7 +17,8 @@ struct EditLayoutView: View {
                         // Top bar with back button
                         HStack {
                             Button(action: {
-                                viewStore.send(.backButtonTapped)
+                                store.send(.backButtonTapped)
+                                dismiss()  
                             }) {
                                 Image(systemName: "chevron.left")
                                     .foregroundColor(.black)
@@ -113,12 +116,14 @@ struct EditLayoutView: View {
     }
 
     private var backgroundGradient: some View {
-        LinearGradient(
-            gradient: Gradient(colors: [.purple.opacity(0.2), .blue.opacity(0.2)]),
-            startPoint: .topLeading,
-            endPoint: .bottomTrailing
-        )
-        .edgesIgnoringSafeArea(.all)
+        ZStack {
+            LinearGradient(
+                gradient: Gradient(colors: [.purple.opacity(0.2), .blue.opacity(0.2)]),
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+            .edgesIgnoringSafeArea(.all)
+        }
     }
 }
 

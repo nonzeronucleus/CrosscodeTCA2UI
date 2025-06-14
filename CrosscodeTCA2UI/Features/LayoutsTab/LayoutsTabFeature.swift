@@ -8,8 +8,7 @@ struct LayoutsTabFeature {
 
     @ObservableState
     struct State: Equatable {
-        var layouts: [Layout] = []
-//        var layouts: IdentifiedArrayOf<Layout> = []
+        var layouts: IdentifiedArrayOf<Layout> = []
         @Presents var editLayout: EditLayoutFeature.State?
         var error: EquatableError?
     }
@@ -24,6 +23,7 @@ struct LayoutsTabFeature {
         case deleteLayout(DeleteLayout)
         case editLayout(PresentationAction<EditLayoutFeature.Action>)
         case failure(EquatableError)
+        case success
         
         enum AddLayout: Equatable {
             case start
@@ -74,10 +74,15 @@ struct LayoutsTabFeature {
                     return handleDelete(&state, action: subAction)
                     
                 case .editLayout(.dismiss):
-                    debugPrint("Edit layout dismissed \(String(describing: state.editLayout?.layoutID))")
+                    return handleEditDimsiss(&state)
+                case .editLayout(.presented(.backButtonTapped)):
+                    // Don't nil out the state manually!
                     return .none
                     
                 case .editLayout(_):
+                    return .none
+                    
+                case .success:
                     return .none
             }
         }
@@ -85,6 +90,30 @@ struct LayoutsTabFeature {
             EditLayoutFeature()
         }
     }
+}
+
+func handleEditDimsiss(_ state: inout LayoutsTabFeature.State) -> Effect<LayoutsTabFeature.Action> {
+    @Dependency(\.apiClient) var apiClient
+    guard let editLayout = state.editLayout else { return .none }
+    guard let layout = editLayout.layout else { return .none }
+    
+    state.layouts[id: editLayout.layoutID] = layout
+    
+    return .run { send in
+        do {
+            try await apiClient.layoutsAPI.saveLevel(level: layout)
+            
+            await send(.success)
+            
+            //            await send(.fetchAll(.success(result)))
+        }
+        catch {
+            await send(.failure(EquatableError(error)))
+        }
+    }
+
+    
+//    return .none
 }
 
 
@@ -131,8 +160,8 @@ extension LayoutsTabFeature {
                 return fetchAll(&state)
                 
             case .success(let layouts):
-//                state.layouts = IdentifiedArray(uniqueElements: layouts)
-                state.layouts = layouts
+                state.layouts = IdentifiedArray(uniqueElements: layouts)
+//                state.layouts = layouts
                 return .none
         }
     }
