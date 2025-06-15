@@ -75,6 +75,7 @@ struct LayoutsTabFeature {
                     
                 case .editLayout(.dismiss):
                     return handleEditDimsiss(&state)
+                    
                 case .editLayout(.presented(.backButtonTapped)):
                     // Don't nil out the state manually!
                     return .none

@@ -29,7 +29,7 @@ struct LevelsListTests {
             await #expect(store.state.layouts.count == 0)
 
             await store.send(LayoutsTabFeature.Action.fetchAll(.success(layouts))) {
-                $0.layouts = layouts
+                $0.layouts = IdentifiedArray(uniqueElements: layouts)
             }
             
             await #expect(store.state.layouts.count == 1)
@@ -74,7 +74,7 @@ struct LevelsListTests {
             await store.send(LayoutsTabFeature.Action.fetchAll(.start))
             
             await store.receive(LayoutsTabFeature.Action.fetchAll(.success(layouts))) {
-                $0.layouts = layouts
+                $0.layouts = IdentifiedArray(uniqueElements: layouts)
             }
 
             await #expect(store.state.layouts.count == 1)

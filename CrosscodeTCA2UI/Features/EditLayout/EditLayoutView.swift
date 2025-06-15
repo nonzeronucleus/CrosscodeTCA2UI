@@ -4,8 +4,6 @@ import CrosscodeDataLibrary
 
 struct EditLayoutView: View {
     let store: StoreOf<EditLayoutFeature>
-    @Environment(\.dismiss) private var dismiss
-
 
     var body: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
@@ -18,7 +16,6 @@ struct EditLayoutView: View {
                         HStack {
                             Button(action: {
                                 store.send(.backButtonTapped)
-                                dismiss()  
                             }) {
                                 Image(systemName: "chevron.left")
                                     .foregroundColor(.black)
@@ -37,7 +34,7 @@ struct EditLayoutView: View {
                         VStack(spacing: 0) {
                             Spacer(minLength: 0)
                             actionButtons
-                                .frame(height: Layout.buttonHeight)
+                                .frame(height: ViewStyle.buttonHeight)
                                 .padding(.bottom, 20)
                         }
                         .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 120 : 10)
@@ -74,15 +71,15 @@ struct EditLayoutView: View {
                     letterValues: layout.letterMap,
                     attemptedletterValues: nil
                 ) { cell in
-                    layoutStore.send(.toggle(cell))
+                    layoutStore.send(.cell(.cellClicked(cell)))
                 }
                 .frame(
-                    width: Layout.crosswordSize(geometry),
-                    height: Layout.crosswordSize(geometry)
+                    width: ViewStyle.crosswordSize(geometry),
+                    height: ViewStyle.crosswordSize(geometry)
                 )
-                .clipShape(RoundedRectangle(cornerRadius: Layout.cornerRadius))
+                .clipShape(RoundedRectangle(cornerRadius: ViewStyle.cornerRadius))
                 .overlay(
-                    RoundedRectangle(cornerRadius: Layout.cornerRadius)
+                    RoundedRectangle(cornerRadius: ViewStyle.cornerRadius)
                         .stroke(Color.gray, lineWidth: 2)
                 )
                 .shadow(radius: 5)
@@ -94,7 +91,7 @@ struct EditLayoutView: View {
 
     private var actionButtons: some View {
         WithViewStore(store, observe: { $0 }) { viewStore in
-            HStack(spacing: Layout.buttonSpacing) {
+            HStack(spacing: ViewStyle.buttonSpacing) {
                 if viewStore.isPopulated {
                     Button("Export") {}
                         .buttonStyle(.borderedProminent)
@@ -106,7 +103,7 @@ struct EditLayoutView: View {
                         .tint(.red)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    Button("Populate") {}
+                    Button("Populate") {store.send(.populate(.buttonClicked))}
                         .buttonStyle(.borderedProminent)
                         .tint(.blue)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -128,7 +125,7 @@ struct EditLayoutView: View {
 }
 
 extension EditLayoutView {
-    private enum Layout {
+    private enum ViewStyle {
         static func crosswordSize(_ geometry: GeometryProxy) -> CGFloat {
             UIDevice.current.userInterfaceIdiom == .pad ?
                 min(geometry.size.width * 0.8, geometry.size.height * 0.6) :
