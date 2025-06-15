@@ -23,24 +23,19 @@ struct EditLayoutFeature {
         
         case loadLayout(LoadLayoutReducer.Action)
         case populate(PopulationReducer.Action)
+        case depopulate(DepopulationReducer.Action)
         case cell(CellReducer.Action)
         case failure(EquatableError)
-//        case cellClicked(UUID)
     }
     
     var body: some Reducer<State, Action> {
-        Scope(state: \.self, action: \.populate) {
-            PopulationReducer()
-        }
         
-        Scope(state: \.self, action: \.loadLayout) {
-            LoadLayoutReducer()
-        }
+        Scope(state: \.self, action: \.loadLayout) { LoadLayoutReducer() }
+        Scope(state: \.self, action: \.cell) { CellReducer() }
+        Scope(state: \.self, action: \.populate) { PopulationReducer() }
+        Scope(state: \.self, action: \.depopulate) { DepopulationReducer() }
         
 
-        Scope(state: \.self, action: \.cell) {
-            CellReducer()
-        }
 
         
         Reduce { state, action in
@@ -59,19 +54,26 @@ struct EditLayoutFeature {
                 case .failure(let error):
                     return handleError(&state, error: error)
                     
-                case .populate(.failure(let error)):
-                    return handleError(&state, error: error)
-
-                case .populate(_):
-                    return .none
-
+                    // Mark - Loading
                 case .loadLayout(.failure(let error)):
                     return handleError(&state, error: error)
-
                 case .loadLayout(_):
                     return .none
                     
+                    // Mark - Cell
                 case .cell(_):
+                    return .none
+                    
+                    // Mark - Population
+                case .populate(.failure(let error)):
+                    return handleError(&state, error: error)
+                case .populate(_):
+                    return .none
+                    
+                    //Mark - Depopulation
+                case .depopulate(.failure(let error)):
+                    return handleError(&state, error: error)
+                case .depopulate(_):
                     return .none
             }
         }

@@ -98,7 +98,7 @@ struct EditLayoutView: View {
                         .tint(.green)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                    Button("Clear") {}
+                    Button("Clear") {store.send(.depopulate(.buttonClicked))}
                         .buttonStyle(.borderedProminent)
                         .tint(.red)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
