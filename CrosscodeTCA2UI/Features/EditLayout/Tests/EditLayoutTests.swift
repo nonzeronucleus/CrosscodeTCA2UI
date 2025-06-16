@@ -69,16 +69,14 @@ struct EditLayoutTests {
         await #expect(store.state.layout?.crossword[2,2].letter == nil)
         
         let cellID = (state.layout?.crossword[0,0].id)!
-        
-        await store.send(EditLayoutFeature.Action.cellClicked(cellID)) {
+        await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellID))) {
             $0.layout!.crossword[0,0].letter = " "
             $0.layout?.crossword[2,2].letter = " "
         }
         
-        await store.send(EditLayoutFeature.Action.cellClicked(cellID)) {
+        await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellID))) {
             $0.layout!.crossword[0,0].letter = nil
             $0.layout?.crossword[2,2].letter = nil
         }
     }
-
 }
