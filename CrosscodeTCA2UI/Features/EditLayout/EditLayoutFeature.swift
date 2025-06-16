@@ -14,6 +14,7 @@ struct EditLayoutFeature {
         var layout: Layout?
         var isBusy = false
         var isPopulated: Bool = false
+        var isExiting: Bool = false
         var error: EquatableError?
     }
 
@@ -22,6 +23,7 @@ struct EditLayoutFeature {
         case backButtonTapped
         
         case loadLayout(LoadLayoutReducer.Action)
+        case saveLayout(SaveLayoutReducer.Action)
         case populate(PopulationReducer.Action)
         case depopulate(DepopulationReducer.Action)
         case cell(CellReducer.Action)
@@ -31,20 +33,20 @@ struct EditLayoutFeature {
     var body: some Reducer<State, Action> {
         
         Scope(state: \.self, action: \.loadLayout) { LoadLayoutReducer() }
+        Scope(state: \.self, action: \.saveLayout) { SaveLayoutReducer() }
         Scope(state: \.self, action: \.cell) { CellReducer() }
         Scope(state: \.self, action: \.populate) { PopulationReducer() }
         Scope(state: \.self, action: \.depopulate) { DepopulationReducer() }
-        
-
-
         
         Reduce { state, action in
             switch action {
                 case .backButtonTapped:
                     if isPresented {
-                        return .run { _ in
-                            await dismiss()
-                        }
+                        state.isExiting = true
+                        return .send(.saveLayout(.start))
+//                        return .run { _ in
+//                            await dismiss()
+//                        }
                     } else {
                         return .none
                     }
@@ -75,6 +77,21 @@ struct EditLayoutFeature {
                     return handleError(&state, error: error)
                 case .depopulate(_):
                     return .none
+
+                case .saveLayout(.success):
+                    if state.isExiting {
+                        return .run { _ in
+                            await dismiss()
+                        }
+                    } else {
+                        return .none
+                    }
+
+                case .saveLayout(.failure(let error)):
+                    state.isExiting = false
+                    return handleError(&state, error: error)
+                case .saveLayout(_):
+                    return .none
             }
         }
     }
@@ -86,32 +103,9 @@ struct EditLayoutFeature {
     }
 }
 
-func handleToggle(_ state: inout EditLayoutFeature.State, id: UUID) -> Effect<EditLayoutFeature.Action> {
-    guard !state.isPopulated, let level = state.layout,
-          let location = level.crossword.locationOfElement(byID: id) else {
-        return .none
-    }
-    
-    // Calculate opposite position first
-    let opposite = Pos(
-        row: level.crossword.columns - 1 - location.row,
-        column: level.crossword.rows - 1 - location.column
-    )
-    
-    // Minimize update calls
-    var crossword = level.crossword
-    crossword.updateElement(byPos: location) { $0.toggle() }
-    if opposite != location {
-        crossword.updateElement(byPos: opposite) { $0.toggle() }
-    }
-    
-    state.layout = level.withUpdatedCrossword(crossword)
-    return .none
-}
-
-
 
 public enum EditLayoutError: Error {
     case loadLayoutError
+    case saveLayoutError
     case handlePopulationError(_ text:String)
 }

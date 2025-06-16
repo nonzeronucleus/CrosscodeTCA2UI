@@ -3,27 +3,26 @@ import Foundation
 import CrosscodeDataLibrary
 
 @Reducer
-struct LoadLayoutReducer {
+struct SaveLayoutReducer {
     @Dependency(\.apiClient) var apiClient
     
     enum Action: Equatable {
-        case start(UUID)
-        case success(Layout)
+        case start
+        case success
         case failure(EquatableError)
     }
     
     var body: some Reducer<EditLayoutFeature.State, Action> {
         Reduce { state, action in
             switch action {
-                case .start(let id):
+                case .start:
                     state.isBusy = true
-                    return loadLayout(&state, id:id)
+                    return saveLayout(&state)
                     
-                case .success(let layout):
-                    state.layout = layout
+                case .success:
                     state.isBusy = false
                     return .none
-
+                    
                 case .failure(let error):
                     debugPrint(error)
                     return .none
@@ -31,21 +30,24 @@ struct LoadLayoutReducer {
         }
     }
     
-    private func loadLayout(_ state: inout EditLayoutFeature.State, id:UUID) -> Effect<Action> {
-        return .run { send in
+    private func saveLayout(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
+        guard let layout = state.layout else {
+            return .run { send in
+                await send (.failure(EquatableError(EditLayoutError.saveLayoutError)))
+            }
+        }
+        
+        return .run {  send in
             do {
-                let result = try await apiClient.layoutsAPI.fetchLevel(id: id)
                 
-                if let result = result as? Layout {
-                    await send(.success(result))
-                }
-                else {
-                    await send(.failure(EquatableError(EditLayoutError.loadLayoutError)))
-                }
+                try await apiClient.layoutsAPI.saveLevel(level: layout)
+                
+                await send(.success)
             }
             catch {
                 await send(.failure(EquatableError(error)))
             }
         }
+        
     }
 }

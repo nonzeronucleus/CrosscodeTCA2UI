@@ -74,10 +74,11 @@ struct LayoutsTabFeature {
                     return handleDelete(&state, action: subAction)
                     
                 case .editLayout(.dismiss):
-                    return handleEditDimsiss(&state)
-                    
-                case .editLayout(.presented(.backButtonTapped)):
-                    // Don't nil out the state manually!
+                    // Update item in list with new layout after editing
+                    guard let editLayout = state.editLayout else { return .none }
+                    guard let layout = editLayout.layout else { return .none }
+
+                    state.layouts[id: editLayout.layoutID] = layout
                     return .none
                     
                 case .editLayout(_):
@@ -92,31 +93,6 @@ struct LayoutsTabFeature {
         }
     }
 }
-
-func handleEditDimsiss(_ state: inout LayoutsTabFeature.State) -> Effect<LayoutsTabFeature.Action> {
-    @Dependency(\.apiClient) var apiClient
-    guard let editLayout = state.editLayout else { return .none }
-    guard let layout = editLayout.layout else { return .none }
-    
-    state.layouts[id: editLayout.layoutID] = layout
-    
-    return .run { send in
-        do {
-            try await apiClient.layoutsAPI.saveLevel(level: layout)
-            
-            await send(.success)
-            
-            //            await send(.fetchAll(.success(result)))
-        }
-        catch {
-            await send(.failure(EquatableError(error)))
-        }
-    }
-
-    
-//    return .none
-}
-
 
 // Add Layout
 
