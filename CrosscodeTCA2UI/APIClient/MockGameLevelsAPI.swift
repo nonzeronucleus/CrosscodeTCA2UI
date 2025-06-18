@@ -7,6 +7,10 @@ class MockGameLevelsAPI: GameLevelsAPI {
     @Dependency(\.uuid) var uuid
     
     var levels: IdentifiedArrayOf<GameLevel> = []
+    
+    init(levels: [GameLevel] = []) {
+        self.levels = IdentifiedArray(uniqueElements: levels)
+    }
 
     func addNewLevel(layout: Layout) async throws {
         levels[id: layout.id] = GameLevel(layout:layout, id: layout.id, number: levels.count)
@@ -40,3 +44,22 @@ class MockGameLevelsAPI: GameLevelsAPI {
         fatalError("\(#function) not implemented")
     }
 }
+
+//extension GameLevel {
+//    
+//    static let shortMock: GameLevel = GameLevel(layout: Layout(
+//                                    id: UUID(0),
+//                                    number: 1,
+//                                    gridText:". | .|"
+//        ), id: UUID(0), number: 1)
+//    
+//    static let longMock = GameLevel(layout: Layout(
+//                                    id: UUID(1),
+//                                    number: 1,
+//                                    gridText:". .| ..|   |"
+//        ), id: UUID(1), number: 2)
+//    
+//    
+//    static var mocks: [GameLevel] = [shortMock, shortMock]
+//
+//}

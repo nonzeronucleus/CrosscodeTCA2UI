@@ -16,7 +16,7 @@ struct EditLayoutTests {
         
         let mockAPI:APIClient =  APIClient(
             layoutsAPI: MockLayoutsAPI(levels: [mockLayout]),
-            gameLevelsAPI: MockGameLevelsAPI()
+            gameLevelsAPI: MockGameLevelsAPI(/*levels: GameLevel.mocks*/)
         )
         
         let store = await TestStore(

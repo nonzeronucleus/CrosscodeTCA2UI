@@ -44,9 +44,6 @@ struct EditLayoutFeature {
                     if isPresented {
                         state.isExiting = true
                         return .send(.saveLayout(.start))
-//                        return .run { _ in
-//                            await dismiss()
-//                        }
                     } else {
                         return .none
                     }

@@ -15,7 +15,7 @@ struct SaveLayoutTests {
         
         let mockAPI:APIClient =  APIClient(
             layoutsAPI: MockLayoutsAPI(levels: [mockLayout]),
-            gameLevelsAPI: MockGameLevelsAPI()
+            gameLevelsAPI: MockGameLevelsAPI(levels:[])
         )
         
         let store = await TestStore(
@@ -45,7 +45,7 @@ struct SaveLayoutTests {
         
         let mockAPI:APIClient =  APIClient(
             layoutsAPI: MockLayoutsAPI(levels: [mockLayout]),
-            gameLevelsAPI: MockGameLevelsAPI()
+            gameLevelsAPI: MockGameLevelsAPI(levels:[])
         )
         
         let store = await TestStore(
@@ -73,7 +73,7 @@ struct SaveLayoutTests {
             .singleton
         
         let mockLayout = Layout.mock
-        let mockGameLevelsAPI:MockGameLevelsAPI = MockGameLevelsAPI()
+        let mockGameLevelsAPI:MockGameLevelsAPI = MockGameLevelsAPI(levels:[])
         
         let mockAPI:APIClient =  APIClient(
             layoutsAPI: MockLayoutsAPI(levels: [mockLayout]),

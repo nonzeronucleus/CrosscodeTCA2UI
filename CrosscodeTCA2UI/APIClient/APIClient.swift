@@ -15,7 +15,7 @@ extension APIClient: DependencyKey {
     
     static let mock = Self (
         layoutsAPI: MockLayoutsAPI(levels: [Layout.mock]),
-        gameLevelsAPI: MockGameLevelsAPI()
+        gameLevelsAPI: MockGameLevelsAPI(/*levels: GameLevel.mocks*/)
     )
 }
 
