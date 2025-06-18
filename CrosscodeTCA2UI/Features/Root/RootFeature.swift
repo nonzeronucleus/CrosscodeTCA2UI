@@ -9,11 +9,13 @@ struct RootFeature {
     @ObservableState
     struct State: Equatable {
         var layoutsList =  LayoutsTabFeature.State()
-        var tab: NavTab = .edit
+        var gameLevelsList =  GameLevelsTabFeature.State()
+        var tab: NavTab = .play
     }
     
     enum Action: Equatable {
         case layoutsListAction(LayoutsTabFeature.Action)
+        case gameLevelsListAction(GameLevelsTabFeature.Action)
         case setTab(NavTab)
     }
     
@@ -25,15 +27,13 @@ struct RootFeature {
                     return .none
                 case .layoutsListAction(_):
                     return .none
+                case .gameLevelsListAction(_):
+                    return .none
             }
         }
         
-        Scope(
-            state: \.layoutsList,
-            action: \.layoutsListAction
-        ) {
-            LayoutsTabFeature()
-        }        
+        Scope(state: \.layoutsList,action: \.layoutsListAction) {LayoutsTabFeature()}
+        Scope(state: \.gameLevelsList,action: \.gameLevelsListAction) {GameLevelsTabFeature()}
     }
 }
 

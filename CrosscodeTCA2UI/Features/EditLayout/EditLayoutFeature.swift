@@ -106,6 +106,6 @@ struct EditLayoutFeature {
 
 public enum EditLayoutError: Error {
     case loadLayoutError
-    case saveLayoutError
+    case saveLayoutError(_ text:String)
     case handlePopulationError(_ text:String)
 }

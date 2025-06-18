@@ -17,6 +17,9 @@ struct SaveLayoutReducer {
             switch action {
                 case .start:
                     state.isBusy = true
+                    if state.isPopulated {
+                        return addLevel(&state)
+                    }
                     return saveLayout(&state)
                     
                 case .success:
@@ -24,6 +27,7 @@ struct SaveLayoutReducer {
                     return .none
                     
                 case .failure(let error):
+                    state.isBusy = false
                     debugPrint(error)
                     return .none
             }
@@ -31,14 +35,11 @@ struct SaveLayoutReducer {
     }
     
     private func saveLayout(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
-        guard let layout = state.layout else {
-            return .run { send in
-                await send (.failure(EquatableError(EditLayoutError.saveLayoutError)))
-            }
-        }
+        let layout = state.layout
         
         return .run {  send in
             do {
+                guard let layout = layout else { throw EditLayoutError.saveLayoutError("No layout found in save level") }
                 
                 try await apiClient.layoutsAPI.saveLevel(level: layout)
                 
@@ -48,6 +49,22 @@ struct SaveLayoutReducer {
                 await send(.failure(EquatableError(error)))
             }
         }
+    }
+    
+    private func addLevel(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
+        let layout = state.layout
         
+        return .run {  send in
+            do {
+                guard let layout = layout else { throw EquatableError(EditLayoutError.saveLayoutError("No layout found in add level")) }
+                
+                try await apiClient.gameLevelsAPI.addNewLevel(layout: layout)
+                
+                await send(.success)
+            }
+            catch {
+                await send(.failure(EquatableError(error)))
+            }
+        }
     }
 }

@@ -1,19 +1,15 @@
 import Dependencies
+import IdentifiedCollections
 import Foundation
 import CrosscodeDataLibrary
 
 class MockLayoutsAPI: LayoutsAPI {
     @Dependency(\.uuid) var uuid
     
-    var levels: [any Level] = []
+    var levels: IdentifiedArrayOf<Layout> = []
     
-    init(levels: [any Level]) {
-//        if let levels {
-            self.levels = levels
-//        }
-//        else {
-//            self.levels = [Layout.mock]
-//        }
+    init(levels: [Layout]) {
+        self.levels = IdentifiedArray(uniqueElements: levels)
     }
     
     func populateCrossword(crosswordLayout: String) async throws -> (String, String) {
@@ -45,7 +41,7 @@ class MockLayoutsAPI: LayoutsAPI {
     }
     
     func fetchAllLevels() async throws -> [any Level] {
-        return levels
+        return levels.elements
     }
     
     func deleteLevel(id: UUID) async throws {
@@ -53,7 +49,11 @@ class MockLayoutsAPI: LayoutsAPI {
     }
     
     func saveLevel(level: any Level) async throws {
-        fatalError("\(#function) not implemented")
+        guard let layout = level as? Layout else {
+            fatalError("\(#function) wrong type")
+        }
+        
+        levels[id: layout.id] = layout
     }
     
     func cancel() async {
@@ -67,10 +67,8 @@ class MockLayoutsAPI: LayoutsAPI {
 
 extension Layout {
     static var mock: Layout { get {
-        @Dependency(\.uuid) var uuid
-        
         return Layout(
-            id: uuid(),
+            id: UUID(0),
             number: 1,
             gridText:"    .    .. ...| ..  .. ... . .| .. ... ...    |    ..    ... .|. .  ... .... .|. ....   .... .|       .      .|...... . ......|.      .       |. ....   .... .|. .... ...  . .|. ...    ..    |    ... ... .. |. . ... ..  .. |... ..    .    |"
             
@@ -78,13 +76,11 @@ extension Layout {
     }}
     
     static func shortMock() -> Layout {
-        @Dependency(\.uuid) var uuid
-
         return Layout(
-            id: uuid(),
+            id: UUID(0),
             number: 1,
             gridText:". | .|"
-            
         )
     }
 }
+

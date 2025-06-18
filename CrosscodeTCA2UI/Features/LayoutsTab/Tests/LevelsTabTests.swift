@@ -67,7 +67,7 @@ struct LevelsListTests {
             
             guard let mockLayoutAPI = mock.layoutsAPI as? MockLayoutsAPI else { return }
             
-            mockLayoutAPI.levels = layouts
+            mockLayoutAPI.levels = IdentifiedArray(uniqueElements: layouts)
             
             await #expect(store.state.layouts.count == 0)
 

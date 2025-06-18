@@ -12,17 +12,12 @@ struct EditLayoutTests {
             .register { IncrementingUUIDProvider() }
             .singleton
         
-        let mockLayout = withDependencies {
-            $0.uuid = .incrementing
-        } operation: {
-            Layout.mock
-        }
+        let mockLayout = Layout.mock
         
-        let mockAPI:APIClient = withDependencies {
-            $0.uuid = .incrementing
-        } operation: {
-            APIClient(layoutsAPI: MockLayoutsAPI(levels: [mockLayout]))
-        }
+        let mockAPI:APIClient =  APIClient(
+            layoutsAPI: MockLayoutsAPI(levels: [mockLayout]),
+            gameLevelsAPI: MockGameLevelsAPI()
+        )
         
         let store = await TestStore(
             initialState: EditLayoutFeature.State(layoutID: UUID(0))
@@ -48,11 +43,8 @@ struct EditLayoutTests {
     @Test func testToggle() async throws {
         @Dependency(\.uuid) var uuid
         
-        let layout = withDependencies {
-            $0.uuid = .incrementing
-        } operation: {
-            Layout(id: uuid(), number: 1, gridText: "...|...|...|")
-        }
+        let layout = Layout(id: UUID(), number: 1, gridText: "...|...|...|")
+        
         
         let state = EditLayoutFeature.State(layoutID: layout.id, layout: layout)
         
