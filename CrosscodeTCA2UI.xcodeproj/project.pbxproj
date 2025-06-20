@@ -10,6 +10,8 @@
 		2803A1212DF4E63E00744E83 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 2803A1202DF4E63E00744E83 /* ComposableArchitecture */; };
 		2803A1652DF4EC3800744E83 /* CrosscodeDataLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 2803A1642DF4EC3800744E83 /* CrosscodeDataLibrary */; };
 		2803A1852DF58DE700744E83 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 2803A1842DF58DE700744E83 /* Factory */; };
+		288320A82E059A7A002E7E32 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 288320A72E059A7A002E7E32 /* Factory */; };
+		288320AA2E059A99002E7E32 /* Factory in Frameworks */ = {isa = PBXBuildFile; productRef = 288320A92E059A99002E7E32 /* Factory */; };
 		28A1C28B2DFB56580036ABFC /* CrosscodeDataLibrary in Frameworks */ = {isa = PBXBuildFile; productRef = 28A1C28A2DFB56580036ABFC /* CrosscodeDataLibrary */; };
 /* End PBXBuildFile section */
 
@@ -40,20 +42,26 @@
 		284FFA5C2DF77B3B001468E3 /* Exceptions for "CrosscodeTCA2UI" folder in "CrosscodeTCA2UI" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Features/EditLayout/Tests/EditLayoutCellReducerTests.swift,
+				Features/EditLayout/Tests/EditLayoutNavigationTest.swift,
 				Features/EditLayout/Tests/EditLayoutTests.swift,
 				Features/EditLayout/Tests/SaveLayoutTests.swift,
 				Features/GameLevelsTab/Tests/LoadGameLevelsTests.swift,
-				Features/LayoutsTab/Tests/LevelsTabTests.swift,
+				Features/LayoutsTab/Tests/LayoutsTabTests.swift,
+				Utils/SetupTestLib.swift,
 			);
 			target = 2803A0DD2DF4E5DE00744E83 /* CrosscodeTCA2UI */;
 		};
 		284FFA5D2DF77B3B001468E3 /* Exceptions for "CrosscodeTCA2UI" folder in "CrosscodeTCA2UITests" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				Features/EditLayout/Tests/EditLayoutCellReducerTests.swift,
+				Features/EditLayout/Tests/EditLayoutNavigationTest.swift,
 				Features/EditLayout/Tests/EditLayoutTests.swift,
 				Features/EditLayout/Tests/SaveLayoutTests.swift,
 				Features/GameLevelsTab/Tests/LoadGameLevelsTests.swift,
-				Features/LayoutsTab/Tests/LevelsTabTests.swift,
+				Features/LayoutsTab/Tests/LayoutsTabTests.swift,
+				Utils/SetupTestLib.swift,
 			);
 			target = 2803A0EA2DF4E5DF00744E83 /* CrosscodeTCA2UITests */;
 		};
@@ -86,6 +94,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				288320AA2E059A99002E7E32 /* Factory in Frameworks */,
 				2803A1652DF4EC3800744E83 /* CrosscodeDataLibrary in Frameworks */,
 				2803A1212DF4E63E00744E83 /* ComposableArchitecture in Frameworks */,
 			);
@@ -104,6 +113,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				288320A82E059A7A002E7E32 /* Factory in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -160,6 +170,7 @@
 			packageProductDependencies = (
 				2803A1202DF4E63E00744E83 /* ComposableArchitecture */,
 				2803A1642DF4EC3800744E83 /* CrosscodeDataLibrary */,
+				288320A92E059A99002E7E32 /* Factory */,
 			);
 			productName = CrosscodeTCA2UI;
 			productReference = 2803A0DE2DF4E5DE00744E83 /* CrosscodeTCA2UI.app */;
@@ -208,6 +219,7 @@
 			);
 			name = CrosscodeTCA2UIUITests;
 			packageProductDependencies = (
+				288320A72E059A7A002E7E32 /* Factory */,
 			);
 			productName = CrosscodeTCA2UIUITests;
 			productReference = 2803A0F52DF4E5DF00744E83 /* CrosscodeTCA2UIUITests.xctest */;
@@ -649,6 +661,16 @@
 			productName = CrosscodeDataLibrary;
 		};
 		2803A1842DF58DE700744E83 /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2803A1832DF58DE700744E83 /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
+		};
+		288320A72E059A7A002E7E32 /* Factory */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2803A1832DF58DE700744E83 /* XCRemoteSwiftPackageReference "Factory" */;
+			productName = Factory;
+		};
+		288320A92E059A99002E7E32 /* Factory */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 2803A1832DF58DE700744E83 /* XCRemoteSwiftPackageReference "Factory" */;
 			productName = Factory;

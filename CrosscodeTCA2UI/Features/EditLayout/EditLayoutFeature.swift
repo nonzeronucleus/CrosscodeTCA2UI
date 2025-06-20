@@ -26,7 +26,7 @@ struct EditLayoutFeature {
         case saveLayout(SaveLayoutReducer.Action)
         case populate(PopulationReducer.Action)
         case depopulate(DepopulationReducer.Action)
-        case cell(CellReducer.Action)
+        case cell(EditLayoutCellReducer.Action)
         case failure(EquatableError)
     }
     
@@ -34,7 +34,7 @@ struct EditLayoutFeature {
         
         Scope(state: \.self, action: \.loadLayout) { LoadLayoutReducer() }
         Scope(state: \.self, action: \.saveLayout) { SaveLayoutReducer() }
-        Scope(state: \.self, action: \.cell) { CellReducer() }
+        Scope(state: \.self, action: \.cell) { EditLayoutCellReducer() }
         Scope(state: \.self, action: \.populate) { PopulationReducer() }
         Scope(state: \.self, action: \.depopulate) { DepopulationReducer() }
         
@@ -43,6 +43,13 @@ struct EditLayoutFeature {
                 case .backButtonTapped:
                     if isPresented {
                         state.isExiting = true
+                        if state.isPopulated {
+                            return .run { _ in
+                                debugPrint("Need to implement handler for population exit here.")
+                                await dismiss()
+                            }
+                        }
+ 
                         return .send(.saveLayout(.start))
                     } else {
                         return .none
@@ -60,9 +67,12 @@ struct EditLayoutFeature {
                     return .none
                     
                     // Mark - Cell
-                case .cell(_):
+                case .cell(.failure(let error)):
+                    return handleError(&state, error: error)
+                case .cell(.cellClicked(_)):
                     return .none
-                    
+
+
                     // Mark - Population
                 case .populate(.failure(let error)):
                     return handleError(&state, error: error)

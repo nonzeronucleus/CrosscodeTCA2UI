@@ -10,8 +10,20 @@ struct CrosscodeTCA2UIApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView(store: store)
+            if isTesting {
+                Text(verbatim: "Testing")
+            }
+            else {
+                ContentView(store: store)
+            }
         }
+    }
+}
+
+
+extension ProcessInfo {
+    var isTesting: Bool {
+        environment["XCTestConfigurationFilePath"] != nil
     }
 }
 

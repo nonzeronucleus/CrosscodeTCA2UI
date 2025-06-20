@@ -4,14 +4,13 @@ import ComposableArchitecture
 import CrosscodeDataLibrary
 import Factory
 
-struct LevelsListTests {
+struct LayoutsTabTests {
 
 //    @MainActor
     @Test func testFetchAllSuccessReducer() async throws {
         await withDependencies {
             $0.uuid = .incrementing
         } operation: {
-            
             @Dependency(\.uuid) var uuid
             
             let store = await TestStore(
@@ -37,9 +36,8 @@ struct LevelsListTests {
     }
     
     @Test func testFetchAllEffectWithSuccess() async throws {
-        let _ = Container.shared.uuid
-            .register { IncrementingUUIDProvider() }
-            .singleton
+        setupTestLib(#function)
+        defer { tearDownTestLib(#function) }
 
         let mock:APIClient = withDependencies {
             $0.uuid = UUIDGenerator.incrementing
@@ -80,6 +78,5 @@ struct LevelsListTests {
             await #expect(store.state.layouts.count == 1)
         }
     }
-
-
 }
+

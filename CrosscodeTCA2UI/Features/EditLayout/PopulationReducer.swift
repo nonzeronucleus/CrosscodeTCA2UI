@@ -1,6 +1,7 @@
 import ComposableArchitecture
 import Foundation
 import CrosscodeDataLibrary
+import Factory
 
 @Reducer
 struct PopulationReducer {
@@ -16,6 +17,8 @@ struct PopulationReducer {
                 case .buttonClicked:
                     return handlePopulation(&state)
                 case .success(let layoutText, let charIntMap):
+                    @Injected(\.uuid) var uuid
+                    
                     state.layout?.crossword = Crossword(initString:layoutText)
                     state.layout?.letterMap = CharacterIntMap(from: charIntMap)
                     state.isPopulated = true

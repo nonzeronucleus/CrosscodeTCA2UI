@@ -7,10 +7,9 @@ import Factory
 struct SaveLayoutTests {
     
     @Test func testLayoutSaved() async throws {
-        let _ = Container.shared.uuid
-            .register { IncrementingUUIDProvider() }
-            .singleton
-        
+        setupTestLib(#function)
+        defer { tearDownTestLib(#function) }
+
         let mockLayout = Layout.mock
         
         let mockAPI:APIClient =  APIClient(
@@ -37,10 +36,9 @@ struct SaveLayoutTests {
     }
     
     @Test func testLayoutSaveErrorForNoLayout() async throws {
-        let _ = Container.shared.uuid
-            .register { IncrementingUUIDProvider() }
-            .singleton
-        
+        setupTestLib(#function)
+        defer { tearDownTestLib(#function) }
+
         let mockLayout = Layout.mock
         
         let mockAPI:APIClient =  APIClient(
@@ -68,10 +66,9 @@ struct SaveLayoutTests {
     
     @Test func tesPopulatedLayoutSaved() async throws {
         // Should create new game level
-        let _ = Container.shared.uuid
-            .register { IncrementingUUIDProvider() }
-            .singleton
-        
+        setupTestLib(#function)
+        defer { tearDownTestLib(#function) }
+
         let mockLayout = Layout.mock
         let mockGameLevelsAPI:MockGameLevelsAPI = MockGameLevelsAPI(levels:[])
         
@@ -99,8 +96,5 @@ struct SaveLayoutTests {
         
         #expect(mockGameLevelsAPI.levels.count == 1)
         #expect(mockGameLevelsAPI.levels[0].id == mockLayout.id)
-        
-
-//        await store.send(Load)
     }
 }

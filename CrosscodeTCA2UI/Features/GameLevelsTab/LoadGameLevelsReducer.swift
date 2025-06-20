@@ -20,9 +20,7 @@ struct LoadGameLevelsReducer {
                     return loadGameLevels(&state)
 
                 case .success(let levels):
-                    print("Loaded \(levels.count) levels")
                     state.levels = IdentifiedArray(uniqueElements: levels)
-                    
                     state.isBusy = false
                     return .none
 

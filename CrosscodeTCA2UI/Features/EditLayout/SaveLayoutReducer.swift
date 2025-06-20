@@ -27,9 +27,8 @@ struct SaveLayoutReducer {
                     state.isBusy = false
                     return .none
                     
-                case .failure(let error):
+                case .failure(_):
                     state.isBusy = false
-                    debugPrint(error)
                     return .none
             }
         }

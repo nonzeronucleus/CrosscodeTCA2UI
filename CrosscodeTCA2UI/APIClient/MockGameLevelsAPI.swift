@@ -45,21 +45,22 @@ class MockGameLevelsAPI: GameLevelsAPI {
     }
 }
 
-//extension GameLevel {
-//    
-//    static let shortMock: GameLevel = GameLevel(layout: Layout(
-//                                    id: UUID(0),
-//                                    number: 1,
-//                                    gridText:". | .|"
-//        ), id: UUID(0), number: 1)
-//    
-//    static let longMock = GameLevel(layout: Layout(
-//                                    id: UUID(1),
-//                                    number: 1,
-//                                    gridText:". .| ..|   |"
-//        ), id: UUID(1), number: 2)
-//    
-//    
-//    static var mocks: [GameLevel] = [shortMock, shortMock]
-//
-//}
+extension GameLevel {
+    static let shortMock: GameLevel = GameLevel(layout: Layout(
+                                    id: UUID(0),
+                                    number: 1,
+                                    gridText:". | .|"
+        ), id: UUID(0), number: 1)
+    
+    static let longMock = GameLevel(layout: Layout(
+                                    id: UUID(1),
+                                    number: 1,
+                                    gridText:". .| ..|   |"
+        ), id: UUID(1), number: 2)
+    
+    
+    static var mocks: [GameLevel] = [shortMock, longMock]
+
+}
+
+

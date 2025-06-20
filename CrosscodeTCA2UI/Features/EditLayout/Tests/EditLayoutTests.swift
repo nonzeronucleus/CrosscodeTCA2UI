@@ -8,10 +8,9 @@ struct EditLayoutTests {
     
     //    @MainActor
     @Test func testPageLoaded() async throws {
-        let _ = Container.shared.uuid
-            .register { IncrementingUUIDProvider() }
-            .singleton
-        
+        setupTestLib(#function)
+        defer { tearDownTestLib(#function) }
+
         let mockLayout = Layout.mock
         
         let mockAPI:APIClient =  APIClient(
