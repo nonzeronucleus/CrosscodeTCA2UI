@@ -13,6 +13,7 @@ struct EditLayoutFeature {
         var layoutID: UUID
         var layout: Layout?
         var isBusy = false
+        var isDirty = false
         var isPopulated: Bool = false
         var isExiting: Bool = false
         var error: EquatableError?
@@ -55,6 +56,7 @@ struct EditLayoutFeature {
                         return .none
                     }
                 case .pageLoaded:
+                    state.isDirty = false
                     return .send(.loadLayout(.start(state.layoutID)))
                     
                 case .failure(let error):

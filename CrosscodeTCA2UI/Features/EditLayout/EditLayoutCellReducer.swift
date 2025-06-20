@@ -40,6 +40,8 @@ struct EditLayoutCellReducer {
         }
         
         state.layout = level.withUpdatedCrossword(crossword)
+        state.isDirty = true
+
         return .none
     }
 }

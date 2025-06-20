@@ -22,6 +22,8 @@ struct LoadLayoutReducer {
                 case .success(let layout):
                     state.layout = layout
                     state.isBusy = false
+                    state.isDirty = false
+
                     return .none
 
                 case .failure(let error):

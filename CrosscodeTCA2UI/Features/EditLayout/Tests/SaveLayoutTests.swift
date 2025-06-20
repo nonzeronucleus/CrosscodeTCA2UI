@@ -18,7 +18,7 @@ struct SaveLayoutTests {
         )
         
         let store = await TestStore(
-            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: mockLayout)
+            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: mockLayout, isDirty: true)
         ) {
             SaveLayoutReducer()
         } withDependencies: {
@@ -32,6 +32,7 @@ struct SaveLayoutTests {
         
         await store.receive(SaveLayoutReducer.Action.success) {
             $0.isBusy = false
+            $0.isDirty = false
         }
     }
     
@@ -47,7 +48,7 @@ struct SaveLayoutTests {
         )
         
         let store = await TestStore(
-            initialState: EditLayoutFeature.State(layoutID: UUID(0))
+            initialState: EditLayoutFeature.State(layoutID: UUID(0), isDirty: true)
         ) {
             SaveLayoutReducer()
         } withDependencies: {
@@ -78,7 +79,7 @@ struct SaveLayoutTests {
         )
         
         let store = await TestStore(
-            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: mockLayout, isPopulated: true)
+            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: mockLayout, isDirty:true, isPopulated: true)
         ) {
             SaveLayoutReducer()
         } withDependencies: {
@@ -92,6 +93,7 @@ struct SaveLayoutTests {
         
         await store.receive(SaveLayoutReducer.Action.success) {
             $0.isBusy = false
+            $0.isDirty = false
         }
         
         #expect(mockGameLevelsAPI.levels.count == 1)

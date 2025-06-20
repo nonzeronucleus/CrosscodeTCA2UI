@@ -37,6 +37,7 @@ struct EditLayoutCellReducerTests {
         await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellUUID))) {
             $0.layout!.crossword[0,0].letter = nil
             $0.layout!.crossword[14,14].letter = nil
+            $0.isDirty = true
         }
         
         await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellUUID))) {

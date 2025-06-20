@@ -17,6 +17,11 @@ struct SaveLayoutReducer {
         Reduce { state, action in
             switch action {
                 case .start:
+                    if !state.isDirty { // Don't bother trying to save something that hasn't changed
+                        return .run {  send in
+                            await send(.success)
+                        }
+                    }
                     state.isBusy = true
                     if state.isPopulated {
                         return addLevel(&state)
@@ -25,6 +30,7 @@ struct SaveLayoutReducer {
                     
                 case .success:
                     state.isBusy = false
+                    state.isDirty = false
                     return .none
                     
                 case .failure(_):

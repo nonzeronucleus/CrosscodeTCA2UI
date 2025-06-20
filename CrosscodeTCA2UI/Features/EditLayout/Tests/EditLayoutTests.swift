@@ -63,6 +63,7 @@ struct EditLayoutTests {
         await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellID))) {
             $0.layout!.crossword[0,0].letter = " "
             $0.layout?.crossword[2,2].letter = " "
+            $0.isDirty = true
         }
         
         await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellID))) {

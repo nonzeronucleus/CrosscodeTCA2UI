@@ -22,6 +22,8 @@ struct PopulationReducer {
                     state.layout?.crossword = Crossword(initString:layoutText)
                     state.layout?.letterMap = CharacterIntMap(from: charIntMap)
                     state.isPopulated = true
+                    state.isDirty = true
+
                     return .none
                 case .failure(let error):
                     debugPrint(error)
