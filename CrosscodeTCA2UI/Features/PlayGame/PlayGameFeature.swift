@@ -33,7 +33,6 @@ struct PlayGameFeature {
     }
     
     var body: some Reducer<State, Action> {
-        
         Scope(state: \.self, action: \.loadGameLevel) { LoadGameLevelReducer() }
         
         Reduce { state, action in
@@ -49,8 +48,6 @@ struct PlayGameFeature {
                             debugPrint("Need to implement handler  here.")
                             await dismiss()
                         }
-                        
-                        //                        return .send(.saveLayout(.start))
                     } else {
                         return .none
                     }

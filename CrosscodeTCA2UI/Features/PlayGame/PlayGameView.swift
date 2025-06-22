@@ -68,7 +68,7 @@ struct PlayGameView: View {
     
     private var backButton: some View {
         Button(action: {
-//            dismiss()
+            store.send(.backButtonTapped)
         }) {
             Image(systemName: "chevron.backward.circle.fill")
                 .symbolRenderingMode(.hierarchical)

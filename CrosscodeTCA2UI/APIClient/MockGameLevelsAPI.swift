@@ -21,7 +21,7 @@ class MockGameLevelsAPI: GameLevelsAPI {
     }
     
     func fetchLevel(id: UUID) async throws -> (any Level)? {
-        fatalError("\(#function) not implemented")
+        return levels[id: id]
     }
     
     func fetchAllLevels() async throws -> [any Level] {
