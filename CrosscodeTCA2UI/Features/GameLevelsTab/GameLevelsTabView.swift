@@ -29,7 +29,7 @@ struct GameLevelsTabView: View {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 16)], spacing: 20) {
                         ForEach(store.levels) { level in
                             LevelCard(level: level) {
-//                                store.send(.didSelectLevel(level))
+                                store.send(.itemSelected(level.id))
                             }
                             .transition(.scale.combined(with: .opacity))
                         }
@@ -42,12 +42,11 @@ struct GameLevelsTabView: View {
         .onAppear {
             store.send(.pageLoaded)
         }
-
-//        .fullScreenCover(
-//            item: $store.scope(state: \.gameView, action: \.gameView)
-//        ) { store in
-//            PlayableLevelView(store: store)
-//        }
+        .fullScreenCover(
+            item: $store.scope(state: \.playGame, action: \.playGame)
+        ) { store in
+            PlayGameView(store: store)
+        }
     }
 }
 
