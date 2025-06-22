@@ -45,7 +45,6 @@ struct PlayGameFeature {
                     if isPresented {
                         state.isExiting = true
                         return .run { _ in
-                            debugPrint("Need to implement handler  here.")
                             await dismiss()
                         }
                     } else {

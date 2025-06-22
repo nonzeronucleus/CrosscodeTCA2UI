@@ -3,11 +3,6 @@ import ComposableArchitecture
 
 struct PlayGameView: View {
     let store: StoreOf<PlayGameFeature>
-//    @Environment(\.dismiss) var dismiss
-//    @Environment(\.horizontalSizeClass) private var horizontalSizeClass
-//    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
-//    @Dependency(\.preferences) var preferences
-
     
     var body: some View {
         GeometryReader { geometry in
@@ -38,9 +33,9 @@ struct PlayGameView: View {
                         Spacer(minLength: 0) // Will compress first
                         
                         // Keyboard
-//                        KeyboardView(store: store)
-//                            .frame(height: ViewStyle.keyboardHeight)
-//                            .padding(.bottom, 5) // Reduced spacing
+                        KeyboardView(store: store.scope(state: \.keyboard, action: \.keyboard))
+                            .frame(height: ViewStyle.keyboardHeight)
+                            .padding(.bottom, 5) // Reduced spacing
                         
                         Spacer(minLength: 0)
                         
