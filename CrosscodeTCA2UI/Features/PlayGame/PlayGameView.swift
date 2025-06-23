@@ -33,7 +33,7 @@ struct PlayGameView: View {
                         Spacer(minLength: 0) // Will compress first
                         
                         // Keyboard
-                        KeyboardView(store: store.scope(state: \.keyboard, action: \.keyboard))
+                        KeyboardView(store: store.scope(state: \.self, action: \.keyboard))
                             .frame(height: ViewStyle.keyboardHeight)
                             .padding(.bottom, 5) // Reduced spacing
                         
@@ -95,7 +95,7 @@ struct PlayGameView: View {
                     attemptedletterValues: gameLevel.attemptedLetters,
                     checking: store.checking
                 ) { id in
-                    //                store.send(.cellSelected(id))
+                    store.send(.playGameCell(.cellClicked(id)))
                 }
                 .frame(
                     width: ViewStyle.crosswordSize(geometry),

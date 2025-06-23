@@ -39,15 +39,11 @@ struct CrosswordView: View {
                             ForEach(row, id: \.self) { cell in
                                 var checkingStatus:CellView.Status = .normal
                                 var number:Int? = nil
-//                                
                                 var letter = cell.letter
-//                                
                                 if let letterValues, let letter {
                                     number = letterValues[letter]
                                 }
                                 
-//                                Text("\(number ?? 0)")
-//
                                 if let number, let attemptedletterValues {
                                     if viewMode == .attemptedValue && letter != nil {
                                         letter = attemptedletterValues[number]

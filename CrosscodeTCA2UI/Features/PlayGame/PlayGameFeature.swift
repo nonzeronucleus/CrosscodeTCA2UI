@@ -13,7 +13,14 @@ struct PlayGameFeature {
         var levelID: UUID
         var level: GameLevel?
         var selectedNumber: Int?
-        var keyboard: KeyboardFeature.State = .init()
+        var usedLetters: Set<Character> {
+            get {
+                guard let level else { return Set<Character>() }
+                
+                return Set<Character>(level.attemptedLetters.filter { $0.isLetter })
+            }
+        }
+
         
         var checking = false
         var isBusy = false
@@ -30,11 +37,14 @@ struct PlayGameFeature {
         case revealRequested
         case keyboard(KeyboardFeature.Action)
         case loadGameLevel(LoadGameLevelReducer.Action)
+        case playGameCell(PlayGameCellReducer.Action)
     }
     
     var body: some Reducer<State, Action> {
         Scope(state: \.self, action: \.loadGameLevel) { LoadGameLevelReducer() }
-        
+        Scope(state: \.self, action: \.playGameCell) { PlayGameCellReducer() }
+        Scope(state: \.self, action: \.keyboard) { KeyboardFeature() }
+
         Reduce { state, action in
             switch action {
                 case .pageLoaded:
@@ -55,9 +65,19 @@ struct PlayGameFeature {
                     return .none
                 case .revealRequested:
                     return .none
+//                case .keyboard(.delegate(.letterSelected(let letter))):
+//                    guard let selectedNumber = state.selectedNumber else { return .none }
+//                    state.level!.attemptedLetters[selectedNumber] = letter
+//                    return .none
                 case .keyboard(_):
                     return .none
                 case .loadGameLevel(_):
+                    return .none
+//                case .playGameCell(.letterSelected(let char)):
+//                    return .run { send in
+//                        await send(.keyboard(.letterSelectedInGrid(char)))
+//                    }
+                case .playGameCell(_):
                     return .none
             }
         }
