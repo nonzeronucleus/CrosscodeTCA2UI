@@ -37,33 +37,6 @@ struct PlayGameCellReducer {
         return .run { send in
             await send(.letterSelected(level.attemptedLetters[number]))
         }
-
-        
-//
-        
-//        guard let level = state.layout else {return .run { send in await send(.failure(EquatableError(FeatureError.layoutNil)))}}
-        
-//        guard !state.isPopulated else {return .none} // If the layout has been populated with words, don't allow the cell to be clicked on
-//        guard let location = level.crossword.locationOfElement(byID: id) else {return .run { send in await send(.failure(EquatableError(FeatureError.couldNotFindCell(id))))}
-//        }
-//        
-//        // Calculate opposite position first
-//        let opposite = Pos(
-//            row: level.crossword.columns - 1 - location.row,
-//            column: level.crossword.rows - 1 - location.column
-//        )
-//        
-//        // Minimize update calls
-//        var crossword = level.crossword
-//        crossword.updateElement(byPos: location) { $0.toggle() }
-//        if opposite != location {
-//            crossword.updateElement(byPos: opposite) { $0.toggle() }
-//        }
-//        
-//        state.layout = level.withUpdatedCrossword(crossword)
-//        state.isDirty = true
-
-//        return .none
     }
     
     public enum FeatureError: Error {

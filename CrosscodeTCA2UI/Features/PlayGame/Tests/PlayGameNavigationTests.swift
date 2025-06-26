@@ -56,14 +56,5 @@ struct PlayGameNavigationTests {
         await store.send(.backButtonTapped) {
             $0.isExiting = true
         }
-//        
-//        await store.receive(.loadGameLevel(.start(mockGame.id))) {
-//            $0.isBusy = true
-//        }
-//
-//        await store.receive(.loadGameLevel(.success(mockGame))) {
-//            $0.isBusy = false
-//            $0.level = mockGame
-//        }
     }
 }

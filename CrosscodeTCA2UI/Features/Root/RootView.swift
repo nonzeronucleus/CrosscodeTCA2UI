@@ -5,7 +5,7 @@ import CrosscodeDataLibrary
 
 
 struct RootView: View {
-    let store: StoreOf<RootFeature>
+    @Bindable var store: StoreOf<RootFeature>
     
     //    // MARK: - Computed binding for sheet
     
@@ -24,7 +24,7 @@ struct RootView: View {
                             title: "Levels",
                             color: .cyan,
                             addItemAction: nil,
-                            showSettingsAction: { }
+                            showSettingsAction: { store.send(.settingsButtonPressed)}
                         )
                         GameLevelsTabView(store:store.scope(state:\.gameLevelsList , action: \.gameLevelsListAction))
                     }
@@ -51,6 +51,14 @@ struct RootView: View {
         }
     }
 }
+
+
+
+//        .fullScreenCover(
+//            item: $store.scope(state: \.settings, action: \.settings)
+//        ) { settingsStore in
+//            SettingsView(store: settingsStore)
+//        }
 
 
 

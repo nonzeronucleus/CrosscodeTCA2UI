@@ -45,7 +45,7 @@ struct EditLayoutNavigationTests {
             $0.isBusy = true
         }
         
-        await store.receive(EditLayoutFeature.Action.saveLayout(.success)){
+        await store.receive(EditLayoutFeature.Action.saveLayout(.delegate(.success))){
             $0.isBusy = false
             $0.isDirty = false
         }
@@ -79,7 +79,7 @@ struct EditLayoutNavigationTests {
         
         await store.receive(EditLayoutFeature.Action.saveLayout(.start))
 
-        await store.receive(EditLayoutFeature.Action.saveLayout(.success))
+        await store.receive(EditLayoutFeature.Action.saveLayout(.delegate(.success)))
 
 //
     }

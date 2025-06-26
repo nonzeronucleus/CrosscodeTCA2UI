@@ -8,7 +8,11 @@ struct DepopulationReducer {
     enum Action: Equatable {
         case buttonClicked
         case success(String, String)
-        case failure(EquatableError)
+        case delegate(Delegate)
+        
+        enum Delegate : Equatable {
+            case failure(EquatableError)
+        }
     }
     
     var body: some Reducer<EditLayoutFeature.State, Action> {
@@ -23,8 +27,7 @@ struct DepopulationReducer {
                     state.layout?.letterMap = nil
                     state.isPopulated = false
                     return .none
-                case .failure(let error):
-                    debugPrint(error)
+                case .delegate:
                     return .none
             }
         }
@@ -43,7 +46,7 @@ struct DepopulationReducer {
             }
         }
         catch {
-            return .run {send in await send(.failure(EquatableError(error)))}
+            return .run {send in await send(.delegate(.failure(EquatableError(error))))}
         }
     }
 }

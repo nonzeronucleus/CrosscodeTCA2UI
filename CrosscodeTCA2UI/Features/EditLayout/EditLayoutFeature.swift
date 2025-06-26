@@ -32,7 +32,6 @@ struct EditLayoutFeature {
     }
     
     var body: some Reducer<State, Action> {
-        
         Scope(state: \.self, action: \.loadLayout) { LoadLayoutReducer() }
         Scope(state: \.self, action: \.saveLayout) { SaveLayoutReducer() }
         Scope(state: \.self, action: \.cell) { EditLayoutCellReducer() }
@@ -41,69 +40,100 @@ struct EditLayoutFeature {
         
         Reduce { state, action in
             switch action {
-                case .backButtonTapped:
-                    if isPresented {
-                        state.isExiting = true
-                        if state.isPopulated {
-                            return .run { _ in
-                                debugPrint("Need to implement handler for population exit here.")
-                                await dismiss()
-                            }
-                        }
- 
-                        return .send(.saveLayout(.start))
-                    } else {
-                        return .none
-                    }
                 case .pageLoaded:
-                    state.isDirty = false
-                    return .send(.loadLayout(.start(state.layoutID)))
+                    return handlePageLoaded(&state)
+                    
+                case .backButtonTapped:
+                    return handleBackButton(&state)
                     
                 case .failure(let error):
                     return handleError(&state, error: error)
+
+                case let .loadLayout(.delegate(action)):
+                    return handleLoadLayoutDelegate(&state, action)
                     
-                    // Mark - Loading
-                case .loadLayout(.failure(let error)):
-                    return handleError(&state, error: error)
-                case .loadLayout(_):
-                    return .none
-                    
-                    // Mark - Cell
-                case .cell(.failure(let error)):
-                    return handleError(&state, error: error)
-                case .cell(.cellClicked(_)):
-                    return .none
+                case let .saveLayout(.delegate(action)):
+                    return handleSaveLayoutDelegate(&state, action)
 
+                case let .cell(.delegate(action)):
+                    return handleCellDelegate(&state, action)
 
-                    // Mark - Population
-                case .populate(.failure(let error)):
-                    return handleError(&state, error: error)
-                case .populate(_):
-                    return .none
-                    
-                    //Mark - Depopulation
-                case .depopulate(.failure(let error)):
-                    return handleError(&state, error: error)
-                case .depopulate(_):
-                    return .none
+                case let .populate(.delegate(action)):
+                    return handlePopulationDelegate(&state, action)
 
-                case .saveLayout(.success):
-                    if state.isExiting {
-                        return .run { _ in
-                            await dismiss()
-                        }
-                    } else {
-                        return .none
-                    }
+                case let .depopulate(.delegate(action)):
+                    return handleDepopulationDelegate(&state, action)
 
-                case .saveLayout(.failure(let error)):
-                    state.isExiting = false
-                    return handleError(&state, error: error)
-                case .saveLayout(_):
+                case .saveLayout, .populate, .depopulate, .loadLayout, .cell:
                     return .none
             }
         }
     }
+    
+    func handlePageLoaded(_ state: inout State) -> Effect<Action> {
+        return .send(.loadLayout(.start(state.layoutID)))
+    }
+    
+    func handleBackButton(_ state: inout State) -> Effect<Action> {
+        if isPresented {
+            state.isExiting = true
+            if state.isPopulated {
+                return .run { _ in await dismiss() }
+            }
+
+            return .send(.saveLayout(.start))
+        } else {
+            return .none
+        }
+    }
+    
+    
+    private func handleLoadLayoutDelegate(_ state: inout State,_ action: LoadLayoutReducer.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case .failure(let error):
+                return handleError(&state, error: error)
+        }
+    }
+
+    private func handleCellDelegate(_ state: inout State,_ action: EditLayoutCellReducer.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case .failure(let error):
+                return handleError(&state, error: error)
+        }
+    }
+
+    private func handlePopulationDelegate(_ state: inout State,_ action: PopulationReducer.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case .failure(let error):
+                return handleError(&state, error: error)
+        }
+    }
+    
+    private func handleDepopulationDelegate(_ state: inout State,_ action: DepopulationReducer.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case .failure(let error):
+                return handleError(&state, error: error)
+        }
+    }
+
+
+    private func handleSaveLayoutDelegate(_ state: inout State,_ action: SaveLayoutReducer.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case .success:
+                state.isBusy = false
+                state.isDirty = false
+
+                if state.isExiting {
+                    return .run { _ in await dismiss() }
+                } else {
+                    return .none
+                }
+            case .failure(let error):
+                state.isExiting = false
+                return handleError(&state, error: error)
+        }
+    }
+
     
     func handleError(_ state: inout State, error: EquatableError) -> Effect<Action> {
         state.error = error

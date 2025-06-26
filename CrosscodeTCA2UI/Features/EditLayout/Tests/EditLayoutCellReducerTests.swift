@@ -30,9 +30,6 @@ struct EditLayoutCellReducerTests {
         }
         
         let cellUUID = await store.state.layout!.crossword[0,0].id
-
-        
-//        debugPrint("Layout id ....\(String(describing: await store.state.layout?.crossword[0,0]))")
         
         await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellUUID))) {
             $0.layout!.crossword[0,0].letter = nil
@@ -99,13 +96,11 @@ struct EditLayoutCellReducerTests {
         // It's populated, so there shouldn't be any reaction to the cell being clicked
         await store.send(EditLayoutFeature.Action.cell(.cellClicked(UUID(0))))
         
-        let expectedError = EquatableError(EditLayoutCellReducerError.couldNotFindCell(UUID(0)))
+        let expectedError = EquatableError(EditLayoutCellReducer.FeatureError.couldNotFindCell(UUID(0)))
         
-        await store.receive(EditLayoutFeature.Action.cell(.failure(expectedError))) {
+        await store.receive(EditLayoutFeature.Action.cell(.delegate(.failure(expectedError)))) {
             $0.error = expectedError
         }
-        
-        
     }
     
     @Test func testToggleCellWithLevelNil() async throws {
@@ -133,9 +128,9 @@ struct EditLayoutCellReducerTests {
         // It's populated, so there shouldn't be any reaction to the cell being clicked
         await store.send(EditLayoutFeature.Action.cell(.cellClicked(UUID(0))))
         
-        let expectedError = EquatableError(EditLayoutCellReducerError.layoutNil)
-        
-        await store.receive(EditLayoutFeature.Action.cell(.failure(expectedError))) {
+        let expectedError = EquatableError(EditLayoutCellReducer.FeatureError.layoutNil)
+
+        await store.receive(EditLayoutFeature.Action.cell(.delegate(.failure(expectedError)))) {
             $0.error = expectedError
         }
     }

@@ -30,10 +30,7 @@ struct SaveLayoutTests {
             $0.isBusy = true
         }
         
-        await store.receive(SaveLayoutReducer.Action.success) {
-            $0.isBusy = false
-            $0.isDirty = false
-        }
+        await store.receive(SaveLayoutReducer.Action.delegate(.success))
     }
     
     @Test func testLayoutSaveErrorForNoLayout() async throws {
@@ -60,9 +57,7 @@ struct SaveLayoutTests {
             $0.isBusy = true
         }
         
-        await store.receive(SaveLayoutReducer.Action.failure(EquatableError(EditLayoutError.saveLayoutError("Some text")))) {
-            $0.isBusy = false
-        }
+        await store.receive(SaveLayoutReducer.Action.delegate(.failure(EquatableError(EditLayoutError.saveLayoutError("Some text"))))) 
     }
     
     @Test func tesPopulatedLayoutSaved() async throws {
@@ -91,10 +86,7 @@ struct SaveLayoutTests {
             $0.isBusy = true
         }
         
-        await store.receive(SaveLayoutReducer.Action.success) {
-            $0.isBusy = false
-            $0.isDirty = false
-        }
+        await store.receive(SaveLayoutReducer.Action.delegate(.success))
         
         #expect(mockGameLevelsAPI.levels.count == 1)
         #expect(mockGameLevelsAPI.levels[0].id == mockLayout.id)

@@ -62,21 +62,15 @@ struct PlayGameFeature {
                     }
                     
                 case .checkToggled:
+                    state.checking.toggle()
                     return .none
                 case .revealRequested:
                     return .none
-//                case .keyboard(.delegate(.letterSelected(let letter))):
-//                    guard let selectedNumber = state.selectedNumber else { return .none }
-//                    state.level!.attemptedLetters[selectedNumber] = letter
-//                    return .none
                 case .keyboard(_):
+                    state.checking = false
                     return .none
                 case .loadGameLevel(_):
                     return .none
-//                case .playGameCell(.letterSelected(let char)):
-//                    return .run { send in
-//                        await send(.keyboard(.letterSelectedInGrid(char)))
-//                    }
                 case .playGameCell(_):
                     return .none
             }

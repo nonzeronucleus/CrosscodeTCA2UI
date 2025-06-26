@@ -8,7 +8,11 @@ struct PopulationReducer {
     enum Action: Equatable {
         case buttonClicked
         case success(String, String)
-        case failure(EquatableError)
+        case delegate(Delegate)
+        
+        enum Delegate : Equatable {
+            case failure(EquatableError)
+        }
     }
     
     var body: some Reducer<EditLayoutFeature.State, Action> {
@@ -25,8 +29,8 @@ struct PopulationReducer {
                     state.isDirty = true
 
                     return .none
-                case .failure(let error):
-                    debugPrint(error)
+                    
+                case .delegate:
                     return .none
             }
         }
@@ -45,7 +49,7 @@ struct PopulationReducer {
             }
         }
         catch {
-            return .run {send in await send(.failure(EquatableError(error)))}
+            return .run {send in await send(.delegate(.failure(EquatableError(error))))}
         }
     }
 }

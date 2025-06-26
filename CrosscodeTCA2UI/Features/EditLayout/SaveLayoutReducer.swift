@@ -8,8 +8,12 @@ struct SaveLayoutReducer {
     
     enum Action: Equatable {
         case start
-        case success
-        case failure(EquatableError)
+        case delegate(Delegate)
+        
+        enum Delegate : Equatable {
+            case success
+            case failure(EquatableError)
+        }
     }
     
     var body: some Reducer<EditLayoutFeature.State, Action> {
@@ -19,7 +23,7 @@ struct SaveLayoutReducer {
                 case .start:
                     if !state.isDirty { // Don't bother trying to save something that hasn't changed
                         return .run {  send in
-                            await send(.success)
+                            await send(.delegate(.success))
                         }
                     }
                     state.isBusy = true
@@ -28,34 +32,44 @@ struct SaveLayoutReducer {
                     }
                     return saveLayout(&state)
                     
-                case .success:
-                    state.isBusy = false
-                    state.isDirty = false
-                    return .none
-                    
-                case .failure(_):
-                    state.isBusy = false
+                case .delegate:
                     return .none
             }
         }
     }
     
     private func saveLayout(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
-        let layout = state.layout
-        
-        return .run {  send in
+        guard let layout = state.layout else {
+            return .send(.delegate(.failure(EquatableError(EditLayoutError.saveLayoutError("No layout found in save level")))))
+        }
+
+        return .run { send in
             do {
-                guard let layout = layout else { throw EditLayoutError.saveLayoutError("No layout found in save level") }
-                
                 try await apiClient.layoutsAPI.saveLevel(level: layout)
-                
-                await send(.success)
-            }
-            catch {
-                await send(.failure(EquatableError(error)))
+                await send(.delegate(.success))
+            } catch {
+                await send(.delegate(.failure(EquatableError(error))))
             }
         }
     }
+    
+    
+//    private func saveLayout(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
+//        let layout = state.layout
+//        
+//        return .run {  send in
+//            do {
+//                guard let layout = layout else { throw EditLayoutError.saveLayoutError("No layout found in save level") }
+//                
+//                try await apiClient.layoutsAPI.saveLevel(level: layout)
+//                
+//                await send(.delegate(.success))
+//            }
+//            catch {
+//                await send(.delegate(.failure(EquatableError(error))))
+//            }
+//        }
+//    }
     
     private func addLevel(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
         let layout = state.layout
@@ -66,10 +80,10 @@ struct SaveLayoutReducer {
                 
                 try await apiClient.gameLevelsAPI.addNewLevel(layout: layout)
                 
-                await send(.success)
+                await send(.delegate(.success))
             }
             catch {
-                await send(.failure(EquatableError(error)))
+                await send(.delegate(.failure(EquatableError(error))))
             }
         }
     }
