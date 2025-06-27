@@ -3,6 +3,7 @@ import SwiftUI
 struct TitleBarView: View {
     var title: String
     var color: Color
+    var exportAction: (() -> Void)?
     var addItemAction: (() -> Void)?
     var showSettingsAction: () -> Void
 
@@ -27,6 +28,19 @@ struct TitleBarView: View {
                 
                 HStack {
                     Spacer()
+                    if let exportAction {
+                        Button(action: {
+                            exportAction()
+                        }) {
+                            Image(systemName: "square.and.arrow.up")
+                                .resizable()
+                                .scaledToFit()
+                                .frame(width: 24, height: 24)
+                                .foregroundColor(.white)
+                        }
+                        .padding(.trailing, 16) // Add some right padding
+                    }
+                    
                     if let addItemAction {
                         Button(action: {
                             addItemAction()

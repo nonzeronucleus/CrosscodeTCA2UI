@@ -14,7 +14,6 @@ struct EditLayoutView: View {
                     VStack(spacing: 0) {
                         // Top bar with back button
                         HStack {
-                            Text("\(viewStore.state.settings.isEditMode)")
                             Button(action: {
                                 store.send(.backButtonTapped)
                             }) {

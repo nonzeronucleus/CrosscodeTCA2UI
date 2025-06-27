@@ -10,6 +10,7 @@ struct LayoutsTabFeature {
     struct State: Equatable {
         var layouts: IdentifiedArrayOf<Layout> = []
         @Presents var editLayout: EditLayoutFeature.State?
+        var isBusy: Bool = false
         var error: EquatableError?
     }
     
@@ -18,17 +19,12 @@ struct LayoutsTabFeature {
         case itemSelected(UUID)
         case deleteButtonPressed(UUID)
 
-        case addLayout(AddLayout)
+        case addLayout(AddLayoutReducer.Action)
         case fetchAll(FetchAll)
         case deleteLayout(DeleteLayout)
         case editLayout(PresentationAction<EditLayoutFeature.Action>)
         case failure(EquatableError)
         case success
-        
-        enum AddLayout: Equatable {
-            case start
-            case success
-        }
         
         enum FetchAll: Equatable {
             case start
@@ -43,6 +39,8 @@ struct LayoutsTabFeature {
     
     
     var body: some Reducer<State, Action> {
+        Scope(state: \.self, action: \.addLayout) { AddLayoutReducer() }
+
         Reduce { state, action in
             switch action {
                 case .pageLoaded:
@@ -64,9 +62,6 @@ struct LayoutsTabFeature {
                 case .deleteButtonPressed(let id):
                     return .send(.deleteLayout(.start(id)))
                     
-                case .addLayout(let subAction):
-                    return handleAddLayout(&state, action: subAction)
-                    
                 case .fetchAll(let subAction):
                     return handleFetchAll(&state, action: subAction)
                     
@@ -81,10 +76,16 @@ struct LayoutsTabFeature {
                     state.layouts[id: editLayout.layoutID] = layout
                     return .none
                     
-                case .editLayout(_):
+                case let .addLayout(.delegate(delegateAction)):
+                    return handleAddLayoutDelegate(&state, delegateAction)
+                    
+                case .editLayout:
                     return .none
                     
                 case .success:
+                    return .none
+                    
+                case .addLayout:
                     return .none
             }
         }
@@ -92,41 +93,22 @@ struct LayoutsTabFeature {
             EditLayoutFeature()
         }
     }
-}
-
-// Add Layout
-
-extension LayoutsTabFeature {
-    private func handleAddLayout(_ state: inout State, action:Action.AddLayout) -> Effect<Action> {
+    
+    private func handleAddLayoutDelegate(_ state: inout State,_ action: AddLayoutReducer.Action.Delegate) -> Effect<Action> {
         switch action {
-            case .start:
-                return addLayout(&state)
-                
             case .success:
                 return .send(Action.fetchAll(.start))
+            case .failure(let error):
+                return handleError(&state, error: error)
         }
     }
     
-    private func addLayout(_ state: inout State) -> Effect<Action> {
-        @Dependency(\.apiClient) var apiClient
-        return .run { send in
-            do {
-                try await apiClient.layoutsAPI.addNewLayout()
-                
-                await send(.addLayout(.success))
-            }
-            catch {
-                await send(.failure(EquatableError(error)))
-            }
-        }
-    }
-    
-    private func handleAddLayoutSuccess(_ state: inout State) -> Effect<Action> {
-        .send(Action.fetchAll(.start))
+    func handleError(_ state: inout State, error: EquatableError) -> Effect<Action> {
+        state.error = error
+        state.isBusy = false
+        return .none
     }
 }
-
-
 
 // Fetch all layouts
 
