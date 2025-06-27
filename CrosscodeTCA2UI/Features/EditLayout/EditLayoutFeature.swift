@@ -10,6 +10,7 @@ struct EditLayoutFeature {
 
     @ObservableState
     struct State: Equatable {
+        var settings = Settings()
         var layoutID: UUID
         var layout: Layout?
         var isBusy = false

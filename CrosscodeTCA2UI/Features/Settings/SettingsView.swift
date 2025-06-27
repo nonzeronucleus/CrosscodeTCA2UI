@@ -17,14 +17,31 @@ struct SettingsView: View {
     @Bindable var store: StoreOf<SettingsFeature>
     
     var body: some View {
-        Form {
-            Toggle("Dark Mode", isOn: $store.isEditMode)
+        VStack(spacing: 0) {
+            HStack {
+                Button(action: {
+                    store.send(.backButtonTapped)
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(.black)
+                        .bold(true)
+                    Text("Back")
+                        .foregroundColor(.black)
+                        .bold(true)
+                }
+                .padding()
+                Spacer()
+            }
+            
+            Form {
+                Toggle("Dark Mode", isOn: $store.settings.isEditMode)
+            }
+            .frame(minWidth: 300, minHeight: 400)
+            .padding()
+            .navigationTitle("Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            // The back button is shown automatically when pushed
         }
-        .frame(minWidth: 300, minHeight: 400)
-        .padding()
-        .navigationTitle("Settings")
-        .navigationBarTitleDisplayMode(.inline)
-        // The back button is shown automatically when pushed
     }
 }
 

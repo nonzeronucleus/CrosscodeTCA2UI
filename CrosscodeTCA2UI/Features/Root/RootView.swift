@@ -39,7 +39,7 @@ struct RootView: View {
                             title: "Layouts",
                             color: .cyan,
                             addItemAction: { store.send( .layoutsListAction(.addLayout(.start)) ) },
-                            showSettingsAction: { }
+                            showSettingsAction: {store.send(.settingsButtonPressed) }
                         )
                         
                         LayoutsTabView(store:store.scope(state:\.layoutsList , action: \.layoutsListAction))
@@ -49,6 +49,12 @@ struct RootView: View {
                 .tag(NavTab.edit)
             }
         }
+        .fullScreenCover(
+            item: $store.scope(state: \.settings, action: \.settings)
+        ) { settingsStore in
+            SettingsView(store: settingsStore)
+        }
+
     }
 }
 
