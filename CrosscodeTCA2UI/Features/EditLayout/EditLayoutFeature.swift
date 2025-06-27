@@ -30,6 +30,10 @@ struct EditLayoutFeature {
         case depopulate(DepopulationReducer.Action)
         case cell(EditLayoutCellReducer.Action)
         case failure(EquatableError)
+        
+        case delegate(Delegate)
+        enum Delegate : Equatable {
+        }
     }
     
     var body: some Reducer<State, Action> {
@@ -65,7 +69,7 @@ struct EditLayoutFeature {
                 case let .depopulate(.delegate(action)):
                     return handleDepopulationDelegate(&state, action)
 
-                case .saveLayout, .populate, .depopulate, .loadLayout, .cell:
+                case .saveLayout, .populate, .depopulate, .loadLayout, .cell, .delegate:
                     return .none
             }
         }
