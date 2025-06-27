@@ -3,35 +3,40 @@ import Foundation
 import CrosscodeDataLibrary
 
     @Reducer
-struct AddLayoutReducer {
+struct FetchLayoutsReducer {
     @Dependency(\.apiClient) var apiClient
     
     enum Action: Equatable {
         case start
+        case success([Layout])
         case delegate(Delegate)
         
         enum Delegate : Equatable {
             case failure(EquatableError)
-            case success
         }
     }
-    
     var body: some Reducer<LayoutsTabFeature.State, Action> {
         Reduce { state, action in
             switch action {
                 case .start:
-                    return addLayout(&state)
+                    return fetchAll(&state)
                 case .delegate:
                     return .none
+                case let .success(layouts):
+                    state.layouts = IdentifiedArray(uniqueElements: layouts)
+                    return .none
+
             }
         }
     }
-    private func addLayout(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
+    
+    private func fetchAll(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
+        @Dependency(\.apiClient) var apiClient
         return .run { send in
             do {
-                try await apiClient.layoutsAPI.addNewLayout()
+                let result = try await apiClient.layoutsAPI.fetchAllLevels() as! [Layout]
                 
-                await send(.delegate(.success))
+                await send(.success(result))
             }
             catch {
                 await send(.delegate(.failure(EquatableError(error))))
