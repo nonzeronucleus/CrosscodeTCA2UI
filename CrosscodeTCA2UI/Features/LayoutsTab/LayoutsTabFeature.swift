@@ -5,7 +5,7 @@ import CrosscodeDataLibrary
 @Reducer
 struct LayoutsTabFeature {
     @Dependency(\.uuid) var uuid
-
+    
     @ObservableState
     struct State: Equatable {
         var layouts: IdentifiedArrayOf<Layout> = []

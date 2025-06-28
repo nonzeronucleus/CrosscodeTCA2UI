@@ -4,18 +4,20 @@ import Foundation
 import CrosscodeDataLibrary
 
 class MockLayoutsAPI: LayoutsAPI {
-    func exportLayouts(layouts: [Layout]) async throws {
-        fatalError("\(#function) not implemented")
-    }
-    
     @Dependency(\.uuid) var uuid
     
     var levels: IdentifiedArrayOf<Layout> = []
-    
+    var exportedLayouts:[Layout]? = nil
+
     init(levels: [Layout]) {
         self.levels = IdentifiedArray(uniqueElements: levels)
     }
+
+    func exportLayouts(layouts: [Layout]) async throws {
+        exportedLayouts = layouts
+    }
     
+
     func populateCrossword(crosswordLayout: String) async throws -> (String, String) {
         fatalError("\(#function) not implemented")
     }

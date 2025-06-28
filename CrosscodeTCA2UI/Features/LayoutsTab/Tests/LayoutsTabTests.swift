@@ -6,7 +6,6 @@ import Factory
 
 struct LayoutsTabTests {
 
-//    @MainActor
     @Test func testFetchAllSuccessReducer() async throws {
         await withDependencies {
             $0.uuid = .incrementing
