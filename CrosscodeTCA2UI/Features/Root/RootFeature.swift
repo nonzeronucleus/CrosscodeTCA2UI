@@ -7,7 +7,7 @@ struct RootFeature {
     @Dependency(\.uuid) var uu
     
     @ObservableState
-    struct State {
+    struct State: Equatable {
         var layoutsList =  LayoutsTabFeature.State()
         var gameLevelsList =  GameLevelsTabFeature.State()
         var tab: NavTab = .edit

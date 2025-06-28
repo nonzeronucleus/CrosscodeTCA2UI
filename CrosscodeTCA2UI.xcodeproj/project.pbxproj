@@ -50,6 +50,7 @@
 				Features/Keyboard/Tests/KeyboardFeatureTests.swift,
 				Features/LayoutsTab/Tests/LayoutsTabTests.swift,
 				Features/PlayGame/Tests/PlayGameNavigationTests.swift,
+				Features/Root/Tests/RootNavigationTests.swift,
 				Utils/SetupTestLib.swift,
 			);
 			target = 2803A0DD2DF4E5DE00744E83 /* CrosscodeTCA2UI */;
@@ -65,6 +66,7 @@
 				Features/Keyboard/Tests/KeyboardFeatureTests.swift,
 				Features/LayoutsTab/Tests/LayoutsTabTests.swift,
 				Features/PlayGame/Tests/PlayGameNavigationTests.swift,
+				Features/Root/Tests/RootNavigationTests.swift,
 				Utils/SetupTestLib.swift,
 			);
 			target = 2803A0EA2DF4E5DF00744E83 /* CrosscodeTCA2UITests */;
