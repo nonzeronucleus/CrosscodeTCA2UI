@@ -15,7 +15,7 @@ struct RootFeature {
     }
     
     enum Action: Equatable {
-        case layoutsListAction(LayoutsTabFeature.Action)
+        case layoutsList(LayoutsTabFeature.Action)
         case gameLevelsListAction(GameLevelsTabFeature.Action)
         case setTab(NavTab)
         case settingsButtonPressed
@@ -28,10 +28,15 @@ struct RootFeature {
                 case .setTab(let tab):
                     state.tab = tab
                     return .none
+                    
                 case .settingsButtonPressed:
                     state.settings = .init()
                     return .none
-                case .layoutsListAction(_):
+                    
+                case let .layoutsList(.delegate(delegateAction)):
+                    return handleLayoutsListDelegate(&state, delegateAction)
+
+                case .layoutsList:
                     return .none
                 case .gameLevelsListAction(_):
                     return .none
@@ -42,10 +47,18 @@ struct RootFeature {
         .ifLet(\.$settings, action: \.settings) {
             SettingsFeature()
         }
-
         
-        Scope(state: \.layoutsList,action: \.layoutsListAction) {LayoutsTabFeature()}
+        Scope(state: \.layoutsList,action: \.layoutsList) {LayoutsTabFeature()}
         Scope(state: \.gameLevelsList,action: \.gameLevelsListAction) {GameLevelsTabFeature()}
+    }
+    
+    
+    private func handleLayoutsListDelegate(_ state: inout State,_ action: LayoutsTabFeature.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case .settingsButtonPressed:
+                state.settings = .init()
+                return .none
+        }
     }
 }
 

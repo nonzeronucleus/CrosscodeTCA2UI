@@ -24,7 +24,7 @@ struct RootView: View {
                             title: "Levels",
                             color: .cyan,
                             addItemAction: nil,
-                            showSettingsAction: { store.send(.settingsButtonPressed)}
+                            showSettingsAction: {store.send(.settingsButtonPressed)}
                         )
                         GameLevelsTabView(store:store.scope(state:\.gameLevelsList , action: \.gameLevelsListAction))
                     }
@@ -33,20 +33,9 @@ struct RootView: View {
                 .tag(NavTab.play)
                 
                 // MARK: - Edit Tab
-                NavigationStack() {
-                    VStack {
-                        TitleBarView(
-                            title: "Layouts",
-                            color: .cyan,
-                            addItemAction: { store.send( .layoutsListAction(.addLayout(.start)) ) },
-                            showSettingsAction: {store.send(.settingsButtonPressed) }
-                        )
-                        
-                        LayoutsTabView(store:store.scope(state:\.layoutsList , action: \.layoutsListAction))
-                    }
-                }
-                .tabItem { Label("Edit", systemImage: "pencil") }
-                .tag(NavTab.edit)
+                LayoutsTabView(store:store.scope(state:\.layoutsList , action: \.layoutsList))
+                    .tabItem { Label("Edit", systemImage: "pencil") }
+                    .tag(NavTab.edit)
             }
         }
         .fullScreenCover(

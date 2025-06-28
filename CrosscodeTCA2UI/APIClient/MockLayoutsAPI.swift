@@ -4,6 +4,10 @@ import Foundation
 import CrosscodeDataLibrary
 
 class MockLayoutsAPI: LayoutsAPI {
+    func exportLayouts(layouts: [Layout]) async throws {
+        fatalError("\(#function) not implemented")
+    }
+    
     @Dependency(\.uuid) var uuid
     
     var levels: IdentifiedArrayOf<Layout> = []

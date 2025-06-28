@@ -7,34 +7,44 @@ struct LayoutsTabView: View {
     
     var body: some View {
         WithViewStore(store, observe: \.layouts) { viewStore in
-            VStack {
-                List {
-                    ForEach(viewStore.state, id: \.id) { layout in
-                        Button {
-                            store.send(.itemSelected(layout.id))
-                        } label: {
-                            Text("\(layout.name)")
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .contentShape(Rectangle())
-                        }
-                        .swipeActions(edge: .trailing) {
-                            Button(role: .destructive) {
-                                store.send(.deleteButtonPressed(layout.id))
+            NavigationStack() {
+                VStack {
+                    TitleBarView(
+                        title: "Layouts",
+                        color: .cyan,
+                        exportAction:{ store.send(.exportButtonPressed) },
+                        addItemAction: { store.send(.addLayout(.start)) },
+                        showSettingsAction: { store.send(.delegate(.settingsButtonPressed)) }
+                    )
+                    
+                    List {
+                        ForEach(viewStore.state, id: \.id) { layout in
+                            Button {
+                                store.send(.itemSelected(layout.id))
                             } label: {
-                                Label("Delete", systemImage: "trash")
+                                Text("\(layout.name)")
+                                    .frame(maxWidth: .infinity, alignment: .leading)
+                                    .contentShape(Rectangle())
+                            }
+                            .swipeActions(edge: .trailing) {
+                                Button(role: .destructive) {
+                                    store.send(.deleteButtonPressed(layout.id))
+                                } label: {
+                                    Label("Delete", systemImage: "trash")
+                                }
                             }
                         }
                     }
                 }
+                .onAppear {
+                    store.send(.pageLoaded)
+                }
             }
-            .onAppear {
-                store.send(.pageLoaded)
+            .fullScreenCover(
+                item: $store.scope(state: \.editLayout, action: \.editLayout)
+            ) { editStore in
+                EditLayoutView(store: editStore)
             }
-        }
-        .fullScreenCover(
-            item: $store.scope(state: \.editLayout, action: \.editLayout)
-        ) { editStore in
-            EditLayoutView(store: editStore)
         }
     }
 }
