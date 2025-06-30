@@ -46,7 +46,7 @@ struct RootNavigationTests {
             RootFeature()
         }
         
-        await store.send(.settingsButtonPressed) {
+        await store.send(.layoutsList(.delegate(.settingsButtonPressed))) {
             $0.settings = SettingsFeature.State()
         }
         

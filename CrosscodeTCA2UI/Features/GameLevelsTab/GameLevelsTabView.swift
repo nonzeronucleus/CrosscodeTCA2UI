@@ -15,37 +15,40 @@ struct GameLevelsTabView: View {
         ZStack {
             // Background with subtle animation
             
-            VStack(spacing: 20) {
-                Text("Test")
-                // Header with game title
-//                Text("Select Level")
-//                    .font(.system(size: 36, weight: .bold, design: .rounded))
-//                    .foregroundStyle(Color.black)
-//                    .shadow(color: .black.opacity(0.4), radius: 4, x: 2, y: 2)
-                
-                
-                // Level grid
-                ScrollView {
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 16)], spacing: 20) {
-                        ForEach(store.levels) { level in
-                            LevelCard(level: level) {
-                                store.send(.itemSelected(level.id))
+            NavigationStack {
+                VStack {
+                    TitleBarView(
+                        title: "Levels",
+                        color: .cyan,
+//                        importAction:{ store.send(.importButtonPressed) },
+                        exportAction:{ store.send(.exportButtonPressed) },
+//                        addItemAction: nil,
+                        showSettingsAction: { store.send(.delegate(.settingsButtonPressed)) }
+                    )
+                    
+                    // Level grid
+                    ScrollView {
+                        LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 16)], spacing: 20) {
+                            ForEach(store.levels) { level in
+                                LevelCard(level: level) {
+                                    store.send(.itemSelected(level.id))
+                                }
+                                .transition(.scale.combined(with: .opacity))
                             }
-                            .transition(.scale.combined(with: .opacity))
                         }
+                        .padding(.horizontal)
                     }
-                    .padding(.horizontal)
                 }
+                .padding(.vertical)
             }
-            .padding(.vertical)
-        }
-        .onAppear {
-            store.send(.pageLoaded)
-        }
-        .fullScreenCover(
-            item: $store.scope(state: \.playGame, action: \.playGame)
-        ) { store in
-            PlayGameView(store: store)
+            .onAppear {
+                store.send(.pageLoaded)
+            }
+            .fullScreenCover(
+                item: $store.scope(state: \.playGame, action: \.playGame)
+            ) { store in
+                PlayGameView(store: store)
+            }
         }
     }
 }

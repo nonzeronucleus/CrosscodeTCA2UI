@@ -4,6 +4,14 @@ import Foundation
 import CrosscodeDataLibrary
 
 class MockGameLevelsAPI: GameLevelsAPI {
+    func importGameLevels() async throws  -> [GameLevel] {
+        fatalError("\(#function) not implemented")
+    }
+    
+    func exportGameLevels() async throws {
+        
+    }
+    
     @Dependency(\.uuid) var uuid
     
     var levels: IdentifiedArrayOf<GameLevel> = []

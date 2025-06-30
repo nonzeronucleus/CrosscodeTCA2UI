@@ -1,5 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
+import CrosscodeDataLibrary
 
 struct PlayGameView: View {
     let store: StoreOf<PlayGameFeature>
@@ -182,26 +183,25 @@ extension PlayGameView {
 }
 
 
-//#Preview {
-//    withDependencies {
-//        $0.uuid = .incrementing
-//    } operation: {
-//        @Dependency(\.uuid) var uuid
-//        
-//        let level = Level(id: uuid(),
-//                          number: 1,
-//                          packId: uuid(),
-//                          gridText: nil,
-//                          letterMap: nil,
-//                          attemptedLetters: nil,
-//                          numCorrectLetters: 0)
-//        
-//        let store = Store(
-//            initialState: PlayableLevelFeature.State(level: level),
-//            reducer: { PlayableLevelFeature() }
-//        )
-//        
-//        return PlayableLevelView(store: store)
-//    }
-//}
-// 
+#Preview {
+    let level = GameLevel.mocks[1]
+    
+    let mockAPI:APIClient =  APIClient(
+        layoutsAPI: MockLayoutsAPI(levels: []),
+        gameLevelsAPI: MockGameLevelsAPI(levels:[level])
+    )
+
+    withDependencies {
+        $0.uuid = .incrementing
+        $0.apiClient = mockAPI
+    } operation: {
+        @Dependency(\.uuid) var uuid
+        let store = Store(
+            initialState: PlayGameFeature.State(levelID: level.id),
+            reducer: { PlayGameFeature() }
+        )
+        
+        return PlayGameView(store: store)
+    }
+}
+ 

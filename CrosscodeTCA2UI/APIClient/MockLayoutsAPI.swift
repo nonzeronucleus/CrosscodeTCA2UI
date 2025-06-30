@@ -17,8 +17,8 @@ class MockLayoutsAPI: LayoutsAPI {
         self.levels = IdentifiedArray(uniqueElements: levels)
     }
 
-    func exportLayouts(layouts: [Layout]) async throws {
-        exportedLayouts = layouts
+    func exportLayouts() async throws {
+        exportedLayouts = levels.elements
     }
     
 

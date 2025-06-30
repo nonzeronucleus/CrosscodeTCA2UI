@@ -35,6 +35,7 @@ struct PlayGameFeature {
         case backButtonTapped
         case checkToggled
         case revealRequested
+
         case keyboard(KeyboardFeature.Action)
         case loadGameLevel(LoadGameLevelReducer.Action)
         case playGameCell(PlayGameCellReducer.Action)
@@ -69,9 +70,7 @@ struct PlayGameFeature {
                 case .keyboard(_):
                     state.checking = false
                     return .none
-                case .loadGameLevel(_):
-                    return .none
-                case .playGameCell(_):
+                case .loadGameLevel, .playGameCell:
                     return .none
             }
         }

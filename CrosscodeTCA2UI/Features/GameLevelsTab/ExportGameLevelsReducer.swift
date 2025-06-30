@@ -2,8 +2,8 @@ import ComposableArchitecture
 import Foundation
 import CrosscodeDataLibrary
 
-    @Reducer
-struct ExportLayoutsReducer {
+@Reducer
+struct ExportGameLevelsReducer {
     @Dependency(\.apiClient) var apiClient
     
     enum Action: Equatable {
@@ -16,11 +16,11 @@ struct ExportLayoutsReducer {
         }
     }
     
-    var body: some Reducer<LayoutsTabFeature.State, Action> {
+    var body: some Reducer<GameLevelsTabFeature.State, Action> {
         Reduce { state, action in
             switch action {
                 case .start:
-                    return exportLayouts(&state)
+                    return exportGameLevels(&state)
                 case .success:
                     return .none
                 case .delegate:
@@ -28,10 +28,10 @@ struct ExportLayoutsReducer {
             }
         }
     }
-    private func exportLayouts(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
+    private func exportGameLevels(_ state: inout GameLevelsTabFeature.State) -> Effect<Action> {
         return .run { send in
             do {
-                try await apiClient.layoutsAPI.exportLayouts()
+                try await apiClient.gameLevelsAPI.exportGameLevels()
                 
                 await send(.success)
             }

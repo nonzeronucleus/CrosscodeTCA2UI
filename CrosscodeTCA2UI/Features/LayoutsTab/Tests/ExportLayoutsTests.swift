@@ -17,6 +17,8 @@ struct ExportLayoutsTests {
             @Dependency(\.uuid) var uuid
             let mockLayouts: [Layout] = [.mock]
             
+            mockLayoutsAPI.levels = IdentifiedArray(uniqueElements: mockLayouts)
+            
             let store = await TestStore(
                 initialState: LayoutsTabFeature.State(layouts:IdentifiedArrayOf(uniqueElements: mockLayouts))
             ) {

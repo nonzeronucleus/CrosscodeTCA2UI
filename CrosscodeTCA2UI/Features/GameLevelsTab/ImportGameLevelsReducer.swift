@@ -2,38 +2,39 @@ import ComposableArchitecture
 import Foundation
 import CrosscodeDataLibrary
 
-    @Reducer
-struct ExportLayoutsReducer {
+@Reducer
+struct ImportGameLevelsReducer {
     @Dependency(\.apiClient) var apiClient
     
     enum Action: Equatable {
         case start
         case delegate(Delegate)
-        case success
+        case success([GameLevel])
 
         enum Delegate : Equatable {
             case failure(EquatableError)
         }
     }
     
-    var body: some Reducer<LayoutsTabFeature.State, Action> {
+    var body: some Reducer<GameLevelsTabFeature.State, Action> {
         Reduce { state, action in
             switch action {
                 case .start:
-                    return exportLayouts(&state)
-                case .success:
+                    return importGameLevels(&state)
+                case let .success(gameLevels):
+                    state.levels = IdentifiedArrayOf(uniqueElements: gameLevels)
                     return .none
                 case .delegate:
                     return .none
             }
         }
     }
-    private func exportLayouts(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
+    private func importGameLevels(_ state: inout GameLevelsTabFeature.State) -> Effect<Action> {
         return .run { send in
             do {
-                try await apiClient.layoutsAPI.exportLayouts()
-                
-                await send(.success)
+                let gameLevels = try await apiClient.gameLevelsAPI.importGameLevels()
+
+                await send(.success(gameLevels))
             }
             catch {
                 await send(.delegate(.failure(EquatableError(error))))

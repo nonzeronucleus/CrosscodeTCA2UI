@@ -162,35 +162,3 @@ struct LayoutsTabFeature {
         return .none
     }
 }
-
-
-// Delete layout
-
-//extension LayoutsTabFeature {
-//    private func handleDelete(_ state: inout State, action:Action.DeleteLayout) -> Effect<Action> {
-//        switch action {
-//            case .start(let id):
-//                return deleteLayout(&state, id: id)
-//                
-//            case .success:
-//                return .send(Action.fetchLayouts(.start))
-//        }
-//    }
-//    
-//    private func deleteLayout(_ state: inout State, id:UUID) -> Effect<Action> {
-//        @Dependency(\.apiClient) var apiClient
-//        return .run { send in
-//            do {
-//                try await apiClient.layoutsAPI.deleteLevel(id: id, )
-//
-//                await send(.fetchLayouts(.start))
-//            }
-//            catch {
-//                await send(.failure(EquatableError(error)))
-//            }
-//        }
-//    }
-//}
-//
-
-
