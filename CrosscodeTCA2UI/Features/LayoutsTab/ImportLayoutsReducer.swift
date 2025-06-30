@@ -3,46 +3,37 @@ import Foundation
 import CrosscodeDataLibrary
 
     @Reducer
-struct FetchLayoutsReducer {
+struct ImportLayoutsReducer {
     @Dependency(\.apiClient) var apiClient
     
     enum Action: Equatable {
         case start
-        case success([Layout])
         case delegate(Delegate)
-        
+        case success([Layout])
+
         enum Delegate : Equatable {
-            case noLayoutsLoaded
             case failure(EquatableError)
         }
     }
+    
     var body: some Reducer<LayoutsTabFeature.State, Action> {
         Reduce { state, action in
             switch action {
                 case .start:
-                    return fetchAll(&state)
+                    return importLayouts(&state)
+                case let .success(layouts):
+                    state.layouts = IdentifiedArrayOf(uniqueElements: layouts)
+                    return .none
                 case .delegate:
                     return .none
-                case let .success(layouts):
-                    state.layouts = IdentifiedArray(uniqueElements: layouts)
-                    return .none
-
             }
         }
     }
-    
-    private func fetchAll(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
-        @Dependency(\.apiClient) var apiClient
+    private func importLayouts(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
         return .run { send in
             do {
-                let layouts = try await apiClient.layoutsAPI.fetchAllLevels() as! [Layout]
-                
-                debugPrint("\(layouts.count) layouts imported.")
-                
-                if layouts.isEmpty {
-                    await send(.delegate(.noLayoutsLoaded))
-                }
-                
+                let layouts = try await apiClient.layoutsAPI.importLayouts()
+
                 await send(.success(layouts))
             }
             catch {

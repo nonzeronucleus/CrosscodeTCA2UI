@@ -19,11 +19,13 @@ struct LayoutsTabFeature {
         case itemSelected(UUID)
         case deleteButtonPressed(UUID)
         case exportButtonPressed
-        
+        case importButtonPressed
+
         case addLayout(AddLayoutReducer.Action)
         case fetchLayouts(FetchLayoutsReducer.Action)
         case deleteLayout(DeleteLayoutsReducer.Action)
         case editLayout(PresentationAction<EditLayoutFeature.Action>)
+        case importLayouts(ImportLayoutsReducer.Action)
         case exportLayouts(ExportLayoutsReducer.Action)
         case failure(EquatableError)
         
@@ -39,6 +41,7 @@ struct LayoutsTabFeature {
         Scope(state: \.self, action: \.addLayout) { AddLayoutReducer() }
         Scope(state: \.self, action: \.fetchLayouts) { FetchLayoutsReducer() }
         Scope(state: \.self, action: \.deleteLayout) { DeleteLayoutsReducer() }
+        Scope(state: \.self, action: \.importLayouts) { ImportLayoutsReducer() }
         Scope(state: \.self, action: \.exportLayouts) { ExportLayoutsReducer() }
 
         Reduce { state, action in
@@ -62,8 +65,12 @@ struct LayoutsTabFeature {
                 case .deleteButtonPressed(let id):
                     return .send(.deleteLayout(.start(id)))
                     
+                case .importButtonPressed:
+                    return .send(.importLayouts(.start))
+                    
                 case .exportButtonPressed:
                     return .send(.exportLayouts(.start))
+
                     
                 case .editLayout(.dismiss):
                     // Update item in list with new layout after editing
@@ -84,11 +91,14 @@ struct LayoutsTabFeature {
                     
                 case let .exportLayouts(.delegate(delegateAction)):
                     return handleExportLayoutsDelegate(&state, delegateAction)
-                    
+
+                case let .importLayouts(.delegate(delegateAction)):
+                    return handleImportLayoutsDelegate(&state, delegateAction)
+
 //                case let .editLayout(.delegate(delegateAction)):
 //                    return handleEditLayoutDelegate(&state, delegateAction)
 //
-                case .addLayout, .fetchLayouts, .deleteLayout, .editLayout, .exportLayouts:
+                case .addLayout, .fetchLayouts, .deleteLayout, .editLayout, .exportLayouts, .importLayouts:
                     return .none
                 case .delegate(_):
                     return .none
@@ -110,6 +120,9 @@ struct LayoutsTabFeature {
     
     private func handleFetchLayoutDelegate(_ state: inout State,_ action: FetchLayoutsReducer.Action.Delegate) -> Effect<Action> {
         switch action {
+            case .noLayoutsLoaded:
+                return .send(.importLayouts(.start))
+
             case .failure(let error):
                 return handleError(&state, error: error)
         }
@@ -131,12 +144,21 @@ struct LayoutsTabFeature {
         }
     }
     
+    private func handleImportLayoutsDelegate(_ state: inout State,_ action: ImportLayoutsReducer.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case .failure(let error):
+                return handleError(&state, error: error)
+        }
+    }
+
+    
     private func handleEditLayoutDelegate(_ state: inout State,_ action: EditLayoutFeature.Action.Delegate) -> Effect<Action> {
     }
 
     func handleError(_ state: inout State, error: EquatableError) -> Effect<Action> {
         state.error = error
         state.isBusy = false
+        debugPrint("Error: \(error.localizedDescription)")
         return .none
     }
 }

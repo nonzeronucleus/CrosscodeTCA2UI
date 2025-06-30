@@ -12,6 +12,7 @@ struct LayoutsTabView: View {
                     TitleBarView(
                         title: "Layouts",
                         color: .cyan,
+                        importAction:{ store.send(.importButtonPressed) },
                         exportAction:{ store.send(.exportButtonPressed) },
                         addItemAction: { store.send(.addLayout(.start)) },
                         showSettingsAction: { store.send(.delegate(.settingsButtonPressed)) }

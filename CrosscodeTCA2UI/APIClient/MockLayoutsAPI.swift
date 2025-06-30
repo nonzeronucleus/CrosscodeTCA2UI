@@ -4,6 +4,10 @@ import Foundation
 import CrosscodeDataLibrary
 
 class MockLayoutsAPI: LayoutsAPI {
+    func importLayouts() async throws -> [Layout] {
+        return []
+    }
+    
     @Dependency(\.uuid) var uuid
     
     var levels: IdentifiedArrayOf<Layout> = []

@@ -8,4 +8,12 @@ class EquatableError: Error, Equatable {
     static func == (lhs: EquatableError, rhs: EquatableError) -> Bool {
         return lhs.wrappedError.localizedDescription == rhs.wrappedError.localizedDescription
     }
+    
+    var localizedDescription: String {
+        return wrappedError.localizedDescription
+    }
+    
+    var description: String {
+        return wrappedError.localizedDescription
+    }
 }

@@ -25,7 +25,7 @@ struct LoadGameLevelsReducer {
                     return .none
 
                 case .failure(let error):
-                    debugPrint(error)
+                    debugPrint(error.localizedDescription)
                     return .none
             }
         }
