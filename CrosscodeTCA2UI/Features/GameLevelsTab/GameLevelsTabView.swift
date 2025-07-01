@@ -26,6 +26,8 @@ struct GameLevelsTabView: View {
                         showSettingsAction: { store.send(.delegate(.settingsButtonPressed)) }
                     )
                     
+                    PackView(store: store.scope(state: \.pack, action: \.pack))
+                    
                     // Level grid
                     ScrollView {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 16)], spacing: 20) {
@@ -40,6 +42,7 @@ struct GameLevelsTabView: View {
                     }
                 }
                 .padding(.vertical)
+                Spacer()
             }
             .onAppear {
                 store.send(.pageLoaded)

@@ -10,6 +10,7 @@ struct GameLevelsTabFeature {
     struct State: Equatable {
         var levels: IdentifiedArrayOf<GameLevel> = []
         @Presents var playGame: PlayGameFeature.State?
+        var pack = PackFeature.State()
 
         var isBusy: Bool = false
         var error: EquatableError?
@@ -22,6 +23,7 @@ struct GameLevelsTabFeature {
         case exportButtonPressed
         case importButtonPressed
         
+        case pack(PackFeature.Action)
         case importGameLevels(ImportGameLevelsReducer.Action)
         case exportGameLevels(ExportGameLevelsReducer.Action)
         case loadLayout(LoadGameLevelsReducer.Action)
@@ -37,6 +39,8 @@ struct GameLevelsTabFeature {
     var body: some Reducer<State, Action> {
         Scope(state: \.self, action: \.loadLayout) { LoadGameLevelsReducer() }
         Scope(state: \.self, action: \.exportGameLevels) { ExportGameLevelsReducer() }
+        Scope(state: \.self, action: \.exportGameLevels) { ExportGameLevelsReducer() }
+        Scope(state: \.pack, action: \.pack) { PackFeature() }
 
         Reduce { state, action in
             switch action {
@@ -53,14 +57,18 @@ struct GameLevelsTabFeature {
                 case .exportButtonPressed:
                     return .send(.exportGameLevels(.start))
                     
+                case let .pack(.delegate(delegateAction)):
+                    return handlePackDelegate(&state, delegateAction)
+
+                    
                 case let .exportGameLevels(.delegate(delegateAction)):
                     return handleExportGameLevelsDelegate(&state, delegateAction)
 
                 case let .importGameLevels(.delegate(delegateAction)):
                     return handleImportGameLevelsDelegate(&state, delegateAction)
+                    
 
-
-                case .loadLayout, .playGame, .importGameLevels, .exportGameLevels, .delegate:
+                case .loadLayout, .playGame, .importGameLevels, .exportGameLevels, .delegate, .pack:
                     return .none
             }
         }
@@ -68,6 +76,15 @@ struct GameLevelsTabFeature {
             PlayGameFeature()
         }
     }
+    
+    private func handlePackDelegate(_ state: inout State,_ action: PackFeature.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case let .didChangePackNumber(packNumber):
+                debugPrint("Changed to pack \(packNumber)")
+                return .none
+        }
+    }
+    
     private func handleExportGameLevelsDelegate(_ state: inout State,_ action: ExportGameLevelsReducer.Action.Delegate) -> Effect<Action> {
         switch action {
             case .failure(let error):
