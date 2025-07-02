@@ -15,7 +15,11 @@ struct PackView: View {
                 Image(systemName: "arrowtriangle.left.fill")
             }
             Spacer()
-            Text("\(store.state.packNumber)")
+            if store.state.packNumber == nil {
+                Text("*")
+            } else {
+                Text("\(store.state.packNumber!)")
+            }
             Spacer()
             Button(action: {store.send(.incrementButtonTapped)}) {
                 Image(systemName: "arrowtriangle.right.fill")
@@ -24,7 +28,9 @@ struct PackView: View {
         .padding([.leading, .trailing], 100)
         .padding([.top, .bottom], 5)
         .font(.largeTitle)
-//        .background(Color.yellow)
+        .onAppear {
+            store.send(.viewDidAppear)
+        }
     }
 }
 

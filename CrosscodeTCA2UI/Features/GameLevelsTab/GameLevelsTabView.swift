@@ -4,11 +4,9 @@ import CrosscodeDataLibrary
 
 struct GameLevelsTabView: View {
     @Bindable var store: StoreOf<GameLevelsTabFeature>
-//    @Bindable var currentPrefs: StoreOf<PreferencesFeature>
     
-    init(store: StoreOf<GameLevelsTabFeature>/*, prefs: StoreOf<PreferencesFeature>*/) {
+    init(store: StoreOf<GameLevelsTabFeature>) {
         self.store = store
-//        self.currentPrefs = prefs
     }
     
     var body: some View {

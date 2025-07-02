@@ -79,8 +79,8 @@ struct GameLevelsTabFeature {
     
     private func handlePackDelegate(_ state: inout State,_ action: PackFeature.Action.Delegate) -> Effect<Action> {
         switch action {
-            case let .didChangePackNumber(packNumber):
-                debugPrint("Changed to pack \(packNumber)")
+            case let .didChangePack(pack):
+                debugPrint("Changed to pack \(pack.id)")
                 return .none
         }
     }

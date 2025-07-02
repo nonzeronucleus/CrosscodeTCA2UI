@@ -4,6 +4,14 @@ import Foundation
 import CrosscodeDataLibrary
 
 class MockGameLevelsAPI: GameLevelsAPI {
+    func fetchAllPacks() async throws -> [Pack] {
+        fatalError("\(#function) not implemented")
+    }
+    
+    func addPack() async throws -> Pack {
+        fatalError("\(#function) not implemented")
+    }
+    
     func importGameLevels() async throws  -> [GameLevel] {
         fatalError("\(#function) not implemented")
     }
