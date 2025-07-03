@@ -7,7 +7,7 @@ struct LoadGameLevelsReducer {
     @Dependency(\.apiClient) var apiClient
 
     enum Action: Equatable {
-        case start
+        case start(UUID)
         case success([GameLevel])
         case failure(EquatableError)
     }
@@ -15,9 +15,9 @@ struct LoadGameLevelsReducer {
     var body: some Reducer<GameLevelsTabFeature.State, Action> {
         Reduce { state, action in
             switch action {
-                case .start:
+                case let .start(id):
                     state.isBusy = true
-                    return loadGameLevels(&state)
+                    return loadGameLevels(&state, id:id)
 
                 case .success(let levels):
                     state.levels = IdentifiedArray(uniqueElements: levels)
@@ -31,17 +31,12 @@ struct LoadGameLevelsReducer {
         }
     }
 
-    private func loadGameLevels(_ state: inout GameLevelsTabFeature.State) -> Effect<Action> {
+    private func loadGameLevels(_ state: inout GameLevelsTabFeature.State, id: UUID) -> Effect<Action> {
         return .run { send in
             do {
-                let result = try await apiClient.gameLevelsAPI.fetchAllLevels()
+                let result = try await apiClient.gameLevelsAPI.fetchGameLevels(packId: id)
 
-                if let result = result as? [GameLevel] {
-                    await send(.success(result))
-                }
-                else {
-                    await send(.failure(EquatableError(EditLayoutError.loadLayoutError)))
-                }
+                await send(.success(result))
             }
             catch {
                 await send(.failure(EquatableError(error)))

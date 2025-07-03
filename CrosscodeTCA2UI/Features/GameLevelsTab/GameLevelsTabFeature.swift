@@ -45,7 +45,8 @@ struct GameLevelsTabFeature {
         Reduce { state, action in
             switch action {
                 case .pageLoaded:
-                    return .send(.loadLayout(.start))
+                    return .none
+//                    return .send(.loadLayout(.start))
 
                 case .itemSelected(let id):
                     state.playGame = PlayGameFeature.State(levelID: id)
@@ -59,7 +60,6 @@ struct GameLevelsTabFeature {
                     
                 case let .pack(.delegate(delegateAction)):
                     return handlePackDelegate(&state, delegateAction)
-
                     
                 case let .exportGameLevels(.delegate(delegateAction)):
                     return handleExportGameLevelsDelegate(&state, delegateAction)
@@ -67,7 +67,6 @@ struct GameLevelsTabFeature {
                 case let .importGameLevels(.delegate(delegateAction)):
                     return handleImportGameLevelsDelegate(&state, delegateAction)
                     
-
                 case .loadLayout, .playGame, .importGameLevels, .exportGameLevels, .delegate, .pack:
                     return .none
             }
@@ -81,7 +80,9 @@ struct GameLevelsTabFeature {
         switch action {
             case let .didChangePack(pack):
                 debugPrint("Changed to pack \(pack.id)")
-                return .none
+                return .send(.loadLayout(.start(pack.id)))
+//
+//                return .none
         }
     }
     
