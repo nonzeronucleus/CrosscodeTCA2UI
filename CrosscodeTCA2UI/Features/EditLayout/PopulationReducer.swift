@@ -27,6 +27,7 @@ struct PopulationReducer {
                     state.layout?.letterMap = CharacterIntMap(from: charIntMap)
                     state.isPopulated = true
                     state.isDirty = true
+                    state.isBusy = false
 
                     return .none
                     
@@ -39,6 +40,7 @@ struct PopulationReducer {
     func handlePopulation(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
         @Dependency(\.apiClient) var apiClient
         do {
+            state.isBusy = true
             guard let layout = state.layout else { throw EditLayoutError.handlePopulationError("No layout loaded") }
             
             return .run { send in

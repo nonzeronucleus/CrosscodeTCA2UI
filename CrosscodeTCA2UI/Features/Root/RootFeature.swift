@@ -10,7 +10,7 @@ struct RootFeature {
     struct State: Equatable {
         var layoutsList =  LayoutsTabFeature.State()
         var gameLevelsList =  GameLevelsTabFeature.State()
-        var tab: NavTab = .play
+        var tab: NavTab = .edit
         @Presents var settings: SettingsFeature.State?
     }
     

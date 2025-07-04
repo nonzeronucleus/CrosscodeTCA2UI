@@ -27,6 +27,9 @@ struct EditLayoutView: View {
                             .padding()
                             Spacer()
                         }
+                        if let error = store.state.error {
+                            Text("Error \(error.localizedDescription)")
+                        }
 
                         crosswordView(geometry: geometry)
                             .padding(.top, 5)
@@ -93,7 +96,7 @@ struct EditLayoutView: View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             HStack(spacing: ViewStyle.buttonSpacing) {
                 if viewStore.isPopulated {
-                    Button("Export") {}
+                    Button("Export") {store.send(.exportButtonPressed) }
                         .buttonStyle(.borderedProminent)
                         .tint(.green)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)

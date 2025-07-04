@@ -21,15 +21,12 @@ struct SaveLayoutReducer {
         Reduce { state, action in
             switch action {
                 case .start:
-                    if !state.isDirty { // Don't bother trying to save something that hasn't changed
+                    if !state.isDirty || state.isPopulated { // Don't bother trying to save something that hasn't changed, or if the grid's been populated
                         return .run {  send in
                             await send(.delegate(.success))
                         }
                     }
                     state.isBusy = true
-                    if state.isPopulated {
-                        return addLevel(&state)
-                    }
                     return saveLayout(&state)
                     
                 case .delegate:
@@ -70,21 +67,4 @@ struct SaveLayoutReducer {
 //            }
 //        }
 //    }
-    
-    private func addLevel(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
-        let layout = state.layout
-        
-        return .run {  send in
-            do {
-                guard let layout = layout else { throw EquatableError(EditLayoutError.saveLayoutError("No layout found in add level")) }
-                
-                try await apiClient.gameLevelsAPI.addNewLevel(layout: layout)
-                
-                await send(.delegate(.success))
-            }
-            catch {
-                await send(.delegate(.failure(EquatableError(error))))
-            }
-        }
-    }
 }
