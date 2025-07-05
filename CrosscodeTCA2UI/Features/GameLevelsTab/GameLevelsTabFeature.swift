@@ -46,7 +46,6 @@ struct GameLevelsTabFeature {
             switch action {
                 case .pageLoaded:
                     return .none
-//                    return .send(.loadLayout(.start))
 
                 case .itemSelected(let id):
                     state.playGame = PlayGameFeature.State(levelID: id)

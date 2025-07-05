@@ -8,7 +8,9 @@ struct CreateGameLevelReducer {
     
     enum Action: Equatable {
         case start
+        case success
         case delegate(Delegate)
+        
         
         enum Delegate : Equatable {
             case success
@@ -29,7 +31,12 @@ struct CreateGameLevelReducer {
                     state.isBusy = true
                     
                     return addLevel(&state)
-                    
+                case .success:
+                    state.isBusy = false
+                    return .run {  send in
+                        await send(.delegate(.success))
+                    }
+
                 case .delegate:
                     return .none
             }
@@ -45,7 +52,7 @@ struct CreateGameLevelReducer {
                 
                 try await apiClient.gameLevelsAPI.addNewLevel(layout: layout)
                 
-                await send(.delegate(.success))
+                await send(.success)
             }
             catch {
                 await send(.delegate(.failure(EquatableError(error))))

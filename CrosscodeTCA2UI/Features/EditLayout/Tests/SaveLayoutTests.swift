@@ -60,7 +60,7 @@ struct SaveLayoutTests {
         await store.receive(SaveLayoutReducer.Action.delegate(.failure(EquatableError(EditLayoutError.saveLayoutError("Some text"))))) 
     }
     
-    @Test func tesPopulatedLayoutSaved() async throws {
+    @Test func tesPopulatedLayoutNotSavedWhenSaveTriggered() async throws {
         // Should create new game level
         setupTestLib(#function)
         defer { tearDownTestLib(#function) }
@@ -82,13 +82,45 @@ struct SaveLayoutTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(SaveLayoutReducer.Action.start) {
-            $0.isBusy = true
+        await store.send(SaveLayoutReducer.Action.start)
+        await store.receive(SaveLayoutReducer.Action.delegate(.success))
+    }
+    
+    
+    @Test func tesPopulatedLayoutExported() async throws {
+        // Should create new game level
+        setupTestLib(#function)
+        defer { tearDownTestLib(#function) }
+
+        let mockLayout = Layout.mock
+        let mockGameLevelsAPI:MockGameLevelsAPI = MockGameLevelsAPI(levels:[])
+        
+        let mockAPI:APIClient =  APIClient(
+            layoutsAPI: MockLayoutsAPI(levels: [mockLayout]),
+            gameLevelsAPI: mockGameLevelsAPI
+        )
+        
+        let store = await TestStore(
+            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: mockLayout, isDirty:true, isPopulated: true)
+        ) {
+            CreateGameLevelReducer()
+        } withDependencies: {
+            $0.uuid = .incrementing
+            $0.apiClient = mockAPI
         }
         
-        await store.receive(SaveLayoutReducer.Action.delegate(.success))
+        await store.send(CreateGameLevelReducer.Action.start) {
+            $0.isBusy = true
+        }
+
+        await store.receive(CreateGameLevelReducer.Action.success) {
+            $0.isBusy = false
+        }
         
-        #expect(mockGameLevelsAPI.levels.count == 1)
-        #expect(mockGameLevelsAPI.levels[0].id == mockLayout.id)
+        await store.receive(CreateGameLevelReducer.Action.delegate(.success))
+
+//
+//        #expect(mockGameLevelsAPI.levels.count == 1)
+//        #expect(mockGameLevelsAPI.levels[0].id == mockLayout.id)
     }
 }

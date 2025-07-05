@@ -5,7 +5,7 @@ import CrosscodeDataLibrary
 
 class MockGameLevelsAPI: GameLevelsAPI {
     func fetchGameLevels(packId: UUID) async throws -> [GameLevel] {
-        fatalError("\(#function) not implemented")
+        return levels.elements.filter { $0.packId == packId }
     }
     
     func fetchAllPacks() async throws -> [Pack] {
@@ -27,8 +27,10 @@ class MockGameLevelsAPI: GameLevelsAPI {
     @Dependency(\.uuid) var uuid
     
     var levels: IdentifiedArrayOf<GameLevel> = []
+    var packs: IdentifiedArrayOf<Pack> = []
     
-    init(levels: [GameLevel] = []) {
+    init(packs:[Pack] = [], levels: [GameLevel] = []) {
+        self.packs = IdentifiedArray(uniqueElements: packs)
         self.levels = IdentifiedArray(uniqueElements: levels)
     }
 
@@ -66,17 +68,22 @@ class MockGameLevelsAPI: GameLevelsAPI {
 }
 
 extension GameLevel {
+    static let mockPacks: [Pack] = [
+        Pack(id: UUID(0), number: 1),
+        Pack(id: UUID(1), number: 1)
+    ]
+    
     static let shortMock: GameLevel = GameLevel(layout: Layout(
                                     id: UUID(0),
                                     number: 1,
                                     gridText:". | .|"
-        ), id: UUID(0), number: 1)
+        ), id: UUID(0), number: 1, packId: UUID(0))
     
     static let longMock = GameLevel(layout: Layout(
                                     id: UUID(1),
                                     number: 1,
                                     gridText:". .| ..|   |"
-        ), id: UUID(1), number: 2)
+        ), id: UUID(1), number: 2, packId: UUID(0))
     
     
     static var mocks: [GameLevel] = [shortMock, longMock]
