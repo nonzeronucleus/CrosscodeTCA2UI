@@ -41,13 +41,22 @@ struct PopulationReducer {
         @Dependency(\.apiClient) var apiClient
         do {
             state.isBusy = true
-            guard let layout = state.layout else { throw EditLayoutError.handlePopulationError("No layout loaded") }
+            guard let layout = state.layout else {
+                throw EditLayoutError.handlePopulationError("No layout loaded")
+            }
             
             return .run { send in
-                guard let populatedLevel = layout.gridText else { throw EditLayoutError.handlePopulationError("No populated layout")}
-                let (updatedCrossword, charIntMap) = try await apiClient.layoutsAPI.populateCrossword(crosswordLayout: populatedLevel)
-                
-                await send(.success(updatedCrossword, charIntMap))
+                do {
+                    guard let populatedLevel = layout.gridText else {
+                        throw EditLayoutError.handlePopulationError("No populated layout")
+                    }
+
+                    let (updatedCrossword, charIntMap) = try await apiClient.layoutsAPI.populateCrossword(crosswordLayout: populatedLevel)
+
+                    await send(.success(updatedCrossword, charIntMap))
+                } catch {
+                    await send(.delegate(.failure(EquatableError(error))))
+                }
             }
         }
         catch {
