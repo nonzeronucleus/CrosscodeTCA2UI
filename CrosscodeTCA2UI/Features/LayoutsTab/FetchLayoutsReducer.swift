@@ -37,8 +37,6 @@ struct FetchLayoutsReducer {
             do {
                 let layouts = try await apiClient.layoutsAPI.fetchAllLevels() as! [Layout]
                 
-                debugPrint("\(layouts.count) layouts imported.")
-                
                 if layouts.isEmpty {
                     await send(.delegate(.noLayoutsLoaded))
                 }

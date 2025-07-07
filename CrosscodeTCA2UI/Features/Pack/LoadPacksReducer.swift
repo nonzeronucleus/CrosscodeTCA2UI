@@ -25,7 +25,6 @@ struct LoadPacksReducer {
                     return loadPacks(&state)
 
                 case .success(let packs):
-                    debugPrint(packs.count)
                     state.packs = IdentifiedArray(uniqueElements: packs)
                     state.isBusy = false
                     

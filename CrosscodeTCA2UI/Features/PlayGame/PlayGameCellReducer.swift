@@ -32,8 +32,6 @@ struct PlayGameCellReducer {
         else { return .none }
         
         state.selectedNumber = number
-        debugPrint("Selected number: \(number),  letter \(level.attemptedLetters[number])")
-        
         return .run { send in
             await send(.letterSelected(level.attemptedLetters[number]))
         }
