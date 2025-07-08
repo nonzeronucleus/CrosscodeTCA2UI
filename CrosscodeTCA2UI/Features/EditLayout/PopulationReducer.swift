@@ -51,6 +51,9 @@ struct PopulationReducer {
                         throw EditLayoutError.handlePopulationError("No populated layout")
                     }
 
+//                    for _ in 0..<100 {
+//                        let _ = try await apiClient.layoutsAPI.populateCrossword(crosswordLayout: populatedLevel)
+//                    }
                     let (updatedCrossword, charIntMap) = try await apiClient.layoutsAPI.populateCrossword(crosswordLayout: populatedLevel)
 
                     await send(.success(updatedCrossword, charIntMap))

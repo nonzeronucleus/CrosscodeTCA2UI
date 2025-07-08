@@ -33,6 +33,9 @@
             reference = "container:../../CrosscodeTCA2UI.xctestplan"
             default = "YES">
          </TestPlanReference>
+         <TestPlanReference
+            reference = "container:../CrosscodeDataLibraryBackendTests.xctestplan">
+         </TestPlanReference>
       </TestPlans>
       <Testables>
          <TestableReference
