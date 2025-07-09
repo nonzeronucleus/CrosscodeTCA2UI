@@ -2,7 +2,7 @@ import SwiftUI
 import CrosscodeDataLibrary
 
 struct CrosswordView: View {
-    var grid: Grid2D<Cell>
+    var grid: Crossword
     var letterValues: CharacterIntMap?
     let performAction: (UUID) -> Void
     let viewMode: ViewMode
@@ -11,7 +11,7 @@ struct CrosswordView: View {
     let attemptedletterValues: [Character]?
     let editMode: Bool
     
-    init(grid: Grid2D<Cell>,
+    init(grid: Crossword,
          viewMode: ViewMode,
          letterValues: CharacterIntMap?,
          selectedNumber:Int? = nil ,
