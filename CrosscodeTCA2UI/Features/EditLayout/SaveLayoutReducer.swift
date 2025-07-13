@@ -49,22 +49,4 @@ struct SaveLayoutReducer {
             }
         }
     }
-    
-    
-//    private func saveLayout(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
-//        let layout = state.layout
-//        
-//        return .run {  send in
-//            do {
-//                guard let layout = layout else { throw EditLayoutError.saveLayoutError("No layout found in save level") }
-//                
-//                try await apiClient.layoutsAPI.saveLevel(level: layout)
-//                
-//                await send(.delegate(.success))
-//            }
-//            catch {
-//                await send(.delegate(.failure(EquatableError(error))))
-//            }
-//        }
-//    }
 }

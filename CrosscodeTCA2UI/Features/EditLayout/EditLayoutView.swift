@@ -106,6 +106,11 @@ struct EditLayoutView: View {
                         .tint(.red)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
+                    Button("Duplicate") {store.send(.duplicateButtonTapped)}
+                        .buttonStyle(.borderedProminent)
+                        .tint(.blue)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity)
+
                     Button("Populate") {store.send(.populate(.buttonClicked))}
                         .buttonStyle(.borderedProminent)
                         .tint(.blue)

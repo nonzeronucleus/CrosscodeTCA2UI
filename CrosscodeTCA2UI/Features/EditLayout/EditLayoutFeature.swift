@@ -23,8 +23,10 @@ struct EditLayoutFeature {
     enum Action: Equatable {
         case pageLoaded
         case backButtonTapped
+        case duplicateButtonTapped
         case exportButtonPressed
         
+        case addLayout(AddLayoutReducer<EditLayoutFeature>.Action)
         case loadLayout(LoadLayoutReducer.Action)
         case saveLayout(SaveLayoutReducer.Action)
         case createGameLevel(CreateGameLevelReducer.Action)
@@ -33,12 +35,16 @@ struct EditLayoutFeature {
         case cell(EditLayoutCellReducer.Action)
         case failure(EquatableError)
         
+        
         case delegate(Delegate)
+        
         enum Delegate : Equatable {
+            case laypoutAdded
         }
     }
     
     var body: some Reducer<State, Action> {
+        Scope(state: \.self, action: \.addLayout) { AddLayoutReducer() }
         Scope(state: \.self, action: \.loadLayout) { LoadLayoutReducer() }
         Scope(state: \.self, action: \.saveLayout) { SaveLayoutReducer() }
         Scope(state: \.self, action: \.cell) { EditLayoutCellReducer() }
@@ -56,11 +62,16 @@ struct EditLayoutFeature {
                     
                 case .exportButtonPressed:
                     return handleExportButton(&state)
-
+                    
+                case .duplicateButtonTapped:
+                    return handleDuplicateButton(&state)
                     
                 case .failure(let error):
                     return handleError(&state, error: error)
-
+                    
+                case let .addLayout(.delegate(delegateAction)):
+                    return handleAddLayoutDelegate(&state, delegateAction)
+                    
                 case let .loadLayout(.delegate(action)):
                     return handleLoadLayoutDelegate(&state, action)
                     
@@ -79,7 +90,7 @@ struct EditLayoutFeature {
                 case let .depopulate(.delegate(action)):
                     return handleDepopulationDelegate(&state, action)
 
-                case .saveLayout, .createGameLevel, .populate, .depopulate, .loadLayout, .cell, .delegate:
+                case .addLayout, .saveLayout, .createGameLevel, .populate, .depopulate, .loadLayout, .cell, .delegate:
                     return .none
             }
         }
@@ -92,6 +103,11 @@ struct EditLayoutFeature {
     func handleExportButton(_ state: inout State) -> Effect<Action> {
         return .send(.createGameLevel(.start))
     }
+    
+    func handleDuplicateButton(_ state: inout State) -> Effect<Action> {
+        return .send(.addLayout(.start(state.layout?.gridText)))
+    }
+
 
     
     func handleBackButton(_ state: inout State) -> Effect<Action> {
@@ -107,7 +123,15 @@ struct EditLayoutFeature {
         }
     }
     
-    
+    private func handleAddLayoutDelegate(_ state: inout State,_ action: AddLayoutReducer<Self>.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case .success:
+//                return .none
+                return .send(Action.delegate(.laypoutAdded))
+            case .failure(let error):
+                return handleError(&state, error: error)
+        }
+    }
     
     
     private func handleLoadLayoutDelegate(_ state: inout State,_ action: LoadLayoutReducer.Action.Delegate) -> Effect<Action> {
@@ -188,3 +212,5 @@ public enum EditLayoutError: Error {
     case saveLayoutError(_ text:String)
     case handlePopulationError(_ text:String)
 }
+
+

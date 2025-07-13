@@ -4,6 +4,7 @@ import Foundation
 import CrosscodeDataLibrary
 
 class MockLayoutsAPI: LayoutsAPI {
+    
     func importLayouts() async throws -> [Layout] {
         return []
     }
@@ -30,7 +31,7 @@ class MockLayoutsAPI: LayoutsAPI {
         fatalError("\(#function) not implemented")
     }
     
-    func addNewLayout() async throws {
+    func addNewLayout(crosswordLayout: String?) async throws {
         self.levels.append(
             Layout(
                 id: uuid(),

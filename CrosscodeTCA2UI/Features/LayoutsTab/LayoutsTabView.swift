@@ -14,7 +14,7 @@ struct LayoutsTabView: View {
                         color: .cyan,
                         importAction:{ store.send(.importButtonPressed) },
                         exportAction:{ store.send(.exportButtonPressed) },
-                        addItemAction: { store.send(.addLayout(.start)) },
+                        addItemAction: { store.send(.addLayout(.start(nil))) },
                         showSettingsAction: { store.send(.delegate(.settingsButtonPressed)) }
                     )
                     
@@ -59,4 +59,8 @@ extension AnyTransition {
             removal: .move(edge: .trailing)
         )
     }
+}
+
+#Preview {
+    Text("Test")
 }

@@ -2,12 +2,13 @@ import ComposableArchitecture
 import Foundation
 import CrosscodeDataLibrary
 
-    @Reducer
-struct AddLayoutReducer {
+
+@Reducer
+struct AddLayoutReducer<L: Reducer> {
     @Dependency(\.apiClient) var apiClient
     
     enum Action: Equatable {
-        case start
+        case start(String? = nil)
         case delegate(Delegate)
         
         enum Delegate : Equatable {
@@ -16,20 +17,22 @@ struct AddLayoutReducer {
         }
     }
     
-    var body: some Reducer<LayoutsTabFeature.State, Action> {
+    var body: some Reducer<L.State, Action> {
+//    var body: some Reducer<LayoutsTabFeature.State, Action> {
         Reduce { state, action in
             switch action {
-                case .start:
-                    return addLayout(&state)
+                case let .start(layoutText):
+                    return addLayout(&state, layoutText: layoutText)
                 case .delegate:
                     return .none
             }
         }
     }
-    private func addLayout(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
+//    private func addLayout(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
+    private func addLayout(_ state: inout L.State, layoutText: String?) -> Effect<Action> {
         return .run { send in
             do {
-                try await apiClient.layoutsAPI.addNewLayout()
+                try await apiClient.layoutsAPI.addNewLayout(crosswordLayout: layoutText)
                 
                 await send(.delegate(.success))
             }
