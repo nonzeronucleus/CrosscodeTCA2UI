@@ -12,16 +12,16 @@ struct LayoutsTabView: View {
                     TitleBarView(
                         title: "Layouts",
                         color: .cyan,
-                        importAction:{ store.send(.importButtonPressed) },
-                        exportAction:{ store.send(.exportButtonPressed) },
-                        addItemAction: { store.send(.addLayout(.start(nil))) },
+                        importAction:{ store.send(.view(.importButtonPressed)) },
+                        exportAction:{ store.send(.view(.exportButtonPressed)) },
+                        addItemAction: { store.send(.addLayout(.api(.start(nil)))) },
                         showSettingsAction: { store.send(.delegate(.settingsButtonPressed)) }
                     )
                     
                     List {
                         ForEach(viewStore.state, id: \.id) { layout in
                             Button {
-                                store.send(.itemSelected(layout.id))
+                                store.send(.view(.itemSelected(layout.id)))
                             } label: {
                                 Text("\(layout.name)")
                                     .frame(maxWidth: .infinity, alignment: .leading)
@@ -29,7 +29,7 @@ struct LayoutsTabView: View {
                             }
                             .swipeActions(edge: .trailing) {
                                 Button(role: .destructive) {
-                                    store.send(.deleteButtonPressed(layout.id))
+                                    store.send(.view(.deleteButtonPressed(layout.id)))
                                 } label: {
                                     Label("Delete", systemImage: "trash")
                                 }
@@ -38,7 +38,7 @@ struct LayoutsTabView: View {
                     }
                 }
                 .onAppear {
-                    store.send(.pageLoaded)
+                    store.send(.view(.pageLoaded))
                 }
             }
             .fullScreenCover(
@@ -49,6 +49,7 @@ struct LayoutsTabView: View {
         }
     }
 }
+
 
 
 

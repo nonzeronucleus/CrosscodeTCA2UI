@@ -47,17 +47,22 @@ struct SaveLayoutTests {
         let store = await TestStore(
             initialState: EditLayoutFeature.State(layoutID: UUID(0), isDirty: true)
         ) {
-            SaveLayoutReducer()
+            EditLayoutFeature()
         } withDependencies: {
             $0.uuid = .incrementing
             $0.apiClient = mockAPI
         }
         
-        await store.send(SaveLayoutReducer.Action.start) {
+        await store.send(EditLayoutFeature.Action.saveLayout(.start)) {
             $0.isBusy = true
         }
         
-        await store.receive(SaveLayoutReducer.Action.delegate(.failure(EquatableError(EditLayoutError.saveLayoutError("Some text"))))) 
+        let expectedError = EquatableError(EditLayoutError.saveLayoutError("Some text"))
+        
+        await store.receive(EditLayoutFeature.Action.saveLayout(.delegate(.failure(expectedError))))  {
+            $0.error = expectedError
+            $0.isBusy = false
+        }
     }
     
     @Test func tesPopulatedLayoutNotSavedWhenSaveTriggered() async throws {

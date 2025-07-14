@@ -6,11 +6,13 @@ import CrosscodeDataLibrary
 struct ExportLayoutsReducer {
     @Dependency(\.apiClient) var apiClient
     
+    @CasePathable
     enum Action: Equatable {
         case start
         case delegate(Delegate)
         case success
 
+        @CasePathable
         enum Delegate : Equatable {
             case failure(EquatableError)
         }

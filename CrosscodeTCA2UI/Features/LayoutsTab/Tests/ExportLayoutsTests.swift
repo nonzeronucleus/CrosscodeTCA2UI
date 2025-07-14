@@ -25,7 +25,7 @@ struct ExportLayoutsTests {
                 LayoutsTabFeature()
             }
             
-            await store.send(.exportButtonPressed)
+            await store.send(.view(.exportButtonPressed))
             
             await store.receive(.exportLayouts(.start))
             await store.receive(.exportLayouts(.success))

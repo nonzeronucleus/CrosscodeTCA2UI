@@ -8,19 +8,17 @@ struct LayoutsTabFeature {
     
 
     @ObservableState
-    struct State: Equatable {
+    struct State: Equatable, ErrorHandling {
         var layouts: IdentifiedArrayOf<Layout> = []
         @Presents var editLayout: EditLayoutFeature.State?
         var isBusy: Bool = false
         var error: EquatableError?
     }
     
+    @CasePathable
     enum Action: Equatable {
-        case pageLoaded
-        case itemSelected(UUID)
-        case deleteButtonPressed(UUID)
-        case exportButtonPressed
-        case importButtonPressed
+        case view(View)
+        case delegate(Delegate)
 
         case addLayout(AddLayoutReducer<LayoutsTabFeature>.Action)
         case fetchLayouts(FetchLayoutsReducer.Action)
@@ -28,11 +26,20 @@ struct LayoutsTabFeature {
         case editLayout(PresentationAction<EditLayoutFeature.Action>)
         case importLayouts(ImportLayoutsReducer.Action)
         case exportLayouts(ExportLayoutsReducer.Action)
+        
         case failure(EquatableError)
         
-        case delegate(Delegate)
+        @CasePathable
+        enum View : Equatable {
+            case pageLoaded
+            case itemSelected(UUID)
+            case deleteButtonPressed(UUID)
+            case exportButtonPressed
+            case importButtonPressed
+        }
         
-        enum Delegate {
+        @CasePathable
+        enum Delegate:Equatable {
             case settingsButtonPressed
         }
     }
@@ -47,31 +54,8 @@ struct LayoutsTabFeature {
 
         Reduce { state, action in
             switch action {
-                case .pageLoaded:
-                    return .send(.fetchLayouts(.start))
-                    
-                case .itemSelected(let id):
-                    state.editLayout = EditLayoutFeature.State(layoutID: id)
-                    return .none
-                    
-                case .failure(let error):
-                    if let wrappedError = error.wrappedError as? EquatableError {
-                        state.error = wrappedError
-                    }
-                    else {
-                        state.error = error
-                    }
-                    return .none
-                    
-                case .deleteButtonPressed(let id):
-                    return .send(.deleteLayout(.start(id)))
-                    
-                case .importButtonPressed:
-                    return .send(.importLayouts(.start))
-                    
-                case .exportButtonPressed:
-                    return .send(.exportLayouts(.start))
-
+                case .view(let viewAction):
+                    return handleViewAction(&state, viewAction)
                     
                 case .editLayout(.dismiss):
                     // Update item in list with new layout after editing
@@ -102,6 +86,14 @@ struct LayoutsTabFeature {
                 case .addLayout, .fetchLayouts, .deleteLayout, .editLayout, .exportLayouts, .importLayouts:
                     return .none
                 case .delegate(_):
+                    return .none
+                case .failure(let error):
+                    if let wrappedError = error.wrappedError as? EquatableError {
+                        state.error = wrappedError
+                    }
+                    else {
+                        state.error = error
+                    }
                     return .none
             }
         }
@@ -139,10 +131,7 @@ struct LayoutsTabFeature {
     }
     
     private func handleExportLayoutsDelegate(_ state: inout State,_ action: ExportLayoutsReducer.Action.Delegate) -> Effect<Action> {
-        switch action {
-            case .failure(let error):
-                return handleError(&state, error: error)
-        }
+            handleChildFailure(&state, action, errorCase: \.failure)
     }
     
     private func handleImportLayoutsDelegate(_ state: inout State,_ action: ImportLayoutsReducer.Action.Delegate) -> Effect<Action> {
@@ -167,5 +156,30 @@ struct LayoutsTabFeature {
         state.isBusy = false
         debugPrint("Error: \(error.localizedDescription)")
         return .none
+    }
+}
+
+
+    // MARK: - Action Handlers
+private extension LayoutsTabFeature {
+    // MARK: View Actions
+    func handleViewAction(_ state: inout State, _ action: Action.View) -> Effect<Action> {
+        switch action {
+            case .pageLoaded:
+                return .send(.fetchLayouts(.start))
+                
+            case .itemSelected(let id):
+                state.editLayout = EditLayoutFeature.State(layoutID: id)
+                return .none
+                
+            case .deleteButtonPressed(let id):
+                return .send(.deleteLayout(.start(id)))
+                
+            case .importButtonPressed:
+                return .send(.importLayouts(.start))
+                
+            case .exportButtonPressed:
+                return .send(.exportLayouts(.start))
+        }
     }
 }

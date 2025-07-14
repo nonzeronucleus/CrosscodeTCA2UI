@@ -9,8 +9,14 @@ struct AddLayoutReducer<L: Reducer> {
     
     @CasePathable
     enum Action: Equatable {
-        case start(String? = nil)
+        
+        case api(API)
         case delegate(Delegate)
+        
+        @CasePathable
+        enum API : Equatable {
+            case start(String? = nil)
+        }
         
         @CasePathable
         enum Delegate : Equatable {
@@ -20,17 +26,16 @@ struct AddLayoutReducer<L: Reducer> {
     }
     
     var body: some Reducer<L.State, Action> {
-//    var body: some Reducer<LayoutsTabFeature.State, Action> {
         Reduce { state, action in
             switch action {
-                case let .start(layoutText):
-                    return addLayout(&state, layoutText: layoutText)
+                case let .api(apiAction):
+                    return handleAPIAction(&state, apiAction)
                 case .delegate:
                     return .none
             }
         }
     }
-//    private func addLayout(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
+    
     private func addLayout(_ state: inout L.State, layoutText: String?) -> Effect<Action> {
         return .run { send in
             do {
@@ -44,4 +49,15 @@ struct AddLayoutReducer<L: Reducer> {
         }
     }
 }
+
+private extension AddLayoutReducer {
+    // MARK: View Actions
+    func handleAPIAction(_ state: inout L.State, _ action: Action.API) -> Effect<Action> {
+        switch action {
+            case let .start(layoutText):
+                return addLayout(&state, layoutText: layoutText)
+        }
+    }
+}
+
 
