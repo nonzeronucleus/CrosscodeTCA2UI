@@ -42,8 +42,10 @@ struct EditLayoutFeature {
             case pageLoaded
             case backButtonTapped
             case duplicateButtonTapped
-            case exportButtonPressed
+            case exportButtonTapped
             case cancelButtonTapped
+            case populateButtonTapped
+            case depopulateButtonTapped
         }
         
         enum Internal:Equatable {
@@ -134,11 +136,17 @@ private extension EditLayoutFeature {
             case .duplicateButtonTapped:
                 return .send(.addLayout(.api(.start(state.layout?.gridText))))
                 
-            case .exportButtonPressed:
+            case .exportButtonTapped:
                 return .send(.createGameLevel(.api(.start)))
                 
             case .cancelButtonTapped:
-                return .send(.populate(.cancel))
+                return .send(.populate(.api(.cancel)))
+                
+            case .populateButtonTapped:
+                return .send(.populate(.api(.start)))
+
+            case .depopulateButtonTapped:
+                return .send(.depopulate(.api(.start)))
         }
     }
     

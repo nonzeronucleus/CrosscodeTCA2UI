@@ -5,15 +5,36 @@ import Factory
 
 @Reducer
 struct PopulationReducer {
+    typealias State = EditLayoutFeature.State
+
     @Dependency(\.apiClient) var apiClient
+    @Injected(\.uuid) var uuid
+
 
     @CasePathable
     enum Action: Equatable {
-        case buttonClicked
-        case success(String, String)
-        case cancel
-        case cancelled
+        case api(API)
+        case `internal`(Internal)
         case delegate(Delegate)
+
+        @CasePathable
+        enum API : Equatable {
+            case start
+            case cancel
+        }
+        
+        @CasePathable
+        enum Internal: Equatable {
+            case cancelled
+            case success(String, String)
+        }
+        
+        
+//        case buttonClicked
+//        case success(String, String)
+//        case cancel
+//        case cancelled
+//        case delegate(Delegate)
         
         @CasePathable
         enum Delegate : Equatable {
@@ -24,30 +45,44 @@ struct PopulationReducer {
     var body: some Reducer<EditLayoutFeature.State, Action> {
         Reduce { state, action in
             switch action {
-                case .buttonClicked:
-                    return handlePopulation(&state)
-                case .success(let layoutText, let charIntMap):
-                    @Injected(\.uuid) var uuid
+                case let .api(apiAction):
+                    return handleAPIAction(&state, apiAction)
                     
-                    state.layout?.crossword = Crossword(initString:layoutText)
-                    state.layout?.letterMap = CharacterIntMap(from: charIntMap)
-                    state.isPopulated = true
-                    state.isDirty = true
-                    state.isBusy = false
-
-                    return .none
-                    
-                case .cancel:
-                    return handlePopulationCancel(&state)
-
-                case .cancelled:
-                    state.isBusy = false
-                    return .none
+                case let .internal(internalAction):
+                    return handleInternalAction(&state, internalAction)
 
                 case .delegate:
                     return .none
             }
         }
+
+        
+//        Reduce { state, action in
+//            switch action {
+//                case .buttonClicked:
+//                    return handlePopulation(&state)
+//                case .success(let layoutText, let charIntMap):
+//                    @Injected(\.uuid) var uuid
+//                    
+//                    state.layout?.crossword = Crossword(initString:layoutText)
+//                    state.layout?.letterMap = CharacterIntMap(from: charIntMap)
+//                    state.isPopulated = true
+//                    state.isDirty = true
+//                    state.isBusy = false
+//
+//                    return .none
+//                    
+//                case .cancel:
+//                    return handlePopulationCancel(&state)
+//
+//                case .cancelled:
+//                    state.isBusy = false
+//                    return .none
+//
+//                case .delegate:
+//                    return .none
+//            }
+//        }
     }
     
     func handlePopulation(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
@@ -68,7 +103,7 @@ struct PopulationReducer {
 //                    }
                     let (updatedCrossword, charIntMap) = try await apiClient.layoutsAPI.populateCrossword(crosswordLayout: populatedLevel)
 
-                    await send(.success(updatedCrossword, charIntMap))
+                    await send(.internal(.success(updatedCrossword, charIntMap)))
                 } catch {
                     await send(.delegate(.failure(EquatableError(error))))
                 }
@@ -83,9 +118,42 @@ struct PopulationReducer {
         return .run { send in
             do {
                 await apiClient.layoutsAPI.cancelPopulation()
-                await send(.cancelled)
+                await send(.internal(.cancelled))
             }
         }
     }
 }
+
+extension PopulationReducer {
+    func handleAPIAction(_ state: inout State, _ action: Action.API) -> Effect<Action> {
+        switch action {
+            case .start:
+                return handlePopulation(&state)
+            case .cancel:
+                return handlePopulationCancel(&state)
+        }
+    }
+
+    
+    // MARK: Internal Actions
+    func handleInternalAction(_ state: inout State, _ action: Action.Internal) -> Effect<Action> {
+        switch action {
+            case .success(let layoutText, let charIntMap):
+                @Injected(\.uuid) var uuid
+
+                state.layout?.crossword = Crossword(initString:layoutText)
+                state.layout?.letterMap = CharacterIntMap(from: charIntMap)
+                state.isPopulated = true
+                state.isDirty = true
+                state.isBusy = false
+
+                return .none
+
+            case .cancelled:
+                state.isBusy = false
+                return .none
+        }
+    }
+}
+
 

@@ -96,12 +96,12 @@ struct EditLayoutView: View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             HStack(spacing: ViewStyle.buttonSpacing) {
                 if viewStore.isPopulated {
-                    Button("Export") {store.send(.view(.exportButtonPressed)) }
+                    Button("Export") {store.send(.view(.exportButtonTapped)) }
                         .buttonStyle(.borderedProminent)
                         .tint(.green)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                    Button("Clear") {store.send(.depopulate(.buttonClicked))}
+                    Button("Clear") {store.send(.view(.depopulateButtonTapped))}
                         .buttonStyle(.borderedProminent)
                         .tint(.red)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -111,7 +111,7 @@ struct EditLayoutView: View {
                         .tint(.blue)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-                    Button("Populate") {store.send(.populate(.buttonClicked))}
+                    Button("Populate") {store.send(.view(.populateButtonTapped))}
                         .buttonStyle(.borderedProminent)
                         .tint(.blue)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
