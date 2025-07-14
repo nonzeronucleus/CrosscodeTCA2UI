@@ -4,10 +4,13 @@ import CrosscodeDataLibrary
 
 @Reducer
 struct EditLayoutCellReducer {
+    
+    @CasePathable
     enum Action: Equatable {
         case cellClicked(UUID)
         case delegate(Delegate)
         
+        @CasePathable
         enum Delegate : Equatable {
             case failure(EquatableError)
         }

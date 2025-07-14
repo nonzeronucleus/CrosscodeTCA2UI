@@ -109,11 +109,11 @@ struct SaveLayoutTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(CreateGameLevelReducer.Action.start) {
+        await store.send(CreateGameLevelReducer.Action.api(.start)) {
             $0.isBusy = true
         }
 
-        await store.receive(CreateGameLevelReducer.Action.success) {
+        await store.receive(CreateGameLevelReducer.Action.internal(.success)) {
             $0.isBusy = false
         }
         

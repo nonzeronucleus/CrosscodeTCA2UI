@@ -65,11 +65,11 @@ struct LoadGameLevelsTests {
         
         await store.send(GameLevelsTabFeature.Action.pack(.delegate(.didChangePack(selectedPack))))
         
-        await store.receive(GameLevelsTabFeature.Action.loadLayout(.start(UUID(0)))) {
+        await store.receive(GameLevelsTabFeature.Action.loadGameLevels(.api(.start(UUID(0))))) {
             $0.isBusy = true
         }
         
-        await store.receive(GameLevelsTabFeature.Action.loadLayout(.success(GameLevel.mocks))) {
+        await store.receive(GameLevelsTabFeature.Action.loadGameLevels(.internal(.success(GameLevel.mocks)))) {
             $0.isBusy = false
             $0.levels = IdentifiedArray(uniqueElements:GameLevel.mocks)
         }

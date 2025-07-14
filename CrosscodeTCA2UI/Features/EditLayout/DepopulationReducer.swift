@@ -3,13 +3,16 @@ import Foundation
 import CrosscodeDataLibrary
 import Factory
 
+
 @Reducer
 struct DepopulationReducer {
+    @CasePathable
     enum Action: Equatable {
         case buttonClicked
         case success(String, String)
         case delegate(Delegate)
         
+        @CasePathable
         enum Delegate : Equatable {
             case failure(EquatableError)
         }

@@ -23,13 +23,13 @@ struct PlayGameNavigationTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(.pageLoaded)
+        await store.send(.view(.pageLoaded))
         
-        await store.receive(.loadGameLevel(.start(mockGame.id))) {
+        await store.receive(.loadGameLevel(.api(.start(mockGame.id)))) {
             $0.isBusy = true
         }
 
-        await store.receive(.loadGameLevel(.success(mockGame))) {
+        await store.receive(.loadGameLevel(.internal(.success(mockGame)))) {
             $0.isBusy = false
             $0.level = mockGame
         }
@@ -53,7 +53,7 @@ struct PlayGameNavigationTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(.backButtonTapped) {
+        await store.send(.view(.backButtonTapped)) {
             $0.isExiting = true
         }
     }

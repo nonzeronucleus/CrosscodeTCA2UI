@@ -6,10 +6,12 @@ import CrosscodeDataLibrary
 struct SaveLayoutReducer {
     @Dependency(\.apiClient) var apiClient
     
+    @CasePathable
     enum Action: Equatable {
         case start
         case delegate(Delegate)
         
+        @CasePathable
         enum Delegate : Equatable {
             case success
             case failure(EquatableError)
@@ -50,3 +52,4 @@ struct SaveLayoutReducer {
         }
     }
 }
+

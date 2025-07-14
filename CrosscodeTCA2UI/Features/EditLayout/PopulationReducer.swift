@@ -5,11 +5,17 @@ import Factory
 
 @Reducer
 struct PopulationReducer {
+    @Dependency(\.apiClient) var apiClient
+
+    @CasePathable
     enum Action: Equatable {
         case buttonClicked
         case success(String, String)
+        case cancel
+        case cancelled
         case delegate(Delegate)
         
+        @CasePathable
         enum Delegate : Equatable {
             case failure(EquatableError)
         }
@@ -31,6 +37,13 @@ struct PopulationReducer {
 
                     return .none
                     
+                case .cancel:
+                    return handlePopulationCancel(&state)
+
+                case .cancelled:
+                    state.isBusy = false
+                    return .none
+
                 case .delegate:
                     return .none
             }
@@ -38,7 +51,6 @@ struct PopulationReducer {
     }
     
     func handlePopulation(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
-        @Dependency(\.apiClient) var apiClient
         do {
             state.isBusy = true
             guard let layout = state.layout else {
@@ -66,4 +78,14 @@ struct PopulationReducer {
             return .run {send in await send(.delegate(.failure(EquatableError(error))))}
         }
     }
+    
+    func handlePopulationCancel(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
+        return .run { send in
+            do {
+                await apiClient.layoutsAPI.cancelPopulation()
+                await send(.cancelled)
+            }
+        }
+    }
 }
+

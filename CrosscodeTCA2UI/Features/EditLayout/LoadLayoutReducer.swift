@@ -7,12 +7,13 @@ extension EditLayoutFeature {
     struct LoadLayoutReducer {
         @Dependency(\.apiClient) var apiClient
         
+        @CasePathable
         enum Action: Equatable {
             case start(UUID)
             case success(Layout)
             case delegate(Delegate)
             
-            enum Delegate : Equatable {
+            @CasePathable enum Delegate : Equatable {
                 case failure(EquatableError)
             }
         }

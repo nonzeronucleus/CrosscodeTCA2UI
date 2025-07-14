@@ -4,6 +4,10 @@ import Foundation
 import CrosscodeDataLibrary
 
 class MockLayoutsAPI: LayoutsAPI {
+    func cancelPopulation() async {
+        
+    }
+    
     
     func importLayouts() async throws -> [Layout] {
         return []

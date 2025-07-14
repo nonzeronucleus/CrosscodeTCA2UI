@@ -31,49 +31,77 @@ struct PlayGameFeature {
     }
     
     enum Action: Equatable {
-        case pageLoaded
-        case backButtonTapped
-        case checkToggled
-        case revealRequested
-
+        case view(View)
+        
         case keyboard(KeyboardFeature.Action)
-        case loadGameLevel(LoadGameLevelReducer.Action)
         case playGameCell(PlayGameCellReducer.Action)
+        case loadGameLevel(LoadGameLevelReducer.Action)
+
+        enum View : Equatable {
+            case pageLoaded
+            case backButtonTapped
+            case checkToggled
+            case revealRequested
+        }
     }
     
     var body: some Reducer<State, Action> {
-        Scope(state: \.self, action: \.loadGameLevel) { LoadGameLevelReducer() }
+        
+        Scope(state: \.self, action: \.loadGameLevel ) { LoadGameLevelReducer() }
         Scope(state: \.self, action: \.playGameCell) { PlayGameCellReducer() }
         Scope(state: \.self, action: \.keyboard) { KeyboardFeature() }
 
         Reduce { state, action in
             switch action {
-                case .pageLoaded:
-                    state.isDirty = false
-                    return .send(.loadGameLevel(.start(state.levelID)))
-                    
-                case .backButtonTapped:
-                    if isPresented {
-                        state.isExiting = true
-                        return .run { _ in
-                            await dismiss()
-                        }
-                    } else {
-                        return .none
+                case .view(let viewAction):
+                    switch viewAction {
+                        case .pageLoaded:
+                            state.isDirty = false
+                            return .send(.loadGameLevel(.api(.start(state.levelID))))
+                            
+                        case .backButtonTapped:
+                            if isPresented {
+                                state.isExiting = true
+                                return .run { _ in
+                                    await dismiss()
+                                }
+                            } else {
+                                return .none
+                            }
+                            
+                        case .checkToggled:
+                            state.checking.toggle()
+                            return .none
+
+                        case .revealRequested:
+                            return .none
                     }
                     
-                case .checkToggled:
-                    state.checking.toggle()
-                    return .none
-                case .revealRequested:
-                    return .none
                 case .keyboard(_):
                     state.checking = false
                     return .none
-                case .loadGameLevel, .playGameCell:
+                    
+                case let .loadGameLevel(.delegate(delegateAction)):
+                    return handleLoadGameLevelDelegate(&state, delegateAction)
+                    
+                case .playGameCell, .loadGameLevel(.api), .loadGameLevel(.internal):
                     return .none
             }
         }
+    }
+    
+    private func handleLoadGameLevelDelegate(_ state: inout State,_ action: LoadGameLevelReducer.Action.Delegate) -> Effect<Action> {
+        switch action {
+            case .failure(let error):
+                return handleError(&state, error: error)
+        }
+    }
+    
+    func handleError(_ state: inout State, error: EquatableError) -> Effect<Action> {
+        state.error = error
+        state.isBusy = false
+        debugPrint("Error: \(error.localizedDescription)")
+        return .none
     }
 }
 

@@ -7,27 +7,45 @@ struct LoadGameLevelReducer {
     @Dependency(\.apiClient) var apiClient
     
     enum Action: Equatable {
-        case start(UUID)
-        case success(GameLevel)
-        case failure(EquatableError)
+        case api(API)
+        case `internal`(Internal)
+        case delegate(Delegate)
+        
+        enum API: Equatable {
+            case start(UUID)
+        }
+        
+        enum Internal : Equatable  {
+            case success(GameLevel)
+        }
+        
+        enum Delegate : Equatable {
+            case failure(EquatableError)
+        }
     }
     
     var body: some Reducer<PlayGameFeature.State, Action> {
         Reduce { state, action in
             switch action {
-                case .start(let id):
-                    state.isBusy = true
-                    return loadLevel(&state, id:id)
+                case let .api(externalActions):
+                    switch externalActions {
+                        case .start(let id):
+                            state.isBusy = true
+                            return loadLevel(&state, id:id)
+                    }
+
+
+                case let .internal(internalAction):
+                    switch internalAction {
+                        case .success(let level):
+                            state.level = level
+                            state.isBusy = false
+                            state.isDirty = false
+                            
+                            return .none
+                    }
                     
-                case .success(let level):
-                    state.level = level
-                    state.isBusy = false
-                    state.isDirty = false
-
-                    return .none
-
-                case .failure(let error):
-                    debugPrint(error)
+                case .delegate:
                     return .none
             }
         }
@@ -39,14 +57,14 @@ struct LoadGameLevelReducer {
                 let result = try await apiClient.gameLevelsAPI.fetchLevel(id: id)
                 
                 if let result = result as? GameLevel {
-                    await send(.success(result))
+                    await send(.internal(.success(result)))
                 }
                 else {
-                    await send(.failure(EquatableError(PlayGameFeature.FeatureError.loadLevelError)))
+                    await send(.delegate(.failure(EquatableError(PlayGameFeature.FeatureError.loadLevelError))))
                 }
             }
             catch {
-                await send(.failure(EquatableError(error)))
+                await send(.delegate(.failure(EquatableError(error))))
             }
         }
     }

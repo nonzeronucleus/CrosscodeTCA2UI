@@ -6,6 +6,7 @@ import CrosscodeDataLibrary
 struct LayoutsTabFeature {
     @Dependency(\.uuid) var uuid
     
+
     @ObservableState
     struct State: Equatable {
         var layouts: IdentifiedArrayOf<Layout> = []
@@ -154,8 +155,10 @@ struct LayoutsTabFeature {
     
     private func handleEditLayoutDelegate(_ state: inout State,_ action: EditLayoutFeature.Action.Delegate) -> Effect<Action> {
         switch action {
-            case .laypoutAdded:
+            case .layoutAdded:
                 return .send(Action.fetchLayouts(.start))
+            case .shouldDismiss:
+                return .none
         }
     }
 

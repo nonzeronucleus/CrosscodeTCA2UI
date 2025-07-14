@@ -27,7 +27,7 @@ struct EditLayoutTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(EditLayoutFeature.Action.pageLoaded)
+        await store.send(EditLayoutFeature.Action.view(.pageLoaded))
         
         await store.receive(EditLayoutFeature.Action.loadLayout(.start(UUID(0)))) {
             $0.isBusy = true

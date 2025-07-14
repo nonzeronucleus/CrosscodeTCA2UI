@@ -56,7 +56,7 @@ struct PlayGameView: View {
             .ignoresSafeArea(.keyboard, edges: .bottom)
         }
         .onAppear {
-            store.send(.pageLoaded)
+            store.send(.view(.pageLoaded))
         }
     }
     
@@ -64,7 +64,7 @@ struct PlayGameView: View {
     
     private var backButton: some View {
         Button(action: {
-            store.send(.backButtonTapped)
+            store.send(.view(.backButtonTapped))
         }) {
             Image(systemName: "chevron.backward.circle.fill")
                 .symbolRenderingMode(.hierarchical)
@@ -114,7 +114,7 @@ struct PlayGameView: View {
     
     private var actionButtons: some View {
         HStack(spacing: ViewStyle.buttonSpacing) {
-            Button(action: { store.send(.checkToggled) }) {
+            Button(action: { store.send(.view(.checkToggled)) }) {
                 Text("Check")
                     .font(.system(size: ViewStyle.buttonFontSize(), weight: .bold))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -123,7 +123,7 @@ struct PlayGameView: View {
             .buttonStyle(.borderedProminent)
             .tint(.blue)
             
-            Button(action: { store.send(.revealRequested) }) {
+            Button(action: { store.send(.view(.revealRequested)) }) {
                 Text("Reveal Letter")
                     .font(.system(size: ViewStyle.buttonFontSize(), weight: .bold))
                     .frame(maxWidth: .infinity, maxHeight: .infinity)

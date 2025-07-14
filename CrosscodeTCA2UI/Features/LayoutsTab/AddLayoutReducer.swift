@@ -7,10 +7,12 @@ import CrosscodeDataLibrary
 struct AddLayoutReducer<L: Reducer> {
     @Dependency(\.apiClient) var apiClient
     
+    @CasePathable
     enum Action: Equatable {
         case start(String? = nil)
         case delegate(Delegate)
         
+        @CasePathable
         enum Delegate : Equatable {
             case failure(EquatableError)
             case success

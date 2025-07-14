@@ -15,7 +15,7 @@ struct EditLayoutView: View {
                         // Top bar with back button
                         HStack {
                             Button(action: {
-                                store.send(.backButtonTapped)
+                                store.send(.view(.backButtonTapped))
                             }) {
                                 Image(systemName: "chevron.left")
                                     .foregroundColor(.black)
@@ -51,7 +51,7 @@ struct EditLayoutView: View {
                                     .scaleEffect(2.5)
 
                                 Button("Cancel") {
-                                    // Add cancel logic here
+                                    store.send(.view(.cancelButtonTapped))
                                 }
                             }
                         )
@@ -60,7 +60,7 @@ struct EditLayoutView: View {
                 .ignoresSafeArea(.keyboard, edges: .bottom)
             }
             .onAppear {
-                viewStore.send(.pageLoaded)
+                viewStore.send(.view(.pageLoaded))
             }
         }
     }
@@ -96,7 +96,7 @@ struct EditLayoutView: View {
         WithViewStore(store, observe: { $0 }) { viewStore in
             HStack(spacing: ViewStyle.buttonSpacing) {
                 if viewStore.isPopulated {
-                    Button("Export") {store.send(.exportButtonPressed) }
+                    Button("Export") {store.send(.view(.exportButtonPressed)) }
                         .buttonStyle(.borderedProminent)
                         .tint(.green)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -106,7 +106,7 @@ struct EditLayoutView: View {
                         .tint(.red)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
                 } else {
-                    Button("Duplicate") {store.send(.duplicateButtonTapped)}
+                    Button("Duplicate") {store.send(.view(.duplicateButtonTapped))}
                         .buttonStyle(.borderedProminent)
                         .tint(.blue)
                         .frame(maxWidth: .infinity, maxHeight: .infinity)

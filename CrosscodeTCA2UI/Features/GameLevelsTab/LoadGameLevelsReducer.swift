@@ -7,25 +7,43 @@ struct LoadGameLevelsReducer {
     @Dependency(\.apiClient) var apiClient
 
     enum Action: Equatable {
-        case start(UUID)
-        case success([GameLevel])
-        case failure(EquatableError)
+        case api(API)
+        case `internal`(Internal)
+        case delegate(Delegate)
+        
+        enum API : Equatable {
+            case start(UUID)
+        }
+        
+        enum Internal : Equatable  {
+            case success([GameLevel])
+        }
+        
+        enum Delegate : Equatable {
+            case failure(EquatableError)
+        }
     }
 
     var body: some Reducer<GameLevelsTabFeature.State, Action> {
         Reduce { state, action in
             switch action {
-                case let .start(id):
-                    state.isBusy = true
-                    return loadGameLevels(&state, id:id)
-
-                case .success(let levels):
-                    state.levels = IdentifiedArray(uniqueElements: levels)
-                    state.isBusy = false
-                    return .none
-
-                case .failure(let error):
-                    debugPrint(error.localizedDescription)
+                case let .api(apiAction):
+                    switch apiAction {
+                        case let .start(id):
+                            state.isBusy = true
+                            return loadGameLevels(&state, id:id)
+                    }
+                            
+                case let .internal(internalAction):
+                    switch internalAction {
+                            
+                        case .success(let levels):
+                            state.levels = IdentifiedArray(uniqueElements: levels)
+                            state.isBusy = false
+                            return .none
+                    }
+                    
+                case .delegate:
                     return .none
             }
         }
@@ -36,10 +54,10 @@ struct LoadGameLevelsReducer {
             do {
                 let result = try await apiClient.gameLevelsAPI.fetchGameLevels(packId: id)
 
-                await send(.success(result))
+                await send(.internal(.success(result)))
             }
             catch {
-                await send(.failure(EquatableError(error)))
+                await send(.delegate(.failure(EquatableError(error))))
             }
         }
     }

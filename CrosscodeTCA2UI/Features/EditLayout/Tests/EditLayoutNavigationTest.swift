@@ -37,7 +37,7 @@ struct EditLayoutNavigationTests {
         }
         
         
-        await store.send(EditLayoutFeature.Action.backButtonTapped){
+        await store.send(EditLayoutFeature.Action.view(.backButtonTapped)){
             $0.isExiting = true
         }
         
@@ -73,7 +73,7 @@ struct EditLayoutNavigationTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(EditLayoutFeature.Action.backButtonTapped){
+        await store.send(EditLayoutFeature.Action.view(.backButtonTapped)){
             $0.isExiting = true
         }
         

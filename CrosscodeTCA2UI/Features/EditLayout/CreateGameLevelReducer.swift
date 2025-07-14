@@ -6,12 +6,24 @@ import CrosscodeDataLibrary
 struct CreateGameLevelReducer {
     @Dependency(\.apiClient) var apiClient
     
+    @CasePathable
     enum Action: Equatable {
-        case start
-        case success
+        
+        case api(API)
+        case `internal`(Internal)
         case delegate(Delegate)
         
+        @CasePathable
+        enum API : Equatable {
+            case start
+        }
         
+        @CasePathable
+        enum Internal: Equatable {
+            case success
+        }
+
+        @CasePathable
         enum Delegate : Equatable {
             case success
             case failure(EquatableError)
@@ -22,19 +34,26 @@ struct CreateGameLevelReducer {
       
         Reduce { state, action in
             switch action {
-                case .start:
-                    if !state.isPopulated { // Don't bother trying to save if not populated
-                        return .run {  send in
-                            await send(.delegate(.success))
-                        }
+                case let .api(apiAction):
+                    switch apiAction {
+                        case .start:
+                            if !state.isPopulated { // Don't bother trying to save if not populated
+                                return .run {  send in
+                                    await send(.delegate(.success))
+                                }
+                            }
+                            state.isBusy = true
+                            
+                            return addLevel(&state)
                     }
-                    state.isBusy = true
                     
-                    return addLevel(&state)
-                case .success:
-                    state.isBusy = false
-                    return .run {  send in
-                        await send(.delegate(.success))
+                case let .internal(internalAction):
+                    switch internalAction {
+                        case .success:
+                            state.isBusy = false
+                            return .run {  send in
+                                await send(.delegate(.success))
+                            }
                     }
 
                 case .delegate:
@@ -52,7 +71,7 @@ struct CreateGameLevelReducer {
                 
                 try await apiClient.gameLevelsAPI.addNewLevel(layout: layout)
                 
-                await send(.success)
+                await send(.internal(.success))
             }
             catch {
                 await send(.delegate(.failure(EquatableError(error))))
