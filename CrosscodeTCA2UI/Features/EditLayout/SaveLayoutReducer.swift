@@ -4,12 +4,19 @@ import CrosscodeDataLibrary
 
 @Reducer
 struct SaveLayoutReducer {
+    typealias State = EditLayoutFeature.State
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable
     enum Action: Equatable {
-        case start
+
+        case api(API)
         case delegate(Delegate)
+
+        @CasePathable
+        enum API: Equatable {
+            case start
+        }
         
         @CasePathable
         enum Delegate : Equatable {
@@ -18,22 +25,31 @@ struct SaveLayoutReducer {
         }
     }
     
-    var body: some Reducer<EditLayoutFeature.State, Action> {
-      
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-                case .start:
-                    if !state.isDirty || state.isPopulated { // Don't bother trying to save something that hasn't changed, or if the grid's been populated
-                        return .run {  send in
-                            await send(.delegate(.success))
-                        }
-                    }
-                    state.isBusy = true
-                    return saveLayout(&state)
+                case let .api(apiAction):
+                    return handleAPIAction(&state, apiAction)
                     
                 case .delegate:
                     return .none
             }
+        }
+    }
+}
+
+// MARK: - API
+extension SaveLayoutReducer {
+    func handleAPIAction(_ state: inout State, _ action: Action.API) -> Effect<Action> {
+        switch action {
+            case .start:
+                if !state.isDirty || state.isPopulated { // Don't bother trying to save something that hasn't changed, or if the grid's been populated
+                    return .run {  send in
+                        await send(.delegate(.success))
+                    }
+                }
+                state.isBusy = true
+                return saveLayout(&state)
         }
     }
     

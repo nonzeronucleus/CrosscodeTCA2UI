@@ -26,7 +26,7 @@ struct SaveLayoutTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(SaveLayoutReducer.Action.start) {
+        await store.send(SaveLayoutReducer.Action.api(.start)) {
             $0.isBusy = true
         }
         
@@ -53,7 +53,7 @@ struct SaveLayoutTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(EditLayoutFeature.Action.saveLayout(.start)) {
+        await store.send(EditLayoutFeature.Action.saveLayout(.api(.start))) {
             $0.isBusy = true
         }
         
@@ -87,7 +87,7 @@ struct SaveLayoutTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(SaveLayoutReducer.Action.start)
+        await store.send(SaveLayoutReducer.Action.api(.start))
         await store.receive(SaveLayoutReducer.Action.delegate(.success))
     }
     

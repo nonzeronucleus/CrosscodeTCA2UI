@@ -29,10 +29,10 @@ struct EditLayoutTests {
         
         await store.send(EditLayoutFeature.Action.view(.pageLoaded))
         
-        await store.receive(EditLayoutFeature.Action.loadLayout(.start(UUID(0)))) {
+        await store.receive(EditLayoutFeature.Action.loadLayout(.api(.start(UUID(0))))) {
             $0.isBusy = true
         }
-        await store.receive(EditLayoutFeature.Action.loadLayout(.success(mockLayout))) {
+        await store.receive(EditLayoutFeature.Action.loadLayout(.internal(.success(mockLayout)))) {
             $0.layout = mockLayout
             $0.isBusy = false
         }
@@ -60,13 +60,13 @@ struct EditLayoutTests {
         await #expect(store.state.layout?.crossword[2,2].letter == nil)
         
         let cellID = (state.layout?.crossword[0,0].id)!
-        await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellID))) {
+        await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(cellID)))) {
             $0.layout!.crossword[0,0].letter = " "
             $0.layout?.crossword[2,2].letter = " "
             $0.isDirty = true
         }
         
-        await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellID))) {
+        await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(cellID)))) {
             $0.layout!.crossword[0,0].letter = nil
             $0.layout?.crossword[2,2].letter = nil
         }

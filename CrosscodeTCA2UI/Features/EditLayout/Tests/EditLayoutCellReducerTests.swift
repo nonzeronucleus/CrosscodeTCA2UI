@@ -31,13 +31,13 @@ struct EditLayoutCellReducerTests {
         
         let cellUUID = await store.state.layout!.crossword[0,0].id
         
-        await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellUUID))) {
+        await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(cellUUID)))) {
             $0.layout!.crossword[0,0].letter = nil
             $0.layout!.crossword[14,14].letter = nil
             $0.isDirty = true
         }
         
-        await store.send(EditLayoutFeature.Action.cell(.cellClicked(cellUUID))) {
+        await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(cellUUID)))) {
             $0.layout!.crossword[0,0].letter = " "
             $0.layout!.crossword[14,14].letter = " "
         }
@@ -67,8 +67,8 @@ struct EditLayoutCellReducerTests {
         }
         
         // It's populated, so there shouldn't be any reaction to the cell being clicked
-        await store.send(EditLayoutFeature.Action.cell(.cellClicked(UUID(2))))
-        await store.send(EditLayoutFeature.Action.cell(.cellClicked(UUID(2))))
+        await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(UUID(2)))))
+        await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(UUID(2)))))
     }
     
     @Test func testToggleCellWithWrongCell() async throws {
@@ -94,7 +94,7 @@ struct EditLayoutCellReducerTests {
         }
         
         // It's populated, so there shouldn't be any reaction to the cell being clicked
-        await store.send(EditLayoutFeature.Action.cell(.cellClicked(UUID(0))))
+        await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(UUID(0)))))
         
         let expectedError = EquatableError(EditLayoutCellReducer.FeatureError.couldNotFindCell(UUID(0)))
         
@@ -126,7 +126,7 @@ struct EditLayoutCellReducerTests {
         }
         
         // It's populated, so there shouldn't be any reaction to the cell being clicked
-        await store.send(EditLayoutFeature.Action.cell(.cellClicked(UUID(0))))
+        await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(UUID(0)))))
         
         let expectedError = EquatableError(EditLayoutCellReducer.FeatureError.layoutNil)
 

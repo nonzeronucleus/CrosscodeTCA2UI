@@ -4,11 +4,17 @@ import CrosscodeDataLibrary
 
 @Reducer
 struct EditLayoutCellReducer {
-    
+    typealias State = EditLayoutFeature.State
+
     @CasePathable
     enum Action: Equatable {
-        case cellClicked(UUID)
+        case view(View)
         case delegate(Delegate)
+        
+        @CasePathable
+        enum View: Equatable {
+            case cellClicked(UUID)
+        }
         
         @CasePathable
         enum Delegate : Equatable {
@@ -16,18 +22,34 @@ struct EditLayoutCellReducer {
         }
     }
     
-    var body: some Reducer<EditLayoutFeature.State, Action> {
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-                case .cellClicked(let id):
-                    return handleToggle(&state, id: id)
+                case let .view(viewAcion):
+                    return handleViewAction(&state, viewAcion)
                 case .delegate:
                     return .none
             }
         }
     }
     
-    func handleToggle(_ state: inout EditLayoutFeature.State, id: UUID) -> Effect<Action> {
+
+    public enum FeatureError: Error {
+        case layoutNil
+        case couldNotFindCell(UUID)
+    }
+}
+
+private extension EditLayoutCellReducer {
+    // MARK: View Actions
+    func handleViewAction(_ state: inout State, _ action: Action.View) -> Effect<Action> {
+        switch action {
+            case .cellClicked(let id):
+                return handleToggle(&state, id: id)
+        }
+    }
+    
+    func handleToggle(_ state: inout State, id: UUID) -> Effect<Action> {
         do {
             guard !state.isPopulated else {return .none} // If the layout has been populated with words, don't allow the cell to be clicked on
             guard let level = state.layout else { throw FeatureError.layoutNil}
@@ -56,11 +78,6 @@ struct EditLayoutCellReducer {
                 send in await send(.delegate(.failure(EquatableError(error))))
             }
         }
-    }
-    
-    public enum FeatureError: Error {
-        case layoutNil
-        case couldNotFindCell(UUID)
     }
 }
 

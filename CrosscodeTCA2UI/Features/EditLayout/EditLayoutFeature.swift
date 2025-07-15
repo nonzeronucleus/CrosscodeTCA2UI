@@ -128,7 +128,7 @@ private extension EditLayoutFeature {
     func handleViewAction(_ state: inout State, _ action: Action.View) -> Effect<Action> {
         switch action {
             case .pageLoaded:
-                return .send(.loadLayout(.start(state.layoutID)))
+                return .send(.loadLayout(.api(.start(state.layoutID))))
                 
             case .backButtonTapped:
                 return handleBackButton(&state)
@@ -153,7 +153,7 @@ private extension EditLayoutFeature {
     func handleBackButton(_ state: inout State) -> Effect<Action> {
         guard isPresented else { return .none }
         state.isExiting = true
-        return state.isPopulated ? .run { _ in await dismiss() } : .send(.saveLayout(.start))
+        return state.isPopulated ? .run { _ in await dismiss() } : .send(.saveLayout(.api(.start)))
     }
     
     // MARK: Internal Actions

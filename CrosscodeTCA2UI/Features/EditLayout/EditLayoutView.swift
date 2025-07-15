@@ -74,7 +74,7 @@ struct EditLayoutView: View {
                     letterValues: layout.letterMap,
                     attemptedletterValues: nil
                 ) { cell in
-                    layoutStore.send(.cell(.cellClicked(cell)))
+                    layoutStore.send(.cell(.view(.cellClicked(cell))))
                 }
                 .frame(
                     width: ViewStyle.crosswordSize(geometry),
