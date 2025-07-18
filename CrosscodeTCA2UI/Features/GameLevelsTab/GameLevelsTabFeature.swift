@@ -16,20 +16,28 @@ struct GameLevelsTabFeature {
         var error: EquatableError?
     }
     
+    
     enum Action: Equatable {
-        case pageLoaded
-        case itemSelected(UUID)
+        case view(View)
+        case `internal`(Internal)
+        case delegate(Delegate)
         
-        case exportButtonPressed
-        case importButtonPressed
+        enum View : Equatable {
+            case pageLoaded
+            case itemSelected(UUID)
+            
+            case exportButtonPressed
+            case importButtonPressed
+        }
+        
+        enum Internal : Equatable  {
+        }
         
         case pack(PackFeature.Action)
         case importGameLevels(ImportGameLevelsReducer.Action)
         case exportGameLevels(ExportGameLevelsReducer.Action)
         case loadGameLevels(LoadGameLevelsReducer.Action)
         case playGame(PresentationAction<PlayGameFeature.Action>)
-        
-        case delegate(Delegate)
         
         enum Delegate {
             case settingsButtonPressed
@@ -41,38 +49,31 @@ struct GameLevelsTabFeature {
         Scope(state: \.self, action: \.exportGameLevels) { ExportGameLevelsReducer() }
         Scope(state: \.self, action: \.exportGameLevels) { ExportGameLevelsReducer() }
         Scope(state: \.pack, action: \.pack) { PackFeature() }
-
+        
         Reduce { state, action in
             switch action {
-                case .pageLoaded:
-                    return .none
-
-                case .itemSelected(let id):
-                    state.playGame = PlayGameFeature.State(levelID: id)
-                    return .none
+                case let .view(viewAction):
+                    return handleViewAction(&state, viewAction)
                     
-                case .importButtonPressed:
-                    return .send(.importGameLevels(.start))
+                case let .internal(internalAction):
+                    return handleInternalAction(&state, internalAction)
                     
-                case .exportButtonPressed:
-                    return .send(.exportGameLevels(.start))
+                case .delegate:
+                    return .none
                     
                 case let .pack(.delegate(delegateAction)):
                     return handlePackDelegate(&state, delegateAction)
-                    
+
                 case let .exportGameLevels(.delegate(delegateAction)):
                     return handleExportGameLevelsDelegate(&state, delegateAction)
 
                 case let .importGameLevels(.delegate(delegateAction)):
                     return handleImportGameLevelsDelegate(&state, delegateAction)
                     
-                case .loadGameLevels(.api), .loadGameLevels(.internal), .playGame, .importGameLevels, .exportGameLevels, .delegate, .pack:
+                case .pack, .importGameLevels, .exportGameLevels, .loadGameLevels, .playGame:
                     return .none
-                    
-                case let .loadGameLevels(.delegate(delegateAction)):
-                    return handleLoadGameLevelDelegate(&state, delegateAction)
-                    
             }
+            
         }
         .ifLet(\.$playGame, action: \.playGame) {
             PlayGameFeature()
@@ -116,5 +117,31 @@ struct GameLevelsTabFeature {
     }
 }
 
+extension GameLevelsTabFeature {
+    func handleViewAction(_ state: inout State, _ action: Action.View) -> Effect<Action> {
+        switch action {
+            case .pageLoaded:
+                return .none
+                
+            case .itemSelected(let id):
+                state.playGame = PlayGameFeature.State(levelID: id)
+                return .none
+                
+            case .importButtonPressed:
+                return .send(.importGameLevels(.api(.start)))
+                
+            case .exportButtonPressed:
+                return .send(.exportGameLevels(.api(.start)))
+                
+        }
+    }
+}
 
-
+    
+// MARK: Internal Actions
+extension GameLevelsTabFeature {
+    func handleInternalAction(_ state: inout State, _ action: Action.Internal) -> Effect<Action> {
+//        switch action {
+//        }
+    }
+}

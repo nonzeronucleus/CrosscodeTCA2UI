@@ -116,12 +116,6 @@ struct EditLayoutFeature {
     }
 }
 
-// MARK: - Error Handling Protocol
-protocol ErrorHandling {
-    var error: EquatableError? { get set }
-    var isBusy: Bool { get set }
-}
-
 // MARK: - Action Handlers
 private extension EditLayoutFeature {
     // MARK: View Actions
@@ -144,7 +138,7 @@ private extension EditLayoutFeature {
                 
             case .populateButtonTapped:
                 return .send(.populate(.api(.start)))
-
+                
             case .depopulateButtonTapped:
                 return .send(.depopulate(.api(.start)))
         }
@@ -155,6 +149,9 @@ private extension EditLayoutFeature {
         state.isExiting = true
         return state.isPopulated ? .run { _ in await dismiss() } : .send(.saveLayout(.api(.start)))
     }
+}
+    
+private extension EditLayoutFeature {
     
     // MARK: Internal Actions
     func handleInternalAction(_ state: inout State, _ action: Action.Internal) -> Effect<Action> {

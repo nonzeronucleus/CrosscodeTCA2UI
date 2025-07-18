@@ -27,8 +27,8 @@ struct ExportLayoutsTests {
             
             await store.send(.view(.exportButtonPressed))
             
-            await store.receive(.exportLayouts(.start))
-            await store.receive(.exportLayouts(.success))
+            await store.receive(.exportLayouts(.api(.start)))
+            await store.receive(.exportLayouts(.internal(.success)))
             
             #expect(mockLayoutsAPI.exportedLayouts == mockLayouts)
         }

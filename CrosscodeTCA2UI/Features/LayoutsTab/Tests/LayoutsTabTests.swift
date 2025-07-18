@@ -26,7 +26,7 @@ struct LayoutsTabTests {
             
             await #expect(store.state.layouts.count == 0)
 
-            await store.send(LayoutsTabFeature.Action.fetchLayouts(.success(layouts))) {
+            await store.send(LayoutsTabFeature.Action.fetchLayouts(.internal(.success(layouts)))) {
                 $0.layouts = IdentifiedArray(uniqueElements: layouts)
             }
             
@@ -68,9 +68,9 @@ struct LayoutsTabTests {
             
             await #expect(store.state.layouts.count == 0)
 
-            await store.send(LayoutsTabFeature.Action.fetchLayouts(.start))
+            await store.send(LayoutsTabFeature.Action.fetchLayouts(.api(.start)))
             
-            await store.receive(LayoutsTabFeature.Action.fetchLayouts(.success(layouts))) {
+            await store.receive(LayoutsTabFeature.Action.fetchLayouts(.internal(.success(layouts)))) {
                 $0.layouts = IdentifiedArray(uniqueElements: layouts)
             }
 

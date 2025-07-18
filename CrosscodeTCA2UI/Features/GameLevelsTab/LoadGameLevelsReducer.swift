@@ -4,6 +4,7 @@ import CrosscodeDataLibrary
 
 @Reducer
 struct LoadGameLevelsReducer {
+    typealias State = GameLevelsTabFeature.State
     @Dependency(\.apiClient) var apiClient
 
     enum Action: Equatable {
@@ -23,29 +24,30 @@ struct LoadGameLevelsReducer {
             case failure(EquatableError)
         }
     }
-
-    var body: some Reducer<GameLevelsTabFeature.State, Action> {
+    
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
                 case let .api(apiAction):
-                    switch apiAction {
-                        case let .start(id):
-                            state.isBusy = true
-                            return loadGameLevels(&state, id:id)
-                    }
-                            
-                case let .internal(internalAction):
-                    switch internalAction {
-                            
-                        case .success(let levels):
-                            state.levels = IdentifiedArray(uniqueElements: levels)
-                            state.isBusy = false
-                            return .none
-                    }
+                    return handleAPIAction(&state, apiAction)
                     
+                case let .internal(internalAction):
+                    return handleInternalAction(&state, internalAction)
+
                 case .delegate:
                     return .none
             }
+        }
+    }
+}
+
+
+extension LoadGameLevelsReducer {
+    func handleAPIAction(_ state: inout State, _ action: Action.API) -> Effect<Action> {
+        switch action {
+            case let .start(id):
+                state.isBusy = true
+                return loadGameLevels(&state, id:id)
         }
     }
 
@@ -59,6 +61,20 @@ struct LoadGameLevelsReducer {
             catch {
                 await send(.delegate(.failure(EquatableError(error))))
             }
+        }
+    }
+}
+
+    
+// MARK: Internal Actions
+extension LoadGameLevelsReducer {
+    func handleInternalAction(_ state: inout State, _ action: Action.Internal) -> Effect<Action> {
+        switch action {
+                
+            case .success(let levels):
+                state.levels = IdentifiedArray(uniqueElements: levels)
+                state.isBusy = false
+                return .none
         }
     }
 }

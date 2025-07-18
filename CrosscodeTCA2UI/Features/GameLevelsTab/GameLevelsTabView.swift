@@ -19,7 +19,7 @@ struct GameLevelsTabView: View {
                         title: "Levels",
                         color: .cyan,
 //                        importAction:{ store.send(.importButtonPressed) },
-                        exportAction:{ store.send(.exportButtonPressed) },
+                        exportAction:{ store.send(.view(.exportButtonPressed)) },
 //                        addItemAction: nil,
                         showSettingsAction: { store.send(.delegate(.settingsButtonPressed)) }
                     )
@@ -31,7 +31,7 @@ struct GameLevelsTabView: View {
                         LazyVGrid(columns: [GridItem(.adaptive(minimum: 100), spacing: 16)], spacing: 20) {
                             ForEach(store.levels) { level in
                                 LevelCard(level: level) {
-                                    store.send(.itemSelected(level.id))
+                                    store.send(.view(.itemSelected(level.id)))
                                 }
                                 .transition(.scale.combined(with: .opacity))
                             }
@@ -43,7 +43,7 @@ struct GameLevelsTabView: View {
                 Spacer()
             }
             .onAppear {
-                store.send(.pageLoaded)
+                store.send(.view(.pageLoaded))
             }
             .fullScreenCover(
                 item: $store.scope(state: \.playGame, action: \.playGame)

@@ -4,37 +4,75 @@ import CrosscodeDataLibrary
 
 @Reducer
 struct ImportGameLevelsReducer {
+    typealias State = GameLevelsTabFeature.State
+
     @Dependency(\.apiClient) var apiClient
+
     
     enum Action: Equatable {
-        case start
+        case api(API)
+        case `internal`(Internal)
         case delegate(Delegate)
-        case success([GameLevel])
+
+        @CasePathable
+        enum API: Equatable {
+            case start
+        }
+        
+        @CasePathable
+        enum Internal: Equatable {
+            case success([GameLevel])
+        }
 
         enum Delegate : Equatable {
             case failure(EquatableError)
         }
     }
-    
-    var body: some Reducer<GameLevelsTabFeature.State, Action> {
+
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-                case .start:
-                    return importGameLevels(&state)
-                case let .success(gameLevels):
-                    state.levels = IdentifiedArrayOf(uniqueElements: gameLevels)
-                    return .none
+                case let .api(apiAction):
+                    return handleAPIAction(&state, apiAction)
+                    
+                case let .internal(internalAction):
+                    return handleInternalAction(&state, internalAction)
+
                 case .delegate:
                     return .none
             }
         }
     }
-    private func importGameLevels(_ state: inout GameLevelsTabFeature.State) -> Effect<Action> {
+    
+//    var body: some Reducer<State, Action> {
+//        Reduce { state, action in
+//            switch action {
+//                case .start:
+//                    return importGameLevels(&state)
+//                case let .success(gameLevels):
+//                    state.levels = IdentifiedArrayOf(uniqueElements: gameLevels)
+//                    return .none
+//                case .delegate:
+//                    return .none
+//            }
+//        }
+//    }
+}
+
+extension ImportGameLevelsReducer {
+    func handleAPIAction(_ state: inout State, _ action: Action.API) -> Effect<Action> {
+        switch action {
+            case .start:
+                return importGameLevels(&state)
+        }
+    }
+    
+    private func importGameLevels(_ state: inout State) -> Effect<Action> {
         return .run { send in
             do {
                 let gameLevels = try await apiClient.gameLevelsAPI.importGameLevels()
 
-                await send(.success(gameLevels))
+                await send(.internal(.success(gameLevels)))
             }
             catch {
                 await send(.delegate(.failure(EquatableError(error))))
@@ -42,4 +80,18 @@ struct ImportGameLevelsReducer {
         }
     }
 }
+
+    
+    // MARK: Internal Actions
+extension ImportGameLevelsReducer {
+    func handleInternalAction(_ state: inout State, _ action: Action.Internal) -> Effect<Action> {
+        switch action {
+            case let .success(gameLevels):
+                state.levels = IdentifiedArrayOf(uniqueElements: gameLevels)
+
+                return .none
+        }
+    }
+}
+
 

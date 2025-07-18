@@ -2,32 +2,54 @@ import ComposableArchitecture
 import Foundation
 import CrosscodeDataLibrary
 
-    @Reducer
+@Reducer
 struct FetchLayoutsReducer {
+    typealias State = LayoutsTabFeature.State
     @Dependency(\.apiClient) var apiClient
     
+    @CasePathable
     enum Action: Equatable {
-        case start
-        case success([Layout])
+        case api(API)
+        case `internal`(Internal)
         case delegate(Delegate)
         
+        @CasePathable
+        enum API : Equatable {
+            case start
+        }
+        
+        @CasePathable
+        enum Internal : Equatable {
+            case success([Layout])
+        }
+        
+        
+        @CasePathable
         enum Delegate : Equatable {
             case noLayoutsLoaded
             case failure(EquatableError)
         }
     }
-    var body: some Reducer<LayoutsTabFeature.State, Action> {
+    
+    var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-                case .start:
-                    return fetchAll(&state)
+                case let .api(apiAction):
+                    return handleAPIAction(&state, apiAction)
+                case let .internal(internalAction):
+                    return handleInternalAction(&state, internalAction)
                 case .delegate:
                     return .none
-                case let .success(layouts):
-                    state.layouts = IdentifiedArray(uniqueElements: layouts)
-                    return .none
-
             }
+        }
+    }
+}
+
+extension FetchLayoutsReducer {
+    func handleAPIAction(_ state: inout State, _ action: Action.API) -> Effect<Action> {
+        switch action {
+            case .start:
+                return fetchAll(&state)
         }
     }
     
@@ -41,7 +63,7 @@ struct FetchLayoutsReducer {
                     await send(.delegate(.noLayoutsLoaded))
                 }
                 
-                await send(.success(layouts))
+                await send(.internal(.success(layouts)))
             }
             catch {
                 await send(.delegate(.failure(EquatableError(error))))
@@ -50,3 +72,12 @@ struct FetchLayoutsReducer {
     }
 }
 
+extension FetchLayoutsReducer {
+    func handleInternalAction(_ state: inout State, _ action: Action.Internal) -> Effect<Action> {
+        switch action {
+            case let .success(layouts):
+                state.layouts = IdentifiedArray(uniqueElements: layouts)
+                return .none
+        }
+    }
+}

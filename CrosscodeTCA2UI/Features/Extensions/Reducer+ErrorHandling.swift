@@ -41,3 +41,10 @@ extension Reducer where State: ErrorHandling {
         return .none
     }
 }
+
+// MARK: - Error Handling Protocol
+protocol ErrorHandling {
+    var error: EquatableError? { get set }
+    var isBusy: Bool { get set }
+}
+

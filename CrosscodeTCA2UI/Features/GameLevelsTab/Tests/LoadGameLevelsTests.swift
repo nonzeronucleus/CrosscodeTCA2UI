@@ -26,7 +26,7 @@ struct LoadGameLevelsTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(GameLevelsTabFeature.Action.pageLoaded)
+        await store.send(GameLevelsTabFeature.Action.view(.pageLoaded))
         
         // Loading page shouldn't load any data
         

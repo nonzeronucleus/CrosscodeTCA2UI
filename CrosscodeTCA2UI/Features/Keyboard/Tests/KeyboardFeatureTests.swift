@@ -14,7 +14,7 @@ struct KeyboardFeatureTests {
         }
         
         // Nothing selected, so state shouldn't change
-        await store.send(.letterInput("Q"))
+        await store.send(.view(.letterInput("Q")))
     }
     
     @Test func testAddLetterWithSelectedSquare() async throws {
@@ -25,12 +25,12 @@ struct KeyboardFeatureTests {
         }
         
         // Third character (offset 0) selected, so that should be set to character
-        await store.send(.letterInput("Q")) {
+        await store.send(.view(.letterInput("Q"))) {
             $0.level!.attemptedLetters[2] = "Q"
         }
         
         // Same one should be overwritten
-        await store.send(.letterInput("W")) {
+        await store.send(.view(.letterInput("W"))) {
             $0.level!.attemptedLetters[2] = "W"
         }
 

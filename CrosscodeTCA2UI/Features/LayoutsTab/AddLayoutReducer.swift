@@ -5,6 +5,7 @@ import CrosscodeDataLibrary
 
 @Reducer
 struct AddLayoutReducer<L: Reducer> {
+    typealias State = L.State
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable

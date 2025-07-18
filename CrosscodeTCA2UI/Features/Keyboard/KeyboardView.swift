@@ -8,10 +8,10 @@ struct KeyboardView: View {
         ZStack {
             LetterKeyboardView(
                 onLetterPressed: {letter in
-                    store.send(.letterInput(letter))
+                    store.send(.view(.letterInput(letter)))
                 },
                 onDeletePressed: {
-                    store.send(.deleteInput)
+                    store.send(.view(.deleteInput))
                 },
                 onEnterPressed: {},
                 usedLetters: store.usedLetters
