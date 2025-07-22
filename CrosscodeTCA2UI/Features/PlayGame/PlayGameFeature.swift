@@ -30,14 +30,14 @@ struct PlayGameFeature {
         var error: EquatableError?
     }
     
-    enum Action: Equatable {
+    enum Action {
         case view(View)
         
         case keyboard(KeyboardFeature.Action)
         case playGameCell(PlayGameCellReducer.Action)
         case loadGameLevel(LoadGameLevelReducer.Action)
 
-        enum View : Equatable {
+        enum View {
             case pageLoaded
             case backButtonTapped
             case checkToggled
@@ -97,8 +97,8 @@ struct PlayGameFeature {
         }
     }
     
-    func handleError(_ state: inout State, error: EquatableError) -> Effect<Action> {
-        state.error = error
+    func handleError(_ state: inout State, error: Error) -> Effect<Action> {
+        state.error = EquatableError(error)
         state.isBusy = false
         debugPrint("Error: \(error.localizedDescription)")
         return .none

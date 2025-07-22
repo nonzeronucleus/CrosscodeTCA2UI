@@ -7,18 +7,18 @@ struct EditLayoutCellReducer {
     typealias State = EditLayoutFeature.State
 
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case view(View)
         case delegate(Delegate)
         
         @CasePathable
-        enum View: Equatable {
+        enum View {
             case cellClicked(UUID)
         }
         
         @CasePathable
-        enum Delegate : Equatable {
-            case failure(EquatableError)
+        enum Delegate {
+            case failure(Error)
         }
     }
     
@@ -75,7 +75,7 @@ private extension EditLayoutCellReducer {
         }
         catch {
             return .run {
-                send in await send(.delegate(.failure(EquatableError(error))))
+                send in await send(.delegate(.failure(error)))
             }
         }
     }

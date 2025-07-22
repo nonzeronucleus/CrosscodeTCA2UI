@@ -5,8 +5,8 @@ extension Reducer where State: ErrorHandling {
     func handleChildFailure<Child: CasePathable>(
         _ state: inout State,
         _ action: Child,
-        errorCase: CaseKeyPath<Child, EquatableError>,
-        onFailure: ((EquatableError, inout State) -> Void)? = nil
+        errorCase: CaseKeyPath<Child, Error>,
+        onFailure: ((Error, inout State) -> Void)? = nil
     ) -> Effect<Action> {
         guard let error = action[case: errorCase] else { return .none }
         return handleError(&state, error: error, onFailure: onFailure)
@@ -16,8 +16,8 @@ extension Reducer where State: ErrorHandling {
         _ state: inout State,
         _ action: Child,
         successCase: CaseKeyPath<Child, Success>,
-        failureCase: CaseKeyPath<Child, EquatableError>,
-        onFailure: ((EquatableError, inout State) -> Void)? = nil,
+        failureCase: CaseKeyPath<Child, Error>,
+        onFailure: ((Error, inout State) -> Void)? = nil,
         onSuccess: (Success, inout State) -> Effect<Action>
     ) -> Effect<Action> {
         if let success = action[case: successCase] {
@@ -31,12 +31,12 @@ extension Reducer where State: ErrorHandling {
         return .none
     }
     
-    func handleError(_ state: inout State, error: EquatableError,
-                     onFailure: ((EquatableError, inout State) -> Void)? = nil) -> Effect<Action> {
+    func handleError(_ state: inout State, error: Error,
+                     onFailure: ((Error, inout State) -> Void)? = nil) -> Effect<Action> {
         if let onFailure {
             onFailure(error, &state)
         }
-        state.error = error
+        state.error = EquatableError(error)
         state.isBusy = false
         return .none
     }

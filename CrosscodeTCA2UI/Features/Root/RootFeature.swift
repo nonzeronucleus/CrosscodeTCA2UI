@@ -15,7 +15,7 @@ struct RootFeature {
         @Presents var settings: SettingsFeature.State?
     }
     
-    enum Action: Equatable {
+    enum Action {
         case layoutsList(LayoutsTabFeature.Action)
         case gameLevelsList(GameLevelsTabFeature.Action)
         case setTab(NavTab)

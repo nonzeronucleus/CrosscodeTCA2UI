@@ -68,26 +68,26 @@ struct PopulationReducer {
 
 
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case api(API)
         case `internal`(Internal)
         case delegate(Delegate)
 
         @CasePathable
-        enum API : Equatable {
+        enum API  {
             case start
             case cancel
         }
         
         @CasePathable
-        enum Internal: Equatable {
+        enum Internal {
             case cancelled
             case success(String, String)
         }
         
         @CasePathable
-        enum Delegate : Equatable {
-            case failure(EquatableError)
+        enum Delegate  {
+            case failure(Error)
         }
     }
     
@@ -123,12 +123,12 @@ struct PopulationReducer {
 
                     await send(.internal(.success(updatedCrossword, charIntMap)))
                 } catch {
-                    await send(.delegate(.failure(EquatableError(error))))
+                    await send(.delegate(.failure(error)))
                 }
             }
         }
         catch {
-            return .run {send in await send(.delegate(.failure(EquatableError(error))))}
+            return .run {send in await send(.delegate(.failure(error)))}
         }
     }
     

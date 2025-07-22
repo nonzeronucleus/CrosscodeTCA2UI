@@ -9,19 +9,19 @@ struct AddLayoutReducer<L: Reducer> {
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         
         case api(API)
         case delegate(Delegate)
         
         @CasePathable
-        enum API : Equatable {
+        enum API {
             case start(String? = nil)
         }
         
         @CasePathable
-        enum Delegate : Equatable {
-            case failure(EquatableError)
+        enum Delegate {
+            case failure(Error)
             case success
         }
     }
@@ -45,7 +45,7 @@ struct AddLayoutReducer<L: Reducer> {
                 await send(.delegate(.success))
             }
             catch {
-                await send(.delegate(.failure(EquatableError(error))))
+                await send(.delegate(.failure(error)))
             }
         }
     }

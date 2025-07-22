@@ -57,10 +57,12 @@ struct SaveLayoutTests {
             $0.isBusy = true
         }
         
-        let expectedError = EquatableError(EditLayoutError.saveLayoutError("Some text"))
+        let expectedError:Error = EditLayoutError.saveLayoutError("Some text")
         
-        await store.receive(\.saveLayout.delegate.failure, expectedError)  {
-            $0.error = expectedError
+        let expectedEquatableError: EquatableError = .init(expectedError)
+        
+        await store.receive(\.saveLayout.delegate.failure)  {
+            $0.error = expectedEquatableError
             $0.isBusy = false
         }
     }

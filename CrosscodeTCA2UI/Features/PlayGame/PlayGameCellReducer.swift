@@ -4,10 +4,10 @@ import CrosscodeDataLibrary
 
 @Reducer
 struct PlayGameCellReducer {
-    enum Action: Equatable {
+    enum Action {
         case cellClicked(UUID)
         case letterSelected(Character)
-        case failure(EquatableError)
+        case failure(Error)
     }
     
     var body: some Reducer<PlayGameFeature.State, Action> {
@@ -24,7 +24,7 @@ struct PlayGameCellReducer {
     }
     
     func handleSelect(_ state: inout PlayGameFeature.State, id: UUID) -> Effect<Action> {
-        guard let level = state.level else {return .run { send in await send(.failure(EquatableError(FeatureError.levelNil)))}}
+        guard let level = state.level else {return .run { send in await send(.failure(FeatureError.levelNil))}}
         guard
             let cell = level.crossword.findElement(byID: id),
             let letter = cell.letter,

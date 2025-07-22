@@ -10,25 +10,25 @@ struct DepopulationReducer {
     @Injected(\.uuid) var uuid
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case api(API)
         case `internal`(Internal)
         case delegate(Delegate)
 
         @CasePathable
-        enum API : Equatable {
+        enum API {
             case start
         }
         
         @CasePathable
-        enum Internal: Equatable {
+        enum Internal {
             case success(String, String)
         }
             
         
         @CasePathable
-        enum Delegate : Equatable {
-            case failure(EquatableError)
+        enum Delegate {
+            case failure(Error)
         }
     }
     
@@ -60,7 +60,7 @@ struct DepopulationReducer {
             }
         }
         catch {
-            return .run {send in await send(.delegate(.failure(EquatableError(error))))}
+            return .run {send in await send(.delegate(.failure(error)))}
         }
     }
 }

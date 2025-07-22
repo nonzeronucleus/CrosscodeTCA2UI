@@ -8,25 +8,25 @@ struct ImportLayoutsReducer {
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case api(API)
         case `internal`(Internal)
         case delegate(Delegate)
         
         @CasePathable
-        enum API : Equatable {
+        enum API {
             case start
         }
         
         @CasePathable
-        enum Internal : Equatable {
+        enum Internal {
             case success([Layout])
         }
         
         
         @CasePathable
-        enum Delegate : Equatable {
-            case failure(EquatableError)
+        enum Delegate {
+            case failure(Error)
         }
     }
     
@@ -60,7 +60,7 @@ extension ImportLayoutsReducer {
                 await send(.internal(.success(layouts)))
             }
             catch {
-                await send(.delegate(.failure(EquatableError(error))))
+                await send(.delegate(.failure(error)))
             }
         }
     }
@@ -77,46 +77,3 @@ extension ImportLayoutsReducer {
 }
 
 
-
-
-//    @Reducer
-//struct ImportLayoutsReducer {
-//    @Dependency(\.apiClient) var apiClient
-//    
-//    enum Action: Equatable {
-//        case start
-//        case delegate(Delegate)
-//        case success([Layout])
-//
-//        enum Delegate : Equatable {
-//            case failure(EquatableError)
-//        }
-//    }
-//    
-//    var body: some Reducer<LayoutsTabFeature.State, Action> {
-//        Reduce { state, action in
-//            switch action {
-//                case .start:
-//                    return importLayouts(&state)
-//                case let .success(layouts):
-//                    state.layouts = IdentifiedArrayOf(uniqueElements: layouts)
-//                    return .none
-//                case .delegate:
-//                    return .none
-//            }
-//        }
-//    }
-//    private func importLayouts(_ state: inout LayoutsTabFeature.State) -> Effect<Action> {
-//        return .run { send in
-//            do {
-//                let layouts = try await apiClient.layoutsAPI.importLayouts()
-//
-//                await send(.success(layouts))
-//            }
-//            catch {
-//                await send(.delegate(.failure(EquatableError(error))))
-//            }
-//        }
-//    }
-//}
-//

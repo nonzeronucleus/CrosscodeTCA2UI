@@ -18,7 +18,7 @@ struct PackFeature {
         }
     }
     
-    enum Action:Equatable {
+    enum Action {
         case viewDidAppear
 
         case incrementButtonTapped
@@ -28,7 +28,7 @@ struct PackFeature {
         
         case delegate(Delegate)
         
-        enum Delegate:Equatable {
+        enum Delegate {
             case didChangePack(Pack)
         }
     }

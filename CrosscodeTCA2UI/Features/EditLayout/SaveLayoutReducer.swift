@@ -8,20 +8,20 @@ struct SaveLayoutReducer {
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
 
         case api(API)
         case delegate(Delegate)
 
         @CasePathable
-        enum API: Equatable {
+        enum API {
             case start
         }
         
         @CasePathable
-        enum Delegate : Equatable {
+        enum Delegate {
             case success
-            case failure(EquatableError)
+            case failure(Error)
         }
     }
     
@@ -55,7 +55,7 @@ extension SaveLayoutReducer {
     
     private func saveLayout(_ state: inout EditLayoutFeature.State) -> Effect<Action> {
         guard let layout = state.layout else {
-            return .send(.delegate(.failure(EquatableError(EditLayoutError.saveLayoutError("No layout found in save level")))))
+            return .send(.delegate(.failure(EditLayoutError.saveLayoutError("No layout found in save level"))))
         }
 
         return .run { send in
@@ -63,7 +63,7 @@ extension SaveLayoutReducer {
                 try await apiClient.layoutsAPI.saveLevel(level: layout)
                 await send(.delegate(.success))
             } catch {
-                await send(.delegate(.failure(EquatableError(error))))
+                await send(.delegate(.failure(error)))
             }
         }
     }

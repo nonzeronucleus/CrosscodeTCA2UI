@@ -96,10 +96,10 @@ struct EditLayoutCellReducerTests {
         // It's populated, so there shouldn't be any reaction to the cell being clicked
         await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(UUID(0)))))
         
-        let expectedError = EquatableError(EditLayoutCellReducer.FeatureError.couldNotFindCell(UUID(0)))
+        let expectedError = EditLayoutCellReducer.FeatureError.couldNotFindCell(UUID(0))
         
-        await store.receive(\.cell.delegate.failure, expectedError) {
-            $0.error = expectedError
+        await store.receive(\.cell.delegate.failure) {
+            $0.error = EquatableError(expectedError)
         }
     }
     
@@ -128,10 +128,10 @@ struct EditLayoutCellReducerTests {
         // It's populated, so there shouldn't be any reaction to the cell being clicked
         await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(UUID(0)))))
         
-        let expectedError = EquatableError(EditLayoutCellReducer.FeatureError.layoutNil)
+        let expectedError = EditLayoutCellReducer.FeatureError.layoutNil
 
-        await store.receive(\.cell.delegate.failure, expectedError) {
-            $0.error = expectedError
+        await store.receive(\.cell.delegate.failure) {
+            $0.error = EquatableError(expectedError)
         }
     }
 }

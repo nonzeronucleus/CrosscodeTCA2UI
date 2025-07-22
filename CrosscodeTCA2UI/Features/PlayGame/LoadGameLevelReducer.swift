@@ -7,24 +7,24 @@ struct LoadGameLevelReducer {
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case api(API)
         case `internal`(Internal)
         case delegate(Delegate)
         
         @CasePathable
-        enum API: Equatable {
+        enum API {
             case start(UUID)
         }
         
         @CasePathable
-        enum Internal : Equatable  {
+        enum Internal  {
             case success(GameLevel)
         }
         
         @CasePathable
-        enum Delegate : Equatable {
-            case failure(EquatableError)
+        enum Delegate {
+            case failure(Error)
         }
     }
     
@@ -64,11 +64,11 @@ struct LoadGameLevelReducer {
                     await send(.internal(.success(result)))
                 }
                 else {
-                    await send(.delegate(.failure(EquatableError(PlayGameFeature.FeatureError.loadLevelError))))
+                    await send(.delegate(.failure(PlayGameFeature.FeatureError.loadLevelError)))
                 }
             }
             catch {
-                await send(.delegate(.failure(EquatableError(error))))
+                await send(.delegate(.failure(error)))
             }
         }
     }

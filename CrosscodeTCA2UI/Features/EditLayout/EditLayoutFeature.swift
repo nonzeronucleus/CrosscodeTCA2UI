@@ -51,7 +51,7 @@ struct EditLayoutFeature {
     
     // MARK: - Actions
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case view(View)
         case `internal`(Internal)
         case delegate(Delegate)
@@ -66,7 +66,7 @@ struct EditLayoutFeature {
         case cell(EditLayoutCellReducer.Action)
         
         @CasePathable
-        enum View:Equatable {
+        enum View {
             case pageLoaded
             case backButtonTapped
             case duplicateButtonTapped
@@ -77,12 +77,12 @@ struct EditLayoutFeature {
         }
 
         @CasePathable
-        enum Internal:Equatable {
-            case failure(EquatableError)
+        enum Internal {
+            case failure(Error)
         }
 
         @CasePathable
-        enum Delegate:Equatable {
+        enum Delegate {
             case layoutAdded
             case shouldDismiss
         }

@@ -9,23 +9,23 @@ struct ImportGameLevelsReducer {
     @Dependency(\.apiClient) var apiClient
 
     
-    enum Action: Equatable {
+    enum Action {
         case api(API)
         case `internal`(Internal)
         case delegate(Delegate)
 
         @CasePathable
-        enum API: Equatable {
+        enum API {
             case start
         }
         
         @CasePathable
-        enum Internal: Equatable {
+        enum Internal {
             case success([GameLevel])
         }
 
-        enum Delegate : Equatable {
-            case failure(EquatableError)
+        enum Delegate {
+            case failure(Error)
         }
     }
 
@@ -75,7 +75,7 @@ extension ImportGameLevelsReducer {
                 await send(.internal(.success(gameLevels)))
             }
             catch {
-                await send(.delegate(.failure(EquatableError(error))))
+                await send(.delegate(.failure(error)))
             }
         }
     }

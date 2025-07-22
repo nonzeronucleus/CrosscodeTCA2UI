@@ -10,24 +10,24 @@ struct ExportLayoutsReducer {
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case api(API)
         case `internal`(Internal)
         case delegate(Delegate)
         
         @CasePathable
-        enum API : Equatable {
+        enum API {
             case start
         }
 
         @CasePathable
-        enum Internal : Equatable {
+        enum Internal {
             case success
         }
         
         @CasePathable
-        enum Delegate : Equatable {
-            case failure(EquatableError)
+        enum Delegate {
+            case failure(Error)
         }
     }
     
@@ -61,7 +61,7 @@ extension ExportLayoutsReducer {
                 await send(.internal(.success))
             }
             catch {
-                await send(.delegate(.failure(EquatableError(error))))
+                await send(.delegate(.failure(error)))
             }
         }
     }

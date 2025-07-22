@@ -6,13 +6,13 @@ import CrosscodeDataLibrary
 struct LoadPacksReducer {
     @Dependency(\.apiClient) var apiClient
 
-    enum Action: Equatable {
+    enum Action {
         case start
         case success([Pack])
-        case failure(EquatableError)
+        case failure(Error)
         case delegate(Delegate)
         
-        enum Delegate: Equatable {
+        enum Delegate {
             case wasLoaded
         }
     }
@@ -51,7 +51,7 @@ struct LoadPacksReducer {
                 await send(.success(result))
             }
             catch {
-                await send(.failure(EquatableError(error)))
+                await send(.failure(error))
             }
         }
     }

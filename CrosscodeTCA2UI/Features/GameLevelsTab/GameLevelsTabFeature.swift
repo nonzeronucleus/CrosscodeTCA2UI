@@ -18,13 +18,13 @@ struct GameLevelsTabFeature {
     
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case view(View)
         case `internal`(Internal)
         case delegate(Delegate)
         
         @CasePathable
-        enum View : Equatable {
+        enum View  {
             case pageLoaded
             case itemSelected(UUID)
             
@@ -33,7 +33,7 @@ struct GameLevelsTabFeature {
         }
         
         @CasePathable
-        enum Internal : Equatable  {
+        enum Internal  {
         }
         
         case pack(PackFeature.Action)
@@ -113,8 +113,8 @@ struct GameLevelsTabFeature {
         }
     }
     
-    func handleError(_ state: inout State, error: EquatableError) -> Effect<Action> {
-        state.error = error
+    func handleError(_ state: inout State, error: Error) -> Effect<Action> {
+        state.error = EquatableError(error)
         state.isBusy = false
         debugPrint("Error: \(error.localizedDescription)")
         return .none

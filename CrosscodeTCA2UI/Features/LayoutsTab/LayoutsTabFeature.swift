@@ -16,7 +16,7 @@ struct LayoutsTabFeature {
     }
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case view(View)
         case delegate(Delegate)
 
@@ -27,10 +27,10 @@ struct LayoutsTabFeature {
         case importLayouts(ImportLayoutsReducer.Action)
         case exportLayouts(ExportLayoutsReducer.Action)
         
-        case failure(EquatableError)
+        case failure(Error)
         
         @CasePathable
-        enum View : Equatable {
+        enum View {
             case pageLoaded
             case itemSelected(UUID)
             case deleteButtonPressed(UUID)
@@ -39,7 +39,7 @@ struct LayoutsTabFeature {
         }
         
         @CasePathable
-        enum Delegate:Equatable {
+        enum Delegate {
             case settingsButtonPressed
         }
     }
@@ -88,12 +88,7 @@ struct LayoutsTabFeature {
                 case .delegate(_):
                     return .none
                 case .failure(let error):
-                    if let wrappedError = error.wrappedError as? EquatableError {
-                        state.error = wrappedError
-                    }
-                    else {
-                        state.error = error
-                    }
+                    state.error = EquatableError(error)
                     return .none
             }
         }
@@ -151,8 +146,8 @@ struct LayoutsTabFeature {
         }
     }
 
-    func handleError(_ state: inout State, error: EquatableError) -> Effect<Action> {
-        state.error = error
+    func handleError(_ state: inout State, error: Error) -> Effect<Action> {
+        state.error = EquatableError(error)
         state.isBusy = false
         debugPrint("Error: \(error.localizedDescription)")
         return .none

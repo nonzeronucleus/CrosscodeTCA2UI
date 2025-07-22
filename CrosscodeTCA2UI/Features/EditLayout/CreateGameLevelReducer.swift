@@ -7,26 +7,26 @@ struct CreateGameLevelReducer {
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         
         case api(API)
         case `internal`(Internal)
         case delegate(Delegate)
         
         @CasePathable
-        enum API : Equatable {
+        enum API {
             case start
         }
         
         @CasePathable
-        enum Internal: Equatable {
+        enum Internal {
             case success
         }
 
         @CasePathable
-        enum Delegate : Equatable {
+        enum Delegate {
             case success
-            case failure(EquatableError)
+            case failure(Error)
         }
     }
     
@@ -67,14 +67,14 @@ struct CreateGameLevelReducer {
         
         return .run {  send in
             do {
-                guard let layout = layout else { throw EquatableError(EditLayoutError.saveLayoutError("No layout found in add level")) }
+                guard let layout = layout else { throw EditLayoutError.saveLayoutError("No layout found in add level") }
                 
                 try await apiClient.gameLevelsAPI.addNewLevel(layout: layout)
                 
                 await send(.internal(.success))
             }
             catch {
-                await send(.delegate(.failure(EquatableError(error))))
+                await send(.delegate(.failure(error)))
             }
         }
     }
