@@ -30,7 +30,7 @@ struct SaveLayoutTests {
             $0.isBusy = true
         }
         
-        await store.receive(SaveLayoutReducer.Action.delegate(.success))
+        await store.receive(\.delegate.success)
     }
     
     @Test func testLayoutSaveErrorForNoLayout() async throws {
@@ -59,7 +59,7 @@ struct SaveLayoutTests {
         
         let expectedError = EquatableError(EditLayoutError.saveLayoutError("Some text"))
         
-        await store.receive(EditLayoutFeature.Action.saveLayout(.delegate(.failure(expectedError))))  {
+        await store.receive(\.saveLayout.delegate.failure, expectedError)  {
             $0.error = expectedError
             $0.isBusy = false
         }
@@ -88,7 +88,7 @@ struct SaveLayoutTests {
         }
         
         await store.send(SaveLayoutReducer.Action.api(.start))
-        await store.receive(SaveLayoutReducer.Action.delegate(.success))
+        await store.receive(\.delegate.success)
     }
     
     
@@ -118,11 +118,11 @@ struct SaveLayoutTests {
             $0.isBusy = true
         }
 
-        await store.receive(CreateGameLevelReducer.Action.internal(.success)) {
+        await store.receive(\.internal.success) {
             $0.isBusy = false
         }
         
-        await store.receive(CreateGameLevelReducer.Action.delegate(.success))
+        await store.receive(\.delegate.success)
 
 //
 //        #expect(mockGameLevelsAPI.levels.count == 1)

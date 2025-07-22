@@ -17,11 +17,13 @@ struct GameLevelsTabFeature {
     }
     
     
+    @CasePathable
     enum Action: Equatable {
         case view(View)
         case `internal`(Internal)
         case delegate(Delegate)
         
+        @CasePathable
         enum View : Equatable {
             case pageLoaded
             case itemSelected(UUID)
@@ -30,6 +32,7 @@ struct GameLevelsTabFeature {
             case importButtonPressed
         }
         
+        @CasePathable
         enum Internal : Equatable  {
         }
         
@@ -39,6 +42,7 @@ struct GameLevelsTabFeature {
         case loadGameLevels(LoadGameLevelsReducer.Action)
         case playGame(PresentationAction<PlayGameFeature.Action>)
         
+        @CasePathable
         enum Delegate {
             case settingsButtonPressed
         }

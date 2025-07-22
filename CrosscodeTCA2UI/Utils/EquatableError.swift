@@ -17,3 +17,5 @@ class EquatableError: Error, Equatable {
         return wrappedError.localizedDescription
     }
 }
+
+

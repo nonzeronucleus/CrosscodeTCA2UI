@@ -34,7 +34,7 @@ struct RootNavigationTests {
         
         await store.send(.settings(.presented(.backButtonTapped)))
         
-        await store.receive(.settings(.dismiss)) {
+        await store.receive(\.settings.dismiss) {
             $0.settings = nil
         }
     }
@@ -52,7 +52,7 @@ struct RootNavigationTests {
         
         await store.send(.settings(.presented(.backButtonTapped)))
         
-        await store.receive(.settings(.dismiss)) {
+        await store.receive(\.settings.dismiss) {
             $0.settings = nil
         }
     }

@@ -7,19 +7,24 @@ struct LoadGameLevelsReducer {
     typealias State = GameLevelsTabFeature.State
     @Dependency(\.apiClient) var apiClient
 
+    
+    @CasePathable
     enum Action: Equatable {
         case api(API)
         case `internal`(Internal)
         case delegate(Delegate)
         
+        @CasePathable
         enum API : Equatable {
             case start(UUID)
         }
         
+        @CasePathable
         enum Internal : Equatable  {
             case success([GameLevel])
         }
         
+        @CasePathable
         enum Delegate : Equatable {
             case failure(EquatableError)
         }

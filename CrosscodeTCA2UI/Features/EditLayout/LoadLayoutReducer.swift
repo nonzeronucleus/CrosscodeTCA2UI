@@ -3,92 +3,65 @@ import Foundation
 import CrosscodeDataLibrary
 
 
-    @Reducer
+@Reducer
 struct LoadLayoutReducer {
     typealias State = EditLayoutFeature.State
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable
     enum Action: Equatable {
-        
         case api(API)
-        case `internal`(Internal)
         case delegate(Delegate)
-        
+
         @CasePathable
-        enum API:Equatable {
+        enum API: Equatable {
             case start(UUID)
         }
         
         @CasePathable
-        enum Internal:Equatable {
-            case success(Layout)
+        enum Delegate : Equatable {
+            case finished(TaskResult<Layout>)
+            case other
         }
         
-        @CasePathable enum Delegate : Equatable {
-            case failure(EquatableError)
+        case `internal`(Internal)
+        @CasePathable
+        enum Internal: Equatable {
+            case finished(TaskResult<Layout>)
         }
     }
     
     var body: some Reducer<State, Action> {
         Reduce { state, action in
             switch action {
-                case let .api(apiAction):
-                    return handleAPIAction(&state, apiAction)
+                case .api(.start(let id)):
+                    state.isBusy = true
+                    return .run { send in
+                        let result = await TaskResult {
+                            let response = try await apiClient.layoutsAPI.fetchLevel(id: id)
+                            guard let layout = response as? Layout else {
+                                throw EditLayoutError.loadLayoutError
+                            }
+                            return layout
+                        }
+                        await send(.internal(.finished(result)))
+                        await send(.delegate(.finished(result)))
+                    }
                     
-                case let .internal(internalAction):
-                    return handleInternalAction(&state, internalAction)
+                    
+                case .internal(.finished(let result)):
+                    state.isBusy = false
+                    switch result {
+                        case .success(let layout):
+                            state.layout = layout
+                        case .failure:
+                            break
+                    }
+                    return .none
                     
                 case .delegate:
                     return .none
             }
-        }
-    }
-}
-
-
-// MARK: - API
-extension LoadLayoutReducer {
-    func handleAPIAction(_ state: inout State, _ action: Action.API) -> Effect<Action> {
-        switch action {
-            case .start(let id):
-                state.isBusy = true
-                return loadLayout(&state, id:id)
-        }
-    }
-    
-    private func loadLayout(_ state: inout EditLayoutFeature.State, id:UUID) -> Effect<Action> {
-        return .run { send in
-            do {
-                let result = try await apiClient.layoutsAPI.fetchLevel(id: id)
-                
-                if let result = result as? Layout {
-                    await send(.internal(.success(result)))
-                }
-                else {
-                    throw EditLayoutError.loadLayoutError
-                }
-            }
-            catch {
-                await send(.delegate(.failure(EquatableError(error))))
-            }
-        }
-    }
-}
-
-    
-
-// MARK: - Internal Actions
-extension LoadLayoutReducer {
-    func handleInternalAction(_ state: inout State, _ action: Action.Internal) -> Effect<Action> {
-        switch action {
-            case .success(let layout):
-                state.layout = layout
-                state.isBusy = false
-                state.isDirty = false
-                
-                return .none
-                
         }
     }
 }

@@ -98,7 +98,7 @@ struct EditLayoutCellReducerTests {
         
         let expectedError = EquatableError(EditLayoutCellReducer.FeatureError.couldNotFindCell(UUID(0)))
         
-        await store.receive(EditLayoutFeature.Action.cell(.delegate(.failure(expectedError)))) {
+        await store.receive(\.cell.delegate.failure, expectedError) {
             $0.error = expectedError
         }
     }
@@ -130,7 +130,7 @@ struct EditLayoutCellReducerTests {
         
         let expectedError = EquatableError(EditLayoutCellReducer.FeatureError.layoutNil)
 
-        await store.receive(EditLayoutFeature.Action.cell(.delegate(.failure(expectedError)))) {
+        await store.receive(\.cell.delegate.failure, expectedError) {
             $0.error = expectedError
         }
     }

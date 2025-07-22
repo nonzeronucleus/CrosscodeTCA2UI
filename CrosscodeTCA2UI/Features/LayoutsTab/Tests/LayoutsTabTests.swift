@@ -70,7 +70,7 @@ struct LayoutsTabTests {
 
             await store.send(LayoutsTabFeature.Action.fetchLayouts(.api(.start)))
             
-            await store.receive(LayoutsTabFeature.Action.fetchLayouts(.internal(.success(layouts)))) {
+            await store.receive(\.fetchLayouts.internal.success, layouts) {
                 $0.layouts = IdentifiedArray(uniqueElements: layouts)
             }
 

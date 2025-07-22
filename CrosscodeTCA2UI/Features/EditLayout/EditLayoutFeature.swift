@@ -3,6 +3,32 @@ import Foundation
 import CrosscodeDataLibrary
 import CasePaths
 
+
+
+private protocol ErrorHandlingResult {
+    var error: (any Error)? { get }
+}
+
+extension TaskResult: ErrorHandlingResult {
+    var error: Error? {
+        guard case .failure(let error) = self else { return nil }
+        return error
+    }
+}
+private extension EditLayoutFeature {
+    func checkDelegateError(_ state: inout State, _ delegateAction: some Any) {
+        let mirror = Mirror(reflecting: delegateAction)
+        for child in mirror.children {
+            if let result = child.value as? any ErrorHandlingResult {
+                if let error = result.error {
+                    state.error = EquatableError(error)
+                }
+            }
+        }
+    }
+}
+
+
 @Reducer
 struct EditLayoutFeature {
     // MARK: - Dependencies
@@ -16,14 +42,15 @@ struct EditLayoutFeature {
         var settings = Settings()
         var layoutID: UUID
         var layout: Layout?
-        var isBusy = false
         var isDirty = false
         var isPopulated = false
         var isExiting = false
+        var isBusy = false
         var error: EquatableError?
     }
     
     // MARK: - Actions
+    @CasePathable
     enum Action: Equatable {
         case view(View)
         case `internal`(Internal)
@@ -38,6 +65,7 @@ struct EditLayoutFeature {
         case depopulate(DepopulationReducer.Action)
         case cell(EditLayoutCellReducer.Action)
         
+        @CasePathable
         enum View:Equatable {
             case pageLoaded
             case backButtonTapped
@@ -47,11 +75,13 @@ struct EditLayoutFeature {
             case populateButtonTapped
             case depopulateButtonTapped
         }
-        
+
+        @CasePathable
         enum Internal:Equatable {
             case failure(EquatableError)
         }
-        
+
+        @CasePathable
         enum Delegate:Equatable {
             case layoutAdded
             case shouldDismiss
@@ -87,8 +117,10 @@ struct EditLayoutFeature {
                 case .addLayout(.delegate(let action)):
                     return handleAddLayoutDelegate(&state, action)
                     
-                case .loadLayout(.delegate(let action)):
-                    return handleLoadLayoutDelegate(&state, action)
+                case .loadLayout(.delegate(let delegateAction)):
+                    checkDelegateError(&state, delegateAction)
+                    
+                    return .none
                     
                 case .saveLayout(.delegate(let action)):
                     return handleSaveLayoutDelegate(&state, action)
@@ -107,7 +139,7 @@ struct EditLayoutFeature {
                     return handleDepopulationDelegate(&state, action)
                     
                     // Non-delegate child actions
-                case .addLayout, .loadLayout, .saveLayout,
+                case .addLayout, .loadLayout(.api), .loadLayout(.internal), .saveLayout,
                         .createGameLevel, .populate,
                         .depopulate, .cell:
                     return .none
@@ -116,8 +148,18 @@ struct EditLayoutFeature {
     }
 }
 
+private extension EditLayoutFeature {
+    func checkError<Success>(_ state: inout State, _ result: TaskResult<Success>) {
+        if case .failure(let error) = result {
+            state.error = EquatableError(error)
+        }
+    }
+}
+
 // MARK: - Action Handlers
 private extension EditLayoutFeature {
+    
+    
     // MARK: View Actions
     func handleViewAction(_ state: inout State, _ action: Action.View) -> Effect<Action> {
         switch action {
@@ -158,6 +200,8 @@ private extension EditLayoutFeature {
         switch action {
             case .failure(let error):
                 return handleError(&state, error: error)
+//            case .handleSuccess(_):
+//                return .none
         }
     }
     
@@ -191,7 +235,8 @@ private extension EditLayoutFeature {
     
     // MARK: Pure Error Handlers
     func handleLoadLayoutDelegate(_ state: inout State, _ action: LoadLayoutReducer.Action.Delegate) -> Effect<Action> {
-        handleChildFailure(&state, action, errorCase: \.failure)
+//        handleChildFailure(&state, action, errorCase: \.failure)
+        return .none
     }
     
     func handleCellDelegate(_ state: inout State, _ action: EditLayoutCellReducer.Action.Delegate) -> Effect<Action> {
@@ -207,8 +252,10 @@ private extension EditLayoutFeature {
     }
 }
 
-public enum EditLayoutError: Error {
+public enum EditLayoutError: Error, Equatable {
     case loadLayoutError
     case saveLayoutError(_ text:String)
     case handlePopulationError(_ text:String)
 }
+
+// 119

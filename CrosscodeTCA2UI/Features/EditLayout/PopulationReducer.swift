@@ -3,6 +3,62 @@ import Foundation
 import CrosscodeDataLibrary
 import Factory
 
+//@Reducer
+//struct PopulationReducer2 {
+//    typealias State = EditLayoutFeature.State
+//    
+//    @Dependency(\.apiClient) var apiClient
+//    @Injected(\.uuid) var uuid
+//    
+//    
+//    @CasePathable
+//    enum Action: Equatable {
+//        case api(API)
+//        case `internal`(Internal)
+//        case delegate(Delegate)
+//        
+//        @CasePathable
+//        enum API : Equatable {
+//            case start
+//            case cancel
+//        }
+//        
+//        @CasePathable
+//        enum Internal: Equatable {
+//            case taskCompleted(TaskResult<CompletionPayload>)
+//        }
+//        
+//        @CasePathable
+//        enum Delegate : Equatable {
+//            case failure(EquatableError)
+//        }
+//        
+//        struct CompletionPayload: Equatable {
+//            let updatedCrossword: String
+//            let charIntMap: String
+//            var isCancelled: Bool = false
+//            
+//            static func success(_ updatedCrossword: String, _ charIntMap: String) -> Self {
+//                CompletionPayload(updatedCrossword: updatedCrossword, charIntMap: charIntMap)
+//            }
+//            
+//            static let cancelled = CompletionPayload(
+//                updatedCrossword: "",
+//                charIntMap: "",
+//                isCancelled: true
+//            )
+//        }
+//    }
+//}
+
+
+
+
+import ComposableArchitecture
+import Foundation
+import CrosscodeDataLibrary
+import Factory
+
 @Reducer
 struct PopulationReducer {
     typealias State = EditLayoutFeature.State
