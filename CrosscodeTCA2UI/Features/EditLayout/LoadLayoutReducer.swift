@@ -11,6 +11,7 @@ struct LoadLayoutReducer {
     @CasePathable
     enum Action {
         case api(API)
+        case `internal`(Internal)
         case delegate(Delegate)
 
         @CasePathable
@@ -21,10 +22,8 @@ struct LoadLayoutReducer {
         @CasePathable
         enum Delegate {
             case finished(Result<Layout, Error>)
-            case other
         }
         
-        case `internal`(Internal)
         @CasePathable
         enum Internal {
             case finished(Result<Layout, Error>)

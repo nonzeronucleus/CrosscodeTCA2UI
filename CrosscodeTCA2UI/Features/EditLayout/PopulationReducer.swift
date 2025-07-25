@@ -39,20 +39,22 @@ struct PopulationReducer {
             switch action {
                 case .api(.start):
                     state.isBusy = true
+                    state.isPopulated = false
+
                     return .run { [state] send in
                         let result = await populate(state)
                         
                         switch result {
                             case .success(let (layoutText, charIntMap)):
                                 await send(.internal(.finished(.success((layoutText, charIntMap)))))
-
+                                
                             case .failure(let error):
                                 await send(.internal(.finished(.failure(error))))
                                 
                         }
                     }
                     
-
+                    
                 case .api(.cancel):
                     state.isBusy = false
                     return .run { send in
@@ -61,9 +63,10 @@ struct PopulationReducer {
                     
                 case .internal(.finished(.success(let (layoutText, charIntMap)))):
                     state.isBusy = false
+                    state.isPopulated = true
                     state.layout?.crossword = Crossword(initString:layoutText)
                     state.layout?.letterMap = CharacterIntMap(from: charIntMap)
-
+                    
                     return .run { send in await send(.delegate(.finished(.success((layoutText, charIntMap))))) }
                     
                 case .internal(.finished(.failure(let error))):
@@ -77,20 +80,18 @@ struct PopulationReducer {
     }
     
     func populate(_ state: State) async -> Result<(String, String), Error> {
+        guard let layout = state.layout else {
+            return .failure(EditLayoutError.handlePopulationError("No layout loaded"))
+        }
+        
         do {
-            guard let layout = state.layout else {
-                return .failure(EditLayoutError.handlePopulationError("No layout loaded"))
+            guard let populatedLevel = layout.gridText else {
+                throw EditLayoutError.handlePopulationError("No populated layout")
             }
             
-            do {
-                guard let populatedLevel = layout.gridText else {
-                    throw EditLayoutError.handlePopulationError("No populated layout")
-                }
-                
-                return try await .success(apiClient.layoutsAPI.populateCrossword(crosswordLayout: populatedLevel))
-            } catch {
-                return .failure(error)
-            }
+            return try await .success(apiClient.layoutsAPI.populateCrossword(crosswordLayout: populatedLevel))
+        } catch {
+            return .failure(error)
         }
     }
 }

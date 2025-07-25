@@ -28,7 +28,7 @@ class MockLayoutsAPI: LayoutsAPI {
     
 
     func populateCrossword(crosswordLayout: String) async throws -> (String, String) {
-        fatalError("\(#function) not implemented")
+        return ("AS|SO", "{\"Z\":13,\"D\":2,\"X\":25,\"V\":0,\"J\":6,\"Q\":12,\"L\":22,\"H\":14,\"A\":8,\"W\":20,\"E\":21,\"G\":18,\"U\":10,\"F\":19,\"T\":4,\"O\":3,\"C\":7,\"M\":23,\"P\":1,\"N\":16,\"R\":15,\"B\":9,\"K\":24,\"Y\":5,\"S\":11,\"I\":17}"    )
     }
     
     func depopulateCrossword(crosswordLayout: String) async throws -> (String, String) {

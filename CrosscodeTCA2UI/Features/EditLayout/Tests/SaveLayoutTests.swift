@@ -116,18 +116,17 @@ struct SaveLayoutTests {
             $0.apiClient = mockAPI
         }
         
-        await store.send(CreateGameLevelReducer.Action.api(.start)) {
+        await store.send(\.api.start) {
             $0.isBusy = true
         }
 
-        await store.receive(\.internal.success) {
-            $0.isBusy = false
+        await store.receive(\.internal.finished) { state in
+            state.isBusy = false
         }
         
-        await store.receive(\.delegate.success)
+        await store.receive(\.delegate.finished)
 
-//
-//        #expect(mockGameLevelsAPI.levels.count == 1)
-//        #expect(mockGameLevelsAPI.levels[0].id == mockLayout.id)
+        #expect(mockGameLevelsAPI.levels.count == 1)
+        #expect(mockGameLevelsAPI.levels[0].id == mockLayout.id)
     }
 }
