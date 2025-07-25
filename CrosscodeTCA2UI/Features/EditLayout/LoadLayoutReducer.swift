@@ -9,25 +9,25 @@ struct LoadLayoutReducer {
     @Dependency(\.apiClient) var apiClient
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case api(API)
         case delegate(Delegate)
 
         @CasePathable
-        enum API: Equatable {
+        enum API {
             case start(UUID)
         }
         
         @CasePathable
-        enum Delegate : Equatable {
-            case finished(TaskResult<Layout>)
+        enum Delegate {
+            case finished(Result<Layout, Error>)
             case other
         }
         
         case `internal`(Internal)
         @CasePathable
-        enum Internal: Equatable {
-            case finished(TaskResult<Layout>)
+        enum Internal {
+            case finished(Result<Layout, Error>)
         }
     }
     
@@ -37,15 +37,9 @@ struct LoadLayoutReducer {
                 case .api(.start(let id)):
                     state.isBusy = true
                     return .run { send in
-                        let result = await TaskResult {
-                            let response = try await apiClient.layoutsAPI.fetchLevel(id: id)
-                            guard let layout = response as? Layout else {
-                                throw EditLayoutError.loadLayoutError
-                            }
-                            return layout
-                        }
-                        await send(.internal(.finished(result)))
-                        await send(.delegate(.finished(result)))
+                      let result = await loadLayout(id: id, apiClient: apiClient)
+                      await send(.internal(.finished(result)))
+                      await send(.delegate(.finished(result)))
                     }
                     
                     
@@ -62,6 +56,18 @@ struct LoadLayoutReducer {
                 case .delegate:
                     return .none
             }
+        }
+    }
+    
+    func loadLayout(id: UUID, apiClient: APIClient) async -> Result<Layout, Error> {
+        do {
+            let response = try await apiClient.layoutsAPI.fetchLevel(id: id)
+            guard let layout = response as? Layout else {
+                throw EditLayoutError.loadLayoutError
+            }
+            return .success(layout)
+        } catch {
+            return .failure(error)
         }
     }
 }

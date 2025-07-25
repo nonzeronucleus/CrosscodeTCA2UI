@@ -9,17 +9,20 @@ private protocol ErrorHandlingResult {
     var error: (any Error)? { get }
 }
 
-extension TaskResult: ErrorHandlingResult {
+extension Result: ErrorHandlingResult {
     var error: Error? {
         guard case .failure(let error) = self else { return nil }
         return error
     }
 }
+
 private extension EditLayoutFeature {
     func checkDelegateError(_ state: inout State, _ delegateAction: some Any) {
         let mirror = Mirror(reflecting: delegateAction)
         for child in mirror.children {
-            if let result = child.value as? any ErrorHandlingResult {
+            let result = child.value as? any ErrorHandlingResult
+
+            if let result = result {
                 if let error = result.error {
                     state.error = EquatableError(error)
                 }
@@ -132,8 +135,9 @@ struct EditLayoutFeature {
                     let ret = handleCellDelegate(&state, action)
                     return ret
                     
-                case .populate(.delegate(let action)):
-                    return handlePopulationDelegate(&state, action)
+                case .populate(.delegate(let delegateAction)):
+                    return handlePopulationDelegate(&state, delegateAction)
+
                     
                 case .depopulate(.delegate(let action)):
                     return handleDepopulationDelegate(&state, action)
@@ -149,7 +153,26 @@ struct EditLayoutFeature {
 }
 
 private extension EditLayoutFeature {
-    func checkError<Success>(_ state: inout State, _ result: TaskResult<Success>) {
+    func handlePopulationDelegate(_ state: inout State,  _ action: PopulationReducer.Action.Delegate) -> Effect<Action> {
+        guard case .finished(let result) = action else {
+            return .none
+        }
+        
+        if case .failure(let error) = result,
+           let populationError = error as? PopulationError,
+           case .cancelled = populationError {
+            
+            return .none
+        }
+        
+        checkDelegateError(&state, action)
+        return .none
+    }
+
+}
+
+private extension EditLayoutFeature {
+    func checkError<Success>(_ state: inout State, _ result: Result<Success, Error>) {
         if case .failure(let error) = result {
             state.error = EquatableError(error)
         }
@@ -200,8 +223,6 @@ private extension EditLayoutFeature {
         switch action {
             case .failure(let error):
                 return handleError(&state, error: error)
-//            case .handleSuccess(_):
-//                return .none
         }
     }
     
@@ -233,17 +254,7 @@ private extension EditLayoutFeature {
         }
     }
     
-    // MARK: Pure Error Handlers
-    func handleLoadLayoutDelegate(_ state: inout State, _ action: LoadLayoutReducer.Action.Delegate) -> Effect<Action> {
-//        handleChildFailure(&state, action, errorCase: \.failure)
-        return .none
-    }
-    
     func handleCellDelegate(_ state: inout State, _ action: EditLayoutCellReducer.Action.Delegate) -> Effect<Action> {
-        handleChildFailure(&state, action, errorCase: \.failure)
-    }
-    
-    func handlePopulationDelegate(_ state: inout State, _ action: PopulationReducer.Action.Delegate) -> Effect<Action> {
         handleChildFailure(&state, action, errorCase: \.failure)
     }
     
@@ -256,6 +267,7 @@ public enum EditLayoutError: Error, Equatable {
     case loadLayoutError
     case saveLayoutError(_ text:String)
     case handlePopulationError(_ text:String)
+    case wrappedError(_ text: String)
 }
 
 // 119
