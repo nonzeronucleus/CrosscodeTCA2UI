@@ -38,7 +38,6 @@ struct LoadLayoutReducer {
                     return .run { send in
                       let result = await loadLayout(id: id, apiClient: apiClient)
                       await send(.internal(.finished(result)))
-                      await send(.delegate(.finished(result)))
                     }
                     
                     
@@ -50,7 +49,7 @@ struct LoadLayoutReducer {
                         case .failure:
                             break
                     }
-                    return .none
+                    return .run { send in await send(.delegate(.finished(result))) }
                     
                 case .delegate:
                     return .none

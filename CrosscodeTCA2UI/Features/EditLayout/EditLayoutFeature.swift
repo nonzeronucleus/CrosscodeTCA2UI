@@ -3,35 +3,6 @@ import Foundation
 import CrosscodeDataLibrary
 import CasePaths
 
-
-
-private protocol ErrorHandlingResult {
-    var error: (any Error)? { get }
-}
-
-extension Result: ErrorHandlingResult {
-    var error: Error? {
-        guard case .failure(let error) = self else { return nil }
-        return error
-    }
-}
-
-private extension EditLayoutFeature {
-    func checkDelegateError(_ state: inout State, _ delegateAction: some Any) {
-        let mirror = Mirror(reflecting: delegateAction)
-        for child in mirror.children {
-            let result = child.value as? any ErrorHandlingResult
-
-            if let result = result {
-                if let error = result.error {
-                    state.error = EquatableError(error)
-                }
-            }
-        }
-    }
-}
-
-
 @Reducer
 struct EditLayoutFeature {
     // MARK: - Dependencies
@@ -116,23 +87,20 @@ struct EditLayoutFeature {
                 case .delegate:
                     return .none // Parent handles
                     
-                    // Child delegates
+                // Child delegates
                 case .addLayout(.delegate(let action)):
                     return handleAddLayoutDelegate(&state, action)
                     
                 case .loadLayout(.delegate(let delegateAction)):
                     checkDelegateError(&state, delegateAction)
-                    
                     return .none
                     
-                case .saveLayout(.delegate(let action)):
-                    return handleSaveLayoutDelegate(&state, action)
+                case .saveLayout(.delegate(let delegateAction)):
+                    return handleSaveLayoutDelegate(&state, delegateAction)
                     
                 case .createGameLevel(.delegate(let delegateAction)):
                     checkDelegateError(&state, delegateAction)
-                    
                     return .none
-//                    return handleCreateGameLevelDelegate(&state, action)
                     
                 case .cell(.delegate(let action)):
                     return handleCellDelegate(&state, action)
@@ -143,10 +111,9 @@ struct EditLayoutFeature {
                     
                 case .depopulate(.delegate(let delegateAction)):
                     checkDelegateError(&state, delegateAction)
-//                    return handleDepopulationDelegate(&state, action)
-                    return .none
+                    return  .none
                     
-                    // Non-delegate child actions
+                // Non-delegate child actions
                 case .addLayout, .loadLayout(.api), .loadLayout(.internal), .saveLayout,
                         .createGameLevel, .populate,
                         .depopulate, .cell:
@@ -176,10 +143,11 @@ private extension EditLayoutFeature {
 }
 
 private extension EditLayoutFeature {
-    func checkError<Success>(_ state: inout State, _ result: Result<Success, Error>) {
+    func checkError<Success>(_ state: inout State, _ result: Result<Success, Error>) -> Effect<Action>{
         if case .failure(let error) = result {
             state.error = EquatableError(error)
         }
+        return .none
     }
 }
 
@@ -222,7 +190,7 @@ private extension EditLayoutFeature {
     
 private extension EditLayoutFeature {
     
-    // MARK: Internal Actions
+//    // MARK: Internal Actions
     func handleInternalAction(_ state: inout State, _ action: Action.Internal) -> Effect<Action> {
         switch action {
             case .failure(let error):
@@ -238,33 +206,26 @@ private extension EditLayoutFeature {
     }
     
     func handleSaveLayoutDelegate(_ state: inout State, _ action: SaveLayoutReducer.Action.Delegate) -> Effect<Action> {
-        handleChildDelegate( &state, action, successCase: \.success, failureCase: \.failure,
-             onFailure: { _, state in state.isExiting = false }
-        ) { _, state in
-            state.isBusy = false
-            state.isDirty = false
-            return state.isExiting ? .run { _ in await dismiss() } : .none
+        guard case .finished(let result) = action else {  return .none }
+
+        // 2. Switch on the Result
+        switch result {
+            case .success:
+                state.isBusy = false
+                state.isDirty = false
+                return state.isExiting ? .run { _ in await dismiss() } : .none
+
+            case .failure(let error):
+                // Handle failure
+                state.isExiting = false
+                state.error = EquatableError(error)
+                return .none
         }
     }
-    
-    
-    
-//    func handleCreateGameLevelDelegate(_ state: inout State, _ action: CreateGameLevelReducer.Action.Delegate) -> Effect<Action> {
-//        handleChildDelegate( &state, action, successCase: \.success, failureCase: \.failure )
-//        { _, state in
-//            state.isBusy = false
-//            state.isDirty = false
-//            return state.isExiting ? .run { _ in await dismiss() } : .none
-//        }
-//    }
     
     func handleCellDelegate(_ state: inout State, _ action: EditLayoutCellReducer.Action.Delegate) -> Effect<Action> {
         handleChildFailure(&state, action, errorCase: \.failure)
     }
-    
-//    func handleDepopulationDelegate(_ state: inout State, _ action: DepopulationReducer.Action.Delegate) -> Effect<Action> {
-//        handleChildFailure(&state, action, errorCase: \.failure)
-//    }
 }
 
 public enum EditLayoutError: Error, Equatable {

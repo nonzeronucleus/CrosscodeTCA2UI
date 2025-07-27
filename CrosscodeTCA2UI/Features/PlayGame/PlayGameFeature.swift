@@ -9,7 +9,7 @@ struct PlayGameFeature {
     @Dependency(\.isPresented) var isPresented
     
     @ObservableState
-    struct State: Equatable {
+    struct State: Equatable, ErrorHandling {
         var levelID: UUID
         var level: GameLevel?
         var selectedNumber: Int?
@@ -20,7 +20,6 @@ struct PlayGameFeature {
                 return Set<Character>(level.attemptedLetters.filter { $0.isLetter })
             }
         }
-
         
         var checking = false
         var isBusy = false
@@ -36,6 +35,7 @@ struct PlayGameFeature {
         case keyboard(KeyboardFeature.Action)
         case playGameCell(PlayGameCellReducer.Action)
         case loadGameLevel(LoadGameLevelReducer.Action)
+        case revealLetterReducer(RevealLetterReducer.Action)
 
         enum View {
             case pageLoaded
@@ -49,6 +49,7 @@ struct PlayGameFeature {
         
         Scope(state: \.self, action: \.loadGameLevel ) { LoadGameLevelReducer() }
         Scope(state: \.self, action: \.playGameCell) { PlayGameCellReducer() }
+        Scope(state: \.self, action: \.revealLetterReducer) { RevealLetterReducer() }
         Scope(state: \.self, action: \.keyboard) { KeyboardFeature() }
 
         Reduce { state, action in
@@ -74,7 +75,7 @@ struct PlayGameFeature {
                             return .none
 
                         case .revealRequested:
-                            return .none
+                            return .send(.revealLetterReducer(.api(.start)))
                     }
                     
                 case .keyboard(_):
@@ -82,28 +83,25 @@ struct PlayGameFeature {
                     return .none
                     
                 case let .loadGameLevel(.delegate(delegateAction)):
-                    return handleLoadGameLevelDelegate(&state, delegateAction)
+                    checkDelegateError(&state, delegateAction)
+                    return .none
                     
-                case .playGameCell, .loadGameLevel(.api), .loadGameLevel(.internal):
+                case let .revealLetterReducer(.delegate(delegateAction)):
+                    checkDelegateError(&state, delegateAction)
+                    return .none
+                    
+                case .playGameCell,
+                        .loadGameLevel(.api), .loadGameLevel(.internal),
+                        .revealLetterReducer(.api), .revealLetterReducer(.internal):
                     return .none
             }
         }
     }
     
-    private func handleLoadGameLevelDelegate(_ state: inout State,_ action: LoadGameLevelReducer.Action.Delegate) -> Effect<Action> {
-        switch action {
-            case .failure(let error):
-                return handleError(&state, error: error)
-        }
-    }
-    
-    func handleError(_ state: inout State, error: Error) -> Effect<Action> {
-        state.error = EquatableError(error)
-        state.isBusy = false
-        debugPrint("Error: \(error.localizedDescription)")
-        return .none
-    }
+
 }
+
+
 
 extension PlayGameFeature {
     public enum FeatureError: Error {

@@ -1,3 +1,4 @@
+import Foundation
 import ComposableArchitecture
 
 // MARK: - Reducer Extensions
@@ -47,4 +48,36 @@ protocol ErrorHandling {
     var error: EquatableError? { get set }
     var isBusy: Bool { get set }
 }
+
+protocol ErrorHandlingResult {
+    var error: (any Error)? { get }
+}
+
+extension Result: ErrorHandlingResult {
+    var error: Error? {
+        guard case .failure(let error) = self else { return nil }
+        return error
+    }
+}
+
+func checkDelegateError<E:ErrorHandling>(_ state: inout E, _ delegateAction: some Any) {
+    let mirror = Mirror(reflecting: delegateAction)
+    for child in mirror.children {
+        let result = child.value as? any ErrorHandlingResult
+
+        if let result = result {
+            if let error = result.error {
+                validateErrorConformance(error)
+                state.error = EquatableError(error)
+            }
+        }
+    }
+}
+
+func validateErrorConformance(_ error: Error) {
+    if !(error is LocalizedError) {
+        print("⚠️ Warning: \(type(of: error)) should conform to LocalizedError")
+    }
+}
+
 

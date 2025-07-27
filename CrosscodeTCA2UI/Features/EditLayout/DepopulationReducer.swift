@@ -3,13 +3,6 @@ import Foundation
 import CrosscodeDataLibrary
 import Factory
 
-
-
-import ComposableArchitecture
-import Foundation
-import CrosscodeDataLibrary
-import Factory
-
 @Reducer
 struct DepopulationReducer {
     typealias State = EditLayoutFeature.State

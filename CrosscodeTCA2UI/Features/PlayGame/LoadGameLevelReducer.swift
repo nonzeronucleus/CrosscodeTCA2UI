@@ -19,12 +19,12 @@ struct LoadGameLevelReducer {
         
         @CasePathable
         enum Internal  {
-            case success(GameLevel)
+            case finished(Result<GameLevel, Error>)
         }
         
         @CasePathable
         enum Delegate {
-            case failure(Error)
+            case finished(Result<GameLevel, Error>)
         }
     }
     
@@ -35,41 +35,39 @@ struct LoadGameLevelReducer {
                     switch externalActions {
                         case .start(let id):
                             state.isBusy = true
-                            return loadLevel(&state, id:id)
-                    }
-
-
-                case let .internal(internalAction):
-                    switch internalAction {
-                        case .success(let level):
-                            state.level = level
-                            state.isBusy = false
-                            state.isDirty = false
-                            
-                            return .none
+                            return .run { send in
+                                let result = await loadLevel(id: id, apiClient: apiClient)
+                                await send(.internal(.finished(result)))
+                            }
                     }
                     
+                case .internal(.finished(let result)):
+                    state.isBusy = false
+                    switch result {
+                        case .success(let level):
+                            state.level = level
+                            state.isDirty = false
+                            
+                        case .failure:
+                            break
+                    }
+                    return .run { send in await send(.delegate(.finished(result))) }
+
                 case .delegate:
                     return .none
             }
         }
     }
     
-    private func loadLevel(_ state: inout PlayGameFeature.State, id:UUID) -> Effect<Action> {
-        return .run { send in
-            do {
-                let result = try await apiClient.gameLevelsAPI.fetchLevel(id: id)
-                
-                if let result = result as? GameLevel {
-                    await send(.internal(.success(result)))
-                }
-                else {
-                    await send(.delegate(.failure(PlayGameFeature.FeatureError.loadLevelError)))
-                }
+    func loadLevel(id: UUID, apiClient: APIClient) async -> Result<GameLevel, Error> {
+        do {
+            let result = try await apiClient.gameLevelsAPI.fetchLevel(id: id)
+            guard let level = result as? GameLevel else {
+                throw PlayGameFeature.FeatureError.loadLevelError
             }
-            catch {
-                await send(.delegate(.failure(error)))
-            }
+            return .success(level)
+        } catch {
+            return .failure(error)
         }
     }
 }

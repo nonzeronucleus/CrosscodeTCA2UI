@@ -25,6 +25,11 @@ struct PlayGameView: View {
                     }
                     .frame(height: 40) // Fixed height
                     
+                    if let error = store.state.error {
+                        Text("Error \(error.localizedDescription)")
+                    }
+
+                    
                     // Crossword with compressed spacing
                     crosswordView(geometry: geometry)
                         .padding(.top, 5) // Reduced from verticalSpacing
