@@ -25,7 +25,7 @@ struct RevealLetterReducer {
         
         @CasePathable
         enum Delegate {
-            case finished(Result<(Character,Int), Error>)
+            case finished(Result<Int, Error>) // Num remaining letters to find
         }
     }
     
@@ -50,7 +50,7 @@ struct RevealLetterReducer {
                         case .failure:
                             break
                     }
-                    return .run { send in await send(.delegate(.finished(result))) }
+                    return .run { [state] send in await send(.delegate(.finished(.success(state.usedLetters.count)))) }
 
                 case .delegate:
                     return .none
@@ -60,7 +60,12 @@ struct RevealLetterReducer {
     
     func getNextLetterToReveal(state:State) async -> Result<(Character,Int), Error> {
         do {
-            guard let char = state.level?.letterMap?.first(where: { !state.usedLetters.contains($0.key) }) else {
+            guard let char = state.level?.letterMap?.first(where: {
+                let pos = $0.value
+                let char = $0.key
+                
+                return !state.usedLetters.contains(char) && state.level?.attemptedLetters[pos] == " "
+            }) else {
                 throw RevealLetterError.noLettersLeft
             }
             return .success(char)

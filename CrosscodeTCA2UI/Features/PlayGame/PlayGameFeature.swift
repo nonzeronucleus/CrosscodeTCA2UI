@@ -78,19 +78,23 @@ struct PlayGameFeature {
                             return .send(.revealLetterReducer(.api(.start)))
                     }
                     
-                case .keyboard(_):
-                    state.checking = false
-                    return .none
-                    
                 case let .loadGameLevel(.delegate(delegateAction)):
                     checkDelegateError(&state, delegateAction)
                     return .none
                     
                 case let .revealLetterReducer(.delegate(delegateAction)):
-                    checkDelegateError(&state, delegateAction)
+                    return handleRevealLetterReducer(&state, delegateAction)
+                    
+                case .keyboard(.delegate(let delegateAction)):
+                    state.checking = false
+                    if case .finished(.success(let remainingLetters)) = delegateAction {
+                        debugPrint(remainingLetters)
+                    }
                     return .none
+
                     
                 case .playGameCell,
+                        .keyboard(.view(_)),
                         .loadGameLevel(.api), .loadGameLevel(.internal),
                         .revealLetterReducer(.api), .revealLetterReducer(.internal):
                     return .none
@@ -98,7 +102,19 @@ struct PlayGameFeature {
         }
     }
     
-
+    func handleRevealLetterReducer(_ state: inout State, _ action: RevealLetterReducer.Action.Delegate) -> Effect<Action> {
+        guard case .finished(let result) = action else {  return .none }
+        
+        // 2. Switch on the Result
+        switch result {
+            case .success(let count):
+                debugPrint("Revealed \(count) letters")
+                return .none
+            case .failure(_):
+                checkDelegateError(&state, action)
+                return .none
+        }
+    }
 }
 
 

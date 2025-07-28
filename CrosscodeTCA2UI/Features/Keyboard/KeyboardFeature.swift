@@ -7,13 +7,19 @@ struct KeyboardFeature {
     typealias State = PlayGameFeature.State
     
     @CasePathable
-    enum Action: Equatable {
+    enum Action {
         case view(View)
+        case delegate(Delegate)
         
         @CasePathable
         enum View: Equatable {
             case letterInput(Character)
             case deleteInput
+        }
+        
+        @CasePathable
+        enum Delegate {
+            case finished(Result<Int, Error>) // Num remaining letters to find
         }
     }
     
@@ -22,6 +28,8 @@ struct KeyboardFeature {
             switch action {
                 case let .view(viewAction):
                     return handleViewAction(&state, viewAction)
+                case .delegate(_):
+                    return .none
             }
         }
     }
@@ -33,10 +41,12 @@ extension KeyboardFeature {
             case .letterInput(let letter):
                 guard let selectedNumber = state.selectedNumber else { return .none }
                 state.level!.attemptedLetters[selectedNumber] = letter
-                return .none
+                break
             case .deleteInput:
-                return .none
+                break
         }
+        
+        return .run { [state] send in await send(.delegate(.finished(.success(state.usedLetters.count)))) }
     }
 }
         

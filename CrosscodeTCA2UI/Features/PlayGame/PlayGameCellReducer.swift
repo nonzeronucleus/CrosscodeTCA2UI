@@ -4,37 +4,52 @@ import CrosscodeDataLibrary
 
 @Reducer
 struct PlayGameCellReducer {
+    @CasePathable
     enum Action {
         case cellClicked(UUID)
         case letterSelected(Character)
-        case failure(Error)
+        case `internal`(Internal)
+        
+        @CasePathable
+        enum Internal {
+            case finished(Result<Int, Error>) // Num remaining letters to find
+        }
+        
+//        case failure(Error)
     }
     
     var body: some Reducer<PlayGameFeature.State, Action> {
         Reduce { state, action in
             switch action {
                 case .cellClicked(let id):
-                    return handleSelect(&state, id: id)
+                    return .run { [state] send in
+                        let result = await handleSelect(state, id: id)
+                        await send(.internal(.finished(result)))
+                    }
                 case .letterSelected(_):
                     return .none
-                case .failure(_):
+                case .internal(.finished(.success(let selectedNumber))):
+                    state.selectedNumber = selectedNumber
+                    return .none
+                case .internal(.finished(.failure(_))):
                     return .none
             }
         }
     }
     
-    func handleSelect(_ state: inout PlayGameFeature.State, id: UUID) -> Effect<Action> {
-        guard let level = state.level else {return .run { send in await send(.failure(FeatureError.levelNil))}}
+    func handleSelect(_ state: PlayGameFeature.State, id: UUID) async -> Result<Int, Error> {
+        guard let level = state.level else {return .failure(FeatureError.levelNil)}
         guard
             let cell = level.crossword.findElement(byID: id),
             let letter = cell.letter,
             let number = level.letterMap?[letter]
-        else { return .none }
+        else { return .failure(FeatureError.couldNotFindCell(id)) }
         
-        state.selectedNumber = number
-        return .run { send in
-            await send(.letterSelected(level.attemptedLetters[number]))
-        }
+        return .success(number)
+            
+//            .run { send in
+//            await send(.letterSelected(level.attemptedLetters[number]))
+//        }
     }
     
     public enum FeatureError: Error {
