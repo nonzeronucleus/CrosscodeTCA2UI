@@ -42,7 +42,7 @@ struct PlayGameCellReducer {
         guard
             let cell = level.crossword.findElement(byID: id),
             let letter = cell.letter,
-            let number = level.letterMap?[letter]
+            let number = indexOfLetter(letter, in: level.letterMap)   //level.letterMap[letter]
         else { return .failure(FeatureError.couldNotFindCell(id)) }
         
         return .success(number)
@@ -50,6 +50,10 @@ struct PlayGameCellReducer {
 //            .run { send in
 //            await send(.letterSelected(level.attemptedLetters[number]))
 //        }
+    }
+    
+    func indexOfLetter(_ letter: Character, in chars: [Character]) -> Int? {
+        chars.firstIndex(of: letter) // Returns nil if not found
     }
     
     public enum FeatureError: Error {

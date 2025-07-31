@@ -58,14 +58,12 @@ struct RevealLetterReducer {
         }
     }
     
+    // Get the first letter that hasn't been used (correctly or incorrectly) and whose correct value hasn't been taken by an incorrect guess
     func getNextLetterToReveal(state:State) async -> Result<(Character,Int), Error> {
         do {
-            guard let char = state.level?.letterMap?.first(where: {
-                let pos = $0.value
-                let char = $0.key
-                
-                return !state.usedLetters.contains(char) && state.level?.attemptedLetters[pos] == " "
-            }) else {
+//            guard let letterMap = state.level?.oldLetterMap else { throw RevealLetterError.noLetterMap }
+            guard let char = try state.level!.getNextLetter()
+            else {
                 throw RevealLetterError.noLettersLeft
             }
             return .success(char)
@@ -73,17 +71,78 @@ struct RevealLetterReducer {
             return .failure(error)
         }
     }
-    
-    
 }
+
+
+
+//            guard let char = state.level?.letterMap?.first(where: {
+//                let pos = $0.value
+//                let char = $0.key
+//
+//                return !state.usedLetters.contains(char) && state.level?.attemptedLetters[pos] == " "
+
+//func getNextLetter(letterMap:[Character], usedLetters: Set<Character>, attemptedLetters:[Character]) throws -> (Character, Int)?  {
+//    guard let char = letterMap.first(where: {
+//        let pos = $0.value
+//        let char = $0.key
+//        
+//        return !usedLetters.contains(char) && attemptedLetters[pos] == " "
+//    }) else {
+//        return nil
+//    }
+//    
+//    return char
+//}
+//
+//
+
+//
+//func getNextLetter(letterMap:[Character], attemptedLetters:[Character]) throws -> (Character, Int)?  {
+//    let unusedLetters = getUnusedLetters(letterMap: letterMap, attemptedLetters: attemptedLetters)
+//    
+//    
+//    let availableLetters = unusedLetters.enumerated()
+//        .compactMap { (index, char) -> (Character, Int)? in
+//            guard let char = char else { return nil }
+//            return (char, index)
+//        }
+//    
+//    // 2. Return random element if exists
+//    return availableLetters.randomElement()
+//
+//}
+
+//
+//func getUnusedLetters(letterMap: [Character], attemptedLetters: [Character?]) -> [Character?] {
+//    guard letterMap.count == 26 && attemptedLetters.count == 26 else {
+//        fatalError("Arrays must be 26 characters long")
+//    }
+//    
+//    // 1. Get all non-nil attempted letters
+//    let usedLetters = Set(attemptedLetters.compactMap { $0 })
+//    
+//    // 2. Create masked array preserving positions
+//    return letterMap.enumerated().map { index, letter in
+//        // Keep letter if:
+//        // - Position in attemptedLetters is nil (not attempted)
+//        // - Letter isn't used elsewhere
+//        attemptedLetters[index] == " " && !usedLetters.contains(letter)
+//        ? letter
+//        : nil
+//    }
+//}
+
 
 enum RevealLetterError:Error, CustomStringConvertible, LocalizedError {
     case noLettersLeft
-    
+    case noLetterMap
+
     public var description: String {
         switch self {
             case .noLettersLeft:
                 return "No letters left"
+            case .noLetterMap:
+                return "No letter map"
         }
     }
     

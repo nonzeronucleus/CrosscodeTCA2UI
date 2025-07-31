@@ -29,10 +29,13 @@ struct PlayGameNavigationTests {
             $0.isBusy = true
         }
 
-        await store.receive(\.loadGameLevel.internal.success, mockGame) {
+        await store.receive(\.loadGameLevel.internal.finished) {
             $0.isBusy = false
             $0.level = mockGame
         }
+
+        await store.receive(\.loadGameLevel.delegate.finished)
+
     }
     
     

@@ -96,7 +96,8 @@ struct PlayGameView: View {
                 CrosswordView(
                     grid: gameLevel.crossword,
                     viewMode: .attemptedValue,
-                    letterValues: gameLevel.letterMap,
+//                    letterValues: gameLevel.layout.oldLetterMapx,
+                    letterMap: gameLevel.letterMap,
                     selectedNumber: store.selectedNumber,
                     attemptedletterValues: gameLevel.attemptedLetters,
                     checking: store.checking

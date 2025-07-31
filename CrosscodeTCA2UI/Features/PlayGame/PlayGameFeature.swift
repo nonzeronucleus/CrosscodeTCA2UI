@@ -82,15 +82,14 @@ struct PlayGameFeature {
                     checkDelegateError(&state, delegateAction)
                     return .none
                     
-                case let .revealLetterReducer(.delegate(delegateAction)):
-                    return handleRevealLetterReducer(&state, delegateAction)
+                case let .revealLetterReducer(.delegate(.finished(result))):
+                    return handleLetterAddedDelegateFinished2(&state, result)
                     
-                case .keyboard(.delegate(let delegateAction)):
-                    state.checking = false
-                    if case .finished(.success(let remainingLetters)) = delegateAction {
-                        debugPrint(remainingLetters)
-                    }
-                    return .none
+//                case let .revealLetterReducer(.delegate(delegateAction)):
+//                    return handleRevealLetterReducerDelegate(&state, delegateAction)
+                    
+                case let .keyboard(.delegate(.finished(result))):
+                    return handleLetterAddedDelegateFinished2(&state, result)
 
                     
                 case .playGameCell,
@@ -102,7 +101,23 @@ struct PlayGameFeature {
         }
     }
     
-    func handleRevealLetterReducer(_ state: inout State, _ action: RevealLetterReducer.Action.Delegate) -> Effect<Action> {
+    func handleLetterAddedDelegateFinished2(_ state: inout State, _ result: Result<Int, any Error>) -> Effect<Action> {
+//        guard case .finished(let result) = action else {  return .none }
+        
+        // 2. Switch on the Result
+        switch result {
+            case .success(let count):
+                debugPrint("Revealed \(count) letters so far")
+                return .none
+            case .failure(let error):
+                state.error = EquatableError(error)
+                return .none
+        }
+    }
+
+    
+    
+    func handleLetterAddedDelegateFinished(_ state: inout State, _ action: RevealLetterReducer.Action.Delegate) -> Effect<Action> {
         guard case .finished(let result) = action else {  return .none }
         
         // 2. Switch on the Result
@@ -115,7 +130,59 @@ struct PlayGameFeature {
                 return .none
         }
     }
+
+    
+    func handleRevealLetterReducerDelegate(_ state: inout State, _ action: RevealLetterReducer.Action.Delegate) -> Effect<Action> {
+        guard case .finished(let result) = action else {  return .none }
+        
+        // 2. Switch on the Result
+        switch result {
+            case .success(let count):
+                debugPrint("Revealed \(count) letters")
+                return .none
+            case .failure(_):
+                checkDelegateError(&state, action)
+                return .none
+        }
+    }
+    
+    func handleKeyboardReducerDelegate(_ state: inout State, _ action: KeyboardFeature.Action.Delegate) -> Effect<Action> {
+        state.checking = false
+        guard case .finished(let result) = action else {  return .none }
+        
+        // 2. Switch on the Result
+        switch result {
+            case .success(let count):
+//                debugPrint("Revealed \(count) letters")
+//                do {
+//                    guard let letterMap = state.level?.oldLetterMap else { return .none }
+//                    
+//                    if count == 26 {
+//                        if try getNextLetter(letterMap: letterMap, usedLetters: state.usedLetters, attemptedLetters: state.level!.attemptedLetters) == nil {
+//                            debugPrint( "YOU WIN!")
+//                        }
+//                    }
+//                }
+//                catch(_) {
+//                    //ignore error
+//                }
+                return .none
+            case .failure(_):
+                checkDelegateError(&state, action)
+                return .none
+        }
+    }
 }
+
+
+//                    state.checking = false
+//                    if case .finished(.success(let remainingLetters)) = delegateAction {
+//                        debugPrint(remainingLetters)
+//                    }
+//                    else {
+//                        checkDelegateError(&state, delegateAction)
+//                    }
+//                    return .none
 
 
 

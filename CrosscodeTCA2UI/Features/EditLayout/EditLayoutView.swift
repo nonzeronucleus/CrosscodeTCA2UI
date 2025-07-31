@@ -71,7 +71,8 @@ struct EditLayoutView: View {
                 CrosswordView(
                     grid: layout.crossword,
                     viewMode: .actualValue,
-                    letterValues: layout.letterMap,
+//                    letterValues: layout.oldLetterMapx,
+                    letterMap: layout.letterMap,
                     attemptedletterValues: nil
                 ) { cell in
                     layoutStore.send(.cell(.view(.cellClicked(cell))))

@@ -3,17 +3,19 @@ import CrosscodeDataLibrary
 
 struct CrosswordView: View {
     var grid: Crossword
-    var letterValues: CharacterIntMap?
+//    var letterValues: CharacterIntMap?
     let performAction: (UUID) -> Void
     let viewMode: ViewMode
     let selectedNumber:Int?
     let checking:Bool
     let attemptedletterValues: [Character]?
+    let letterMap: [Character]?
     let editMode: Bool
     
     init(grid: Crossword,
          viewMode: ViewMode,
-         letterValues: CharacterIntMap?,
+//         letterValues: CharacterIntMap?,
+         letterMap: [Character]?,
          selectedNumber:Int? = nil ,
          attemptedletterValues: [Character]?,
          checking:Bool = false,
@@ -22,7 +24,8 @@ struct CrosswordView: View {
     {
         self.grid = grid
         self.viewMode = viewMode
-        self.letterValues = letterValues
+//        self.letterValues = letterValues
+        self.letterMap = letterMap
         self.selectedNumber = selectedNumber
         self.attemptedletterValues = attemptedletterValues
         self.checking = checking
@@ -40,10 +43,10 @@ struct CrosswordView: View {
                                 var checkingStatus:CellView.Status = .normal
                                 var number:Int? = nil
                                 var letter = cell.letter
-                                if let letterValues, let letter {
-                                    number = letterValues[letter]
-                                }
                                 
+                                if let letter {
+                                    number = self.letterMap?.firstIndex(of: letter)
+                                }
                                 if let number, let attemptedletterValues {
                                     if viewMode == .attemptedValue && letter != nil {
                                         letter = attemptedletterValues[number]

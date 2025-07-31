@@ -28,12 +28,15 @@ struct KeyboardFeatureTests {
         await store.send(.view(.letterInput("Q"))) {
             $0.level!.attemptedLetters[2] = "Q"
         }
-        
+
+        await store.receive(\.delegate.finished)
+
         // Same one should be overwritten
         await store.send(.view(.letterInput("W"))) {
             $0.level!.attemptedLetters[2] = "W"
         }
-
+        
+        await store.receive(\.delegate.finished)
     }
 
     
@@ -70,6 +73,7 @@ struct KeyboardFeatureTests {
 //        }
 //    }
 }
+
 
 fileprivate func createLevel(charMap: String) -> GameLevel {
     let layout = Layout(id: UUID(0), number: 1, crossword: Crossword(rows: 4, columns: 4), letterMap: CharacterIntMap(testMap:charMap))

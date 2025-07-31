@@ -65,7 +65,8 @@ struct PopulationReducer {
                     state.isBusy = false
                     state.isPopulated = true
                     state.layout?.crossword = Crossword(initString:layoutText)
-                    state.layout?.letterMap = CharacterIntMap(from: charIntMap)
+//                    state.layout?.oldLetterMapx = CharacterIntMap(from: charIntMap)
+                    state.layout?.initLetterMap(letterMap: charIntMap)
                     
                     return .run { send in await send(.delegate(.finished(.success((layoutText, charIntMap))))) }
                     
