@@ -3,7 +3,6 @@ import CrosscodeDataLibrary
 
 struct CrosswordView: View {
     var grid: Crossword
-//    var letterValues: CharacterIntMap?
     let performAction: (UUID) -> Void
     let viewMode: ViewMode
     let selectedNumber:Int?
@@ -14,7 +13,6 @@ struct CrosswordView: View {
     
     init(grid: Crossword,
          viewMode: ViewMode,
-//         letterValues: CharacterIntMap?,
          letterMap: [Character]?,
          selectedNumber:Int? = nil ,
          attemptedletterValues: [Character]?,
@@ -24,7 +22,6 @@ struct CrosswordView: View {
     {
         self.grid = grid
         self.viewMode = viewMode
-//        self.letterValues = letterValues
         self.letterMap = letterMap
         self.selectedNumber = selectedNumber
         self.attemptedletterValues = attemptedletterValues

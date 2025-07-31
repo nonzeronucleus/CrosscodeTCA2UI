@@ -102,12 +102,10 @@ struct PlayGameFeature {
     }
     
     func handleLetterAddedDelegateFinished2(_ state: inout State, _ result: Result<Int, any Error>) -> Effect<Action> {
-//        guard case .finished(let result) = action else {  return .none }
-        
         // 2. Switch on the Result
         switch result {
             case .success(let count):
-                debugPrint("Revealed \(count) letters so far")
+                debugPrint("Revealed \(count) letters so far. \(state.level!.numCorrectLetters) are correct")
                 return .none
             case .failure(let error):
                 state.error = EquatableError(error)
@@ -116,62 +114,32 @@ struct PlayGameFeature {
     }
 
     
-    
-    func handleLetterAddedDelegateFinished(_ state: inout State, _ action: RevealLetterReducer.Action.Delegate) -> Effect<Action> {
-        guard case .finished(let result) = action else {  return .none }
-        
-        // 2. Switch on the Result
-        switch result {
-            case .success(let count):
-                debugPrint("Revealed \(count) letters")
-                return .none
-            case .failure(_):
-                checkDelegateError(&state, action)
-                return .none
-        }
-    }
-
-    
-    func handleRevealLetterReducerDelegate(_ state: inout State, _ action: RevealLetterReducer.Action.Delegate) -> Effect<Action> {
-        guard case .finished(let result) = action else {  return .none }
-        
-        // 2. Switch on the Result
-        switch result {
-            case .success(let count):
-                debugPrint("Revealed \(count) letters")
-                return .none
-            case .failure(_):
-                checkDelegateError(&state, action)
-                return .none
-        }
-    }
-    
-    func handleKeyboardReducerDelegate(_ state: inout State, _ action: KeyboardFeature.Action.Delegate) -> Effect<Action> {
-        state.checking = false
-        guard case .finished(let result) = action else {  return .none }
-        
-        // 2. Switch on the Result
-        switch result {
-            case .success(let count):
-//                debugPrint("Revealed \(count) letters")
-//                do {
-//                    guard let letterMap = state.level?.oldLetterMap else { return .none }
-//                    
-//                    if count == 26 {
-//                        if try getNextLetter(letterMap: letterMap, usedLetters: state.usedLetters, attemptedLetters: state.level!.attemptedLetters) == nil {
-//                            debugPrint( "YOU WIN!")
-//                        }
-//                    }
-//                }
-//                catch(_) {
-//                    //ignore error
-//                }
-                return .none
-            case .failure(_):
-                checkDelegateError(&state, action)
-                return .none
-        }
-    }
+//    func handleKeyboardReducerDelegate(_ state: inout State, _ action: KeyboardFeature.Action.Delegate) -> Effect<Action> {
+//        state.checking = false
+//        guard case .finished(let result) = action else {  return .none }
+//        
+//        // 2. Switch on the Result
+//        switch result {
+//            case .success(let count):
+////                debugPrint("Revealed \(count) letters")
+////                do {
+////                    guard let letterMap = state.level?.oldLetterMap else { return .none }
+////                    
+////                    if count == 26 {
+////                        if try getNextLetter(letterMap: letterMap, usedLetters: state.usedLetters, attemptedLetters: state.level!.attemptedLetters) == nil {
+////                            debugPrint( "YOU WIN!")
+////                        }
+////                    }
+////                }
+////                catch(_) {
+////                    //ignore error
+////                }
+//                return .none
+//            case .failure(_):
+//                checkDelegateError(&state, action)
+//                return .none
+//        }
+//    }
 }
 
 

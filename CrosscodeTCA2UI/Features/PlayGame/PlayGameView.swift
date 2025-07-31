@@ -96,7 +96,6 @@ struct PlayGameView: View {
                 CrosswordView(
                     grid: gameLevel.crossword,
                     viewMode: .attemptedValue,
-//                    letterValues: gameLevel.layout.oldLetterMapx,
                     letterMap: gameLevel.letterMap,
                     selectedNumber: store.selectedNumber,
                     attemptedletterValues: gameLevel.attemptedLetters,
@@ -169,22 +168,10 @@ extension PlayGameView {
         static let buttonSpacing: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 50 : 20
         static let cornerRadius: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 2 : 1
         
-        //        static func crosswordSize(_ geometry: GeometryProxy) -> CGFloat {
-        //            UIDevice.current.userInterfaceIdiom == .pad ?
-        //                min(geometry.size.width * 0.8, geometry.size.height * 0.6) :
-        //                geometry.size.width * 0.95
-        //        }
-        //
         static func buttonFontSize() -> CGFloat {
             UIDevice.current.userInterfaceIdiom == .pad ? 22 : 17
         }
-        //
-        //        static let buttonHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 60 : 50
         static let keyboardHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 220 : 160
-        //                static let buttonSpacing: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 50 : 20
-        //                static let verticalSpacing: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 30 : 15
-        //        static let cornerRadius: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 2 : 1
-        
     }
 }
 

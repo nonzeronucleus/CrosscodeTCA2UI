@@ -76,17 +76,17 @@ struct KeyboardFeatureTests {
 
 
 fileprivate func createLevel(charMap: String) -> GameLevel {
-    let layout = Layout(id: UUID(0), number: 1, crossword: Crossword(rows: 4, columns: 4), letterMap: CharacterIntMap(testMap:charMap))
+    let layout = Layout(id: UUID(0), number: 1, crossword: Crossword(rows: 4, columns: 4), letterMap: charMap)  //letterMap: CharacterIntMap(testMap:charMap))
     return GameLevel(layout: layout, id: UUID(0), number: 1, attemptedLetters: [Character](repeating: " ", count: 26))
 //    return GameLevel(id: UUID(0), number: 1, packId: nil, letterMap: charMap)
 }
 
-public extension CharacterIntMap {
-    init(testMap: String) {
-        var charToIndex: [Character: Int] = [:]
-        for (index, char) in testMap.enumerated() {
-            charToIndex[char] = index // Overwrites duplicates!
-        }
-        self = charToIndex
-    }
-}
+//public extension CharacterIntMap {
+//    init(testMap: String) {
+//        var charToIndex: [Character: Int] = [:]
+//        for (index, char) in testMap.enumerated() {
+//            charToIndex[char] = index // Overwrites duplicates!
+//        }
+//        self = charToIndex
+//    }
+//}

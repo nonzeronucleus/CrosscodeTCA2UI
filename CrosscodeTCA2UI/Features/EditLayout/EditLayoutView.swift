@@ -71,7 +71,6 @@ struct EditLayoutView: View {
                 CrosswordView(
                     grid: layout.crossword,
                     viewMode: .actualValue,
-//                    letterValues: layout.oldLetterMapx,
                     letterMap: layout.letterMap,
                     attemptedletterValues: nil
                 ) { cell in

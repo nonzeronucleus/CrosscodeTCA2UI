@@ -54,7 +54,6 @@ struct DepopulationReducer {
                     state.isBusy = false
                     state.isPopulated = false
                     state.layout?.crossword = Crossword(initString:layoutText)
-//                    state.layout?.oldLetterMapx = nil
                     
                     return .run { send in await send(.delegate(.finished(.success((layoutText, charIntMap))))) }
                     

@@ -38,11 +38,8 @@ struct PopulateTests {
             await store.send(\.view.populateButtonTapped)
             
             uuidGen.increase(-5) // Fudge to work around value being created in actual layout
-//            uuidGen.increase(1005)  Fudge to work around value being created in actual layout
 
             let expectedLetterMapx = "{\"Z\":13,\"D\":2,\"X\":25,\"V\":0,\"J\":6,\"Q\":12,\"L\":22,\"H\":14,\"A\":8,\"W\":20,\"E\":21,\"G\":18,\"U\":10,\"F\":19,\"T\":4,\"O\":3,\"C\":7,\"M\":23,\"P\":1,\"N\":16,\"R\":15,\"B\":9,\"K\":24,\"Y\":5,\"S\":11,\"I\":17}"
-
-//            let expectedLetterMap: [Character] = ["Z","D", "X"]
 
             let expectedLayout = Layout(id: uuid(), number: 1, gridText: "AS|SO", letterMap: expectedLetterMapx)
                 
@@ -55,7 +52,6 @@ struct PopulateTests {
                 state.isPopulated = true
                 state.isBusy = false
                 state.layout = expectedLayout
-//                state.layout.levelMap = expectedLetterMap
             }
             await store.receive(\.populate.delegate.finished)
         }
