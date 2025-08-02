@@ -19,7 +19,7 @@ struct KeyboardFeature {
         
         @CasePathable
         enum Delegate {
-            case finished(Result<Int, Error>) // Num remaining letters to find
+            case finished(Result<Void, Error>) // Num remaining letters to find
         }
     }
     
@@ -46,7 +46,7 @@ extension KeyboardFeature {
                 break
         }
         
-        return .run { [state] send in await send(.delegate(.finished(.success(state.usedLetters.count)))) }
+        return .run { send in await send(.delegate(.finished(.success(())))) }
     }
 }
         

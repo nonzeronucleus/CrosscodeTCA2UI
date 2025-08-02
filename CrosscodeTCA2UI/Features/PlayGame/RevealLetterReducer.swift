@@ -25,7 +25,7 @@ struct RevealLetterReducer {
         
         @CasePathable
         enum Delegate {
-            case finished(Result<Int, Error>) // Num remaining letters to find
+            case finished(Result<Void, Error>) // Num remaining letters to find
         }
     }
     
@@ -50,7 +50,7 @@ struct RevealLetterReducer {
                         case .failure:
                             break
                     }
-                    return .run { [state] send in await send(.delegate(.finished(.success(state.usedLetters.count)))) }
+                    return .run { send in await send(.delegate(.finished(.success(())))) }
 
                 case .delegate:
                     return .none

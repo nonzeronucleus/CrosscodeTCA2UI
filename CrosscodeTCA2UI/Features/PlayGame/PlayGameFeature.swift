@@ -17,7 +17,9 @@ struct PlayGameFeature {
             get {
                 guard let level else { return Set<Character>() }
                 
-                return Set<Character>(level.attemptedLetters.filter { $0.isLetter })
+                return level.usedLetters
+                
+                //return Set<Character>(level.attemptedLetters.filter { $0.isLetter })
             }
         }
         
@@ -85,9 +87,6 @@ struct PlayGameFeature {
                 case let .revealLetterReducer(.delegate(.finished(result))):
                     return handleLetterAddedDelegateFinished2(&state, result)
                     
-//                case let .revealLetterReducer(.delegate(delegateAction)):
-//                    return handleRevealLetterReducerDelegate(&state, delegateAction)
-                    
                 case let .keyboard(.delegate(.finished(result))):
                     return handleLetterAddedDelegateFinished2(&state, result)
 
@@ -101,11 +100,11 @@ struct PlayGameFeature {
         }
     }
     
-    func handleLetterAddedDelegateFinished2(_ state: inout State, _ result: Result<Int, any Error>) -> Effect<Action> {
+    func handleLetterAddedDelegateFinished2(_ state: inout State, _ result: Result<Void, any Error>) -> Effect<Action> {
         // 2. Switch on the Result
         switch result {
-            case .success(let count):
-                debugPrint("Revealed \(count) letters so far. \(state.level!.numCorrectLetters) are correct")
+            case .success:
+                debugPrint("\(state.level!.numCorrectLetters) are correct")
                 return .none
             case .failure(let error):
                 state.error = EquatableError(error)

@@ -36,6 +36,9 @@
          <TestPlanReference
             reference = "container:../CrosscodeDataLibraryBackendTests.xctestplan">
          </TestPlanReference>
+         <TestPlanReference
+            reference = "container:../AllTests.xctestplan">
+         </TestPlanReference>
       </TestPlans>
       <Testables>
          <TestableReference
