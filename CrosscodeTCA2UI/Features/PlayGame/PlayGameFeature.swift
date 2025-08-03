@@ -24,7 +24,11 @@ struct PlayGameFeature {
         var checking = false
         var isBusy = false
         var isDirty = false
-        var isCompleted = false
+        var isCompleted: Bool {
+            get {
+                level?.numCorrectLetters == 26 || false
+            }
+        }
         var isExiting: Bool = false
         var error: EquatableError?
     }
