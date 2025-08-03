@@ -28,9 +28,9 @@ struct KeyboardFeatureTests {
         await store.send(.view(.letterInput("Q"))) {
             $0.level!.attemptedLetters[2] = "Q"
         }
-
+        
         await store.receive(\.delegate.finished)
-
+        
         // Same one should be overwritten
         await store.send(.view(.letterInput("W"))) {
             $0.level!.attemptedLetters[2] = "W"
@@ -38,40 +38,69 @@ struct KeyboardFeatureTests {
         
         await store.receive(\.delegate.finished)
     }
-
     
+    
+    @Test func testAddLetterWithMultipleSelectedSquares() async throws {
+        let store = await TestStore(
+            initialState: PlayGameFeature.State(levelID:UUID(0), level: createLevel(charMap: "QWERTYUIOPASDFGHJKLZXCVBNM"), selectedNumber:2 )
+        ) {
+            PlayGameFeature()
+        }
         
-//        {
-//            $0.selectedNumber = 1
-////            $0.usedLetters = ["Q"]
-//        }
-//        await store.send(.letterInput("A")) {
-//            $0.usedLetters = ["A"]
-//       }
-//        await store.send(.letterInput("A"))
-//        
-//        await store.send(.letterSelectedInGrid("Q")) {
-//        }
-//        await store.send(.letterInput("Z")) {
-//            $0.usedLetters = ["A", "Z"]
-//        }
-//        await store.send(.letterSelectedInGrid(nil)) {
-//            $0.selectedLetterInGrid = nil
-//        }
-//        await store.send(.letterInput("T")) 
-//
-//    
-//    @Test func testAddLetterThatsAlreadyBeenUsed() async throws {
-//        let store = await TestStore(
-//            initialState: PlayGameFeature.State(levelID:UUID(0), usedLetters:["A","B","C"], selectedLetterInGrid: "D")
-//        ) {
-//            KeyboardFeature()
-//        }
-////        await store.send(.keyboard(.letterInput("A"))) {
-//        await store.send(.letterInput("A")) {
-//            $0.usedLetters = ["A", "Z"]
-//        }
-//    }
+        // Third character (offset 0) selected, so that should be set to character
+        await store.send(.keyboard(.view(.letterInput("Q")))) {
+            $0.level!.attemptedLetters[2] = "Q"
+        }
+        
+        await store.receive(\.keyboard.delegate.finished)
+        
+        await store.send(.playGameCell(.internal(.finished(.success(3))))) { state in // Seleect cell numbered 3
+            state.selectedNumber = 3
+        }
+        
+        await store.send(.keyboard(.view(.letterInput("Q")))) {
+            $0.level!.attemptedLetters[2] = " "
+            $0.level!.attemptedLetters[3] = "Q"
+        }
+        
+        await store.receive(\.keyboard.delegate.finished)
+    }
+    
+    @Test func testDeleteLetter() async throws {
+        let store = await TestStore(
+            initialState: PlayGameFeature.State(levelID:UUID(0), level: createLevel(charMap: "QWERTYUIOPASDFGHJKLZXCVBNM"), selectedNumber:2 )
+        ) {
+            PlayGameFeature()
+        }
+        
+        // Third character (offset 0) selected, so that should be set to character
+        await store.send(.keyboard(.view(.letterInput("Q")))) {
+            $0.level!.attemptedLetters[2] = "Q"
+        }
+        
+        await store.receive(\.keyboard.delegate.finished)
+        
+        await store.send(.playGameCell(.internal(.finished(.success(3))))) { state in // Seleect cell numbered 3
+            state.selectedNumber = 3
+        }
+        
+        await store.send(.keyboard(.view(.letterInput("A")))) {
+            $0.level!.attemptedLetters[3] = "A"
+        }
+        
+        await store.receive(\.keyboard.delegate.finished)
+        
+        await store.send(.playGameCell(.internal(.finished(.success(2))))) { state in // Seleect cell numbered 2 again - which should have Q in it
+            state.selectedNumber = 2
+        }
+        
+        await store.send(.keyboard(.view(.deleteInput))) {
+            $0.level!.attemptedLetters[2] = " "
+        }
+        
+        await store.receive(\.keyboard.delegate.finished)
+
+    }
 }
 
 
@@ -81,12 +110,3 @@ fileprivate func createLevel(charMap: String) -> GameLevel {
 //    return GameLevel(id: UUID(0), number: 1, packId: nil, letterMap: charMap)
 }
 
-//public extension CharacterIntMap {
-//    init(testMap: String) {
-//        var charToIndex: [Character: Int] = [:]
-//        for (index, char) in testMap.enumerated() {
-//            charToIndex[char] = index // Overwrites duplicates!
-//        }
-//        self = charToIndex
-//    }
-//}

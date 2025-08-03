@@ -40,9 +40,14 @@ extension KeyboardFeature {
         switch action {
             case .letterInput(let letter):
                 guard let selectedNumber = state.selectedNumber else { return .none }
+                if let index = state.level!.attemptedLetters.firstIndex(of: letter) {
+                    state.level!.attemptedLetters[index] = " "
+                }
                 state.level!.attemptedLetters[selectedNumber] = letter
                 break
             case .deleteInput:
+                guard let selectedNumber = state.selectedNumber else { return .none }
+                state.level!.attemptedLetters[selectedNumber] = " "
                 break
         }
         

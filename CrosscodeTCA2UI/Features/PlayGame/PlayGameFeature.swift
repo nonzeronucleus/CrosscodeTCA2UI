@@ -18,8 +18,6 @@ struct PlayGameFeature {
                 guard let level else { return Set<Character>() }
                 
                 return level.usedLetters
-                
-                //return Set<Character>(level.attemptedLetters.filter { $0.isLetter })
             }
         }
         
