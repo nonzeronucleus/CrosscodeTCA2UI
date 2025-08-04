@@ -25,8 +25,11 @@ struct KeyboardFeature {
     
     var body: some Reducer<State, Action> {
         Reduce { state, action in
+
             switch action {
                 case let .view(viewAction):
+                    if state.isCompleted {return .none}
+                    
                     return handleViewAction(&state, viewAction)
                 case .delegate(_):
                     return .none

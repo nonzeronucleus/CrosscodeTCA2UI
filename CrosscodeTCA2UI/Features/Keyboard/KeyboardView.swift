@@ -1,8 +1,12 @@
 import SwiftUI
 import ComposableArchitecture
 
-struct KeyboardView: View {
+struct KeyboardView: View, Equatable {
     @Bindable var store: StoreOf<KeyboardFeature>
+
+    static func == (lhs: KeyboardView, rhs: KeyboardView) -> Bool {
+        return lhs.store.usedLetters == rhs.store.usedLetters
+    }
 
     var body: some View {
         ZStack {
@@ -16,7 +20,7 @@ struct KeyboardView: View {
                 onEnterPressed: {},
                 usedLetters: store.usedLetters
             )
-//            .padding(5)
+//            .debugBorder()
         }
     }
 }

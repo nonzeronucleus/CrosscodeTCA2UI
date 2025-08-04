@@ -22,6 +22,7 @@ struct PlayGameCellReducer {
         Reduce { state, action in
             switch action {
                 case .cellClicked(let id):
+                    if state.isCompleted {return .none}
                     return .run { [state] send in
                         let result = await handleSelect(state, id: id)
                         await send(.internal(.finished(result)))

@@ -31,8 +31,11 @@ struct RevealLetterReducer {
     
     var body: some Reducer<PlayGameFeature.State, Action> {
         Reduce { state, action in
+
             switch action {
                 case let .api(externalActions):
+                    if state.isCompleted {return .none}
+
                     switch externalActions {
                         case .start:
                             return .run { [state] send in

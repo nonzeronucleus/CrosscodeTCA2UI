@@ -46,7 +46,8 @@ struct PlayGameView: View {
                         Spacer(minLength: 0)
                         
                         // Action Buttons (fixed at bottom)
-                        actionButtons
+//                        actionButtons
+                        ActionButtons(store: store)
                             .frame(height: ViewStyle.buttonHeight)
                             .padding(.bottom, 20) // Keep bottom padding
                     }
@@ -54,7 +55,7 @@ struct PlayGameView: View {
                 }
                 
                 // Completion Overlay
-                if store.isCompleted {
+                if store.showCompletionDialog {
                     completionOverlay
                 }
             }
@@ -117,7 +118,47 @@ struct PlayGameView: View {
         }
     }
     
-    private var actionButtons: some View {
+    private var completionOverlay: some View {
+        Color.black.opacity(0.5)
+            .edgesIgnoringSafeArea(.all)
+            .overlay(
+                VStack {
+                    Spacer()
+                    CompletedPopover {
+                        store.send(.view(.completionDialogDismissTapped))
+                    }
+                    .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 100 : 40)
+                    Spacer()
+                }
+            )
+    }
+}
+
+
+extension PlayGameView {
+    private enum ViewStyle {
+        static func crosswordSize(_ geometry: GeometryProxy) -> CGFloat {
+            UIDevice.current.userInterfaceIdiom == .pad ?
+            min(geometry.size.width * 0.8, geometry.size.height * 0.6) :
+            geometry.size.width * 0.95
+        }
+        
+        static let buttonHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 60 : 50
+        static let buttonSpacing: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 50 : 20
+        static let cornerRadius: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 2 : 1
+        
+        static func buttonFontSize() -> CGFloat {
+            UIDevice.current.userInterfaceIdiom == .pad ? 22 : 17
+        }
+        static let keyboardHeight: CGFloat = UIDevice.current.userInterfaceIdiom == .pad ? 220 : 160
+    }
+}
+
+
+private struct ActionButtons: View, Equatable {
+    let store: StoreOf<PlayGameFeature>
+    
+    var body: some View {
         HStack(spacing: ViewStyle.buttonSpacing) {
             Button(action: { store.send(.view(.checkToggled)) }) {
                 Text("Check")
@@ -138,25 +179,6 @@ struct PlayGameView: View {
             .tint(.green)
         }
     }
-    
-    private var completionOverlay: some View {
-        Color.black.opacity(0.5)
-            .edgesIgnoringSafeArea(.all)
-            .overlay(
-                VStack {
-                    Spacer()
-                    CompletedPopover {
-//                        store.send(.delegate(.dismiss))
-                    }
-                    .padding(.horizontal, UIDevice.current.userInterfaceIdiom == .pad ? 100 : 40)
-                    Spacer()
-                }
-            )
-    }
-}
-
-
-extension PlayGameView {
     private enum ViewStyle {
         static func crosswordSize(_ geometry: GeometryProxy) -> CGFloat {
             UIDevice.current.userInterfaceIdiom == .pad ?
@@ -195,17 +217,5 @@ extension PlayGameView {
         )
         
         return PlayGameView(store: store)
-    }
-}
-
-func randomColorProvider() -> Color {
-    let colors = [Color.red, Color.yellow, Color.blue, Color.orange, Color.green, Color.brown]
-    let random = Int.random(in: 0..<6)
-    return colors[random]
-}
- 
-extension View {
-    func debugBorder(_ color: Color = randomColorProvider(), width: CGFloat = 1) -> some View {
-        self.overlay(RoundedRectangle(cornerRadius: 1).stroke(color, lineWidth: width))
     }
 }

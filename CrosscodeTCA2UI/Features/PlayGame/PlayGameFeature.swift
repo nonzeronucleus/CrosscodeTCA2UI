@@ -29,6 +29,8 @@ struct PlayGameFeature {
                 level?.numCorrectLetters == 26 || false
             }
         }
+        
+        var showCompletionDialog: Bool = false
         var isExiting: Bool = false
         var error: EquatableError?
     }
@@ -46,6 +48,7 @@ struct PlayGameFeature {
             case backButtonTapped
             case checkToggled
             case revealRequested
+            case completionDialogDismissTapped
         }
     }
     
@@ -80,6 +83,10 @@ struct PlayGameFeature {
 
                         case .revealRequested:
                             return .send(.revealLetterReducer(.api(.start)))
+                            
+                        case .completionDialogDismissTapped:
+                            state.showCompletionDialog = false
+                            return .none
                     }
                     
                 case let .loadGameLevel(.delegate(delegateAction)):
@@ -87,10 +94,10 @@ struct PlayGameFeature {
                     return .none
                     
                 case let .revealLetterReducer(.delegate(.finished(result))):
-                    return handleLetterAddedDelegateFinished2(&state, result)
+                    return handleLetterAddedDelegateFinished(&state, result)
                     
                 case let .keyboard(.delegate(.finished(result))):
-                    return handleLetterAddedDelegateFinished2(&state, result)
+                    return handleLetterAddedDelegateFinished(&state, result)
 
                     
                 case .playGameCell,
@@ -102,57 +109,19 @@ struct PlayGameFeature {
         }
     }
     
-    func handleLetterAddedDelegateFinished2(_ state: inout State, _ result: Result<Void, any Error>) -> Effect<Action> {
-        // 2. Switch on the Result
+    func handleLetterAddedDelegateFinished(_ state: inout State, _ result: Result<Void, any Error>) -> Effect<Action> {
         switch result {
             case .success:
-                debugPrint("\(state.level!.numCorrectLetters) are correct")
+                if state.isCompleted {
+                    state.showCompletionDialog = true
+                }
                 return .none
             case .failure(let error):
                 state.error = EquatableError(error)
                 return .none
         }
     }
-
-    
-//    func handleKeyboardReducerDelegate(_ state: inout State, _ action: KeyboardFeature.Action.Delegate) -> Effect<Action> {
-//        state.checking = false
-//        guard case .finished(let result) = action else {  return .none }
-//        
-//        // 2. Switch on the Result
-//        switch result {
-//            case .success(let count):
-////                debugPrint("Revealed \(count) letters")
-////                do {
-////                    guard let letterMap = state.level?.oldLetterMap else { return .none }
-////                    
-////                    if count == 26 {
-////                        if try getNextLetter(letterMap: letterMap, usedLetters: state.usedLetters, attemptedLetters: state.level!.attemptedLetters) == nil {
-////                            debugPrint( "YOU WIN!")
-////                        }
-////                    }
-////                }
-////                catch(_) {
-////                    //ignore error
-////                }
-//                return .none
-//            case .failure(_):
-//                checkDelegateError(&state, action)
-//                return .none
-//        }
-//    }
 }
-
-
-//                    state.checking = false
-//                    if case .finished(.success(let remainingLetters)) = delegateAction {
-//                        debugPrint(remainingLetters)
-//                    }
-//                    else {
-//                        checkDelegateError(&state, delegateAction)
-//                    }
-//                    return .none
-
 
 
 extension PlayGameFeature {
