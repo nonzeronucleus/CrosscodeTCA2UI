@@ -7,6 +7,8 @@ import Factory
 struct SaveLayoutTests {
     
     @Test func testLayoutSaved() async throws {
+        @Dependency(\.apiClient) var apiClient
+
         setupTestLib(#function)
         defer { tearDownTestLib(#function) }
 
@@ -18,9 +20,9 @@ struct SaveLayoutTests {
         )
         
         let store = await TestStore(
-            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: mockLayout, isDirty: true)
+            initialState: EditLayoutFeature.State(layoutID: UUID(0), level: mockLayout, isDirty: true)
         ) {
-            SaveLayoutReducer()
+            SaveLevelReducer<EditLayoutFeature>(levelAPI:apiClient.layoutsAPI)
         } withDependencies: {
             $0.uuid = .incrementing
             $0.apiClient = mockAPI

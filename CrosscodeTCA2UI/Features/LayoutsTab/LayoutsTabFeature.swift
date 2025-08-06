@@ -60,7 +60,7 @@ struct LayoutsTabFeature {
                 case .editLayout(.dismiss):
                     // Update item in list with new layout after editing
                     guard let editLayout = state.editLayout else { return .none }
-                    guard let layout = editLayout.layout else { return .none }
+                    guard let layout = editLayout.level else { return .none }
 
                     state.layouts[id: editLayout.layoutID] = layout
                     return .none

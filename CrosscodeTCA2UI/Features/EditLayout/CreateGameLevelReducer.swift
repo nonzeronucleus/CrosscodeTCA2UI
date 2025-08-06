@@ -65,7 +65,7 @@ struct CreateGameLevelReducer {
     }
     
     func addLevel(_ state: State) async -> Result<(Void), Error> {
-        let layout = state.layout
+        let layout = state.level
 
         do {
             guard let layout = layout else { throw EditLayoutError.saveLayoutError("No layout found in add level") }

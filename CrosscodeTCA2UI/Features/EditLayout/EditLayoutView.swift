@@ -66,7 +66,7 @@ struct EditLayoutView: View {
     }
 
     private func crosswordView(geometry: GeometryProxy) -> some View {
-        WithViewStore(store, observe: { $0.layout }) { layoutStore in
+        WithViewStore(store, observe: { $0.level }) { layoutStore in
             if let layout = layoutStore.state {
                 CrosswordView(
                     grid: layout.crossword,

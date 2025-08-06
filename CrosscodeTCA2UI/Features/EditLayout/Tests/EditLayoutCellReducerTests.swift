@@ -21,7 +21,7 @@ struct EditLayoutCellReducerTests {
         )
         
         let store = await TestStore(
-            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: mockLayout, isPopulated: false)
+            initialState: EditLayoutFeature.State(layoutID: UUID(0), level: mockLayout, isPopulated: false)
         ) {
             EditLayoutFeature()
         } withDependencies: {
@@ -29,17 +29,17 @@ struct EditLayoutCellReducerTests {
             $0.apiClient = mockAPI
         }
         
-        let cellUUID = await store.state.layout!.crossword[0,0].id
+        let cellUUID = await store.state.level!.crossword[0,0].id
         
         await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(cellUUID)))) {
-            $0.layout!.crossword[0,0].letter = nil
-            $0.layout!.crossword[14,14].letter = nil
+            $0.level!.crossword[0,0].letter = nil
+            $0.level!.crossword[14,14].letter = nil
             $0.isDirty = true
         }
         
         await store.send(EditLayoutFeature.Action.cell(.view(.cellClicked(cellUUID)))) {
-            $0.layout!.crossword[0,0].letter = " "
-            $0.layout!.crossword[14,14].letter = " "
+            $0.level!.crossword[0,0].letter = " "
+            $0.level!.crossword[14,14].letter = " "
         }
 
     }
@@ -58,7 +58,7 @@ struct EditLayoutCellReducerTests {
         )
         
         let store = await TestStore(
-            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: mockLayout, isPopulated: true)
+            initialState: EditLayoutFeature.State(layoutID: UUID(0), level: mockLayout, isPopulated: true)
         ) {
             EditLayoutFeature()
         } withDependencies: {
@@ -85,7 +85,7 @@ struct EditLayoutCellReducerTests {
         )
         
         let store = await TestStore(
-            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: mockLayout, isPopulated: false)
+            initialState: EditLayoutFeature.State(layoutID: UUID(0), level: mockLayout, isPopulated: false)
         ) {
             EditLayoutFeature()
         } withDependencies: {
@@ -117,7 +117,7 @@ struct EditLayoutCellReducerTests {
         )
         
         let store = await TestStore(
-            initialState: EditLayoutFeature.State(layoutID: UUID(0), layout: nil, isPopulated: false)
+            initialState: EditLayoutFeature.State(layoutID: UUID(0), level: nil, isPopulated: false)
         ) {
             EditLayoutFeature()
         } withDependencies: {

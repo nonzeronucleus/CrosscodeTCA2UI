@@ -9,13 +9,15 @@ struct EditLayoutFeature {
     @Dependency(\.uuid) var uuid
     @Dependency(\.dismiss) var dismiss
     @Dependency(\.isPresented) var isPresented
+    @Dependency(\.apiClient) var apiClient
+
     
     // MARK: - State
     @ObservableState
-    struct State: Equatable, LayoutState, ErrorHandling {
+    struct State: Equatable, LevelState, ErrorHandling {        
         var settings = Settings()
         var layoutID: UUID
-        var layout: Layout?
+        var level: Layout?
         var isDirty = false
         var isPopulated = false
         var isExiting = false
@@ -33,7 +35,7 @@ struct EditLayoutFeature {
         // Child reducers
         case addLayout(AddLayoutReducer<EditLayoutFeature>.Action)
         case loadLayout(LoadLayoutReducer.Action)
-        case saveLayout(SaveLayoutReducer<EditLayoutFeature>.Action)
+        case saveLayout(SaveLevelReducer<EditLayoutFeature>.Action)
         case createGameLevel(CreateGameLevelReducer.Action)
         case populate(PopulationReducer.Action)
         case depopulate(DepopulationReducer.Action)
@@ -68,7 +70,7 @@ struct EditLayoutFeature {
         CombineReducers {
             Scope(state: \.self, action: \.addLayout) { AddLayoutReducer() }
             Scope(state: \.self, action: \.loadLayout) { LoadLayoutReducer() }
-            Scope(state: \.self, action: \.saveLayout) { SaveLayoutReducer() }
+            Scope(state: \.self, action: \.saveLayout) { SaveLevelReducer(levelAPI: apiClient.layoutsAPI) }
             Scope(state: \.self, action: \.createGameLevel) { CreateGameLevelReducer() }
             Scope(state: \.self, action: \.populate) { PopulationReducer() }
             Scope(state: \.self, action: \.depopulate) { DepopulationReducer() }
@@ -165,7 +167,7 @@ private extension EditLayoutFeature {
                 return handleBackButton(&state)
                 
             case .duplicateButtonTapped:
-                return .send(.addLayout(.api(.start(state.layout?.gridText))))
+                return .send(.addLayout(.api(.start(state.level?.gridText))))
                 
             case .exportButtonTapped:
                 return .send(.createGameLevel(.api(.start)))
@@ -205,7 +207,7 @@ private extension EditLayoutFeature {
         }
     }
     
-    func handleSaveLayoutDelegate(_ state: inout State, _ action: SaveLayoutReducer<EditLayoutFeature>.Action.Delegate) -> Effect<Action> {
+    func handleSaveLayoutDelegate(_ state: inout State, _ action: SaveLevelReducer<EditLayoutFeature>.Action.Delegate) -> Effect<Action> {
         guard case .finished(let result) = action else {  return .none }
 
         // 2. Switch on the Result

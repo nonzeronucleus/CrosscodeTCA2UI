@@ -3,23 +3,12 @@ import Foundation
 import CrosscodeDataLibrary
 import Factory
 
-protocol LayoutState {
-    var isBusy: Bool {
-        get set
-    }
-    var layout: Layout?{
-        get set
-    }
-    var isDirty: Bool {
-        get set
-    }
-}
-
 @Reducer
-struct SaveLayoutReducer<R: Reducer> where R.State: LayoutState {
+struct SaveLevelReducer<R: Reducer> where R.State: LevelState {
     typealias State = R.State
+    let levelAPI: LevelsAPI
     
-    @Dependency(\.apiClient) var apiClient
+//    @Dependency(\.apiClient) var apiClient
     @Injected(\.uuid) var uuid
     
     @CasePathable
@@ -42,6 +31,10 @@ struct SaveLayoutReducer<R: Reducer> where R.State: LayoutState {
         enum Delegate {
             case finished(Result<Void, Error>)
         }
+    }
+    
+    init(levelAPI: LevelsAPI) {
+        self.levelAPI = levelAPI
     }
     
     var body: some Reducer<State, Action> {
@@ -72,11 +65,12 @@ struct SaveLayoutReducer<R: Reducer> where R.State: LayoutState {
     }
 
     private func saveLayout(_ state: State) async -> Result<Void, Error> {
-        guard let layout = state.layout else {
+        guard let layout = state.level else {
             return .failure(EditLayoutError.saveLayoutError("No layout found in save level"))
         }
         do {
-            try await apiClient.layoutsAPI.saveLevel(level: layout)
+//            try await apiClient.layoutsAPI.saveLevel(level: layout)
+            try await levelAPI.saveLevel(level: layout)
             return .success(())
         } catch {
             return .failure(error)

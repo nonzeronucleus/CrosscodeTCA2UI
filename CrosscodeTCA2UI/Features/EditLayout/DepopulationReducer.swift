@@ -53,7 +53,7 @@ struct DepopulationReducer {
                 case .internal(.finished(.success(let (layoutText, charIntMap)))):
                     state.isBusy = false
                     state.isPopulated = false
-                    state.layout?.crossword = Crossword(initString:layoutText)
+                    state.level?.crossword = Crossword(initString:layoutText)
                     
                     return .run { send in await send(.delegate(.finished(.success((layoutText, charIntMap))))) }
                     
@@ -68,7 +68,7 @@ struct DepopulationReducer {
     }
     
     func depopulate(_ state: State) async -> Result<(String, String), Error> {
-        guard let layout = state.layout else { return .failure(EditLayoutError.handlePopulationError("No layout loaded")) }
+        guard let layout = state.level else { return .failure(EditLayoutError.handlePopulationError("No layout loaded")) }
         
         do {
             guard let populatedLevel = layout.gridText else { throw EditLayoutError.handlePopulationError("No layout") }

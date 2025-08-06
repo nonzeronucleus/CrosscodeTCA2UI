@@ -52,7 +52,7 @@ private extension EditLayoutCellReducer {
     func handleToggle(_ state: inout State, id: UUID) -> Effect<Action> {
         do {
             guard !state.isPopulated else {return .none} // If the layout has been populated with words, don't allow the cell to be clicked on
-            guard let level = state.layout else { throw FeatureError.layoutNil}
+            guard let level = state.level else { throw FeatureError.layoutNil}
             guard let location = level.crossword.locationOfElement(byID: id) else { throw FeatureError.couldNotFindCell(id)}
             
             // Calculate opposite position first
@@ -68,7 +68,7 @@ private extension EditLayoutCellReducer {
                 crossword.updateElement(byPos: opposite) { $0.toggle() }
             }
             
-            state.layout = level.withUpdatedCrossword(crossword)
+            state.level = level.withUpdatedCrossword(crossword)
             state.isDirty = true
             
             return .none

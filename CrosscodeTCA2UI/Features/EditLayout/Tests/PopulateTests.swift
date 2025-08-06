@@ -26,7 +26,7 @@ struct PopulateTests {
             let layout = Layout(id: UUID(0), number: 1, gridText:  "--|--|")
             
             let store = await TestStore(
-                initialState: EditLayoutFeature.State(layoutID: UUID(0),layout: layout)
+                initialState: EditLayoutFeature.State(layoutID: UUID(0),level: layout)
             ) {
                 EditLayoutFeature()
             } withDependencies: {
@@ -51,7 +51,7 @@ struct PopulateTests {
             await store.receive(\.populate.internal.finished) { state in
                 state.isPopulated = true
                 state.isBusy = false
-                state.layout = expectedLayout
+                state.level = expectedLayout
             }
             await store.receive(\.populate.delegate.finished)
         }

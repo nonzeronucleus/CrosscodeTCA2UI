@@ -45,7 +45,7 @@ struct LoadLayoutReducer {
                     state.isBusy = false
                     switch result {
                         case .success(let layout):
-                            state.layout = layout
+                            state.level = layout
                         case .failure:
                             break
                     }

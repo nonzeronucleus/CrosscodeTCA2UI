@@ -7,9 +7,13 @@ struct PlayGameFeature {
     @Dependency(\.uuid) var uuid
     @Dependency(\.dismiss) var dismiss
     @Dependency(\.isPresented) var isPresented
+    @Dependency(\.apiClient) var apiClient
+
     
     @ObservableState
     struct State: Equatable, ErrorHandling {
+//        var layout: CrosscodeDataLibrary.Layout?
+        
         var levelID: UUID
         var level: GameLevel?
         var selectedNumber: Int?

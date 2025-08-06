@@ -10,7 +10,11 @@ extension APIClient: DependencyKey {
     static let liveValue = Self(
         layoutsAPI:LayoutsAPIImpl(),
         gameLevelsAPI: GameLevelsAPIImpl()
-        
+    )
+    
+    static let previewValue = Self (
+        layoutsAPI: MockLayoutsAPI(levels: [Layout.mock]),
+        gameLevelsAPI: MockGameLevelsAPI(/*levels: GameLevel.mocks*/)
     )
     
     static let mock = Self (

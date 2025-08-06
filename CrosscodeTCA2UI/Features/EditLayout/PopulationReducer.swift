@@ -63,8 +63,8 @@ struct PopulationReducer {
                 case .internal(.finished(.success(let (layoutText, charIntMap)))):
                     state.isBusy = false
                     state.isPopulated = true
-                    state.layout?.crossword = Crossword(initString:layoutText)
-                    state.layout?.initLetterMap(letterMap: charIntMap)
+                    state.level?.crossword = Crossword(initString:layoutText)
+                    state.level?.initLetterMap(letterMap: charIntMap)
                     
                     return .run { send in await send(.delegate(.finished(.success((layoutText, charIntMap))))) }
                     
@@ -79,7 +79,7 @@ struct PopulationReducer {
     }
     
     func populate(_ state: State) async -> Result<(String, String), Error> {
-        guard let layout = state.layout else {
+        guard let layout = state.level else {
             return .failure(EditLayoutError.handlePopulationError("No layout loaded"))
         }
         

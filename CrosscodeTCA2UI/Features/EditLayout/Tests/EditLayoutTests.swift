@@ -37,7 +37,7 @@ struct EditLayoutTests {
         }
         
         await store.receive(\.loadLayout.internal.finished/*, expectedResult*/) {
-            $0.layout = mockLayout
+            $0.level = mockLayout
             $0.isBusy = false
         }
         
@@ -52,30 +52,33 @@ struct EditLayoutTests {
         let layout = Layout(id: UUID(), number: 1, gridText: "...|...|...|")
         
         
-        let state = EditLayoutFeature.State(layoutID: layout.id, layout: layout)
+        let state = EditLayoutFeature.State(layoutID: layout.id, level: layout)
+        
         
         let store = await TestStore(initialState: state) {
             EditLayoutFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
+            $0.apiClient = .previewValue
         }
         
-        
-        #expect(state.layout != nil)
+        #expect(state.level != nil)
         
         // Grid should be all nil (off)
-        await #expect(store.state.layout?.crossword[0,0].letter == nil)
-        await #expect(store.state.layout?.crossword[1,1].letter == nil)
-        await #expect(store.state.layout?.crossword[2,2].letter == nil)
+        await #expect(store.state.level?.crossword[0,0].letter == nil)
+        await #expect(store.state.level?.crossword[1,1].letter == nil)
+        await #expect(store.state.level?.crossword[2,2].letter == nil)
         
-        let cellID = (state.layout?.crossword[0,0].id)!
+        let cellID = (state.level?.crossword[0,0].id)!
         await store.send(\.cell.view.cellClicked, cellID) {
-            $0.layout!.crossword[0,0].letter = " "
-            $0.layout?.crossword[2,2].letter = " "
+            $0.level!.crossword[0,0].letter = " "
+            $0.level?.crossword[2,2].letter = " "
             $0.isDirty = true
         }
         
         await store.send(\.cell.view.cellClicked, cellID) {
-            $0.layout!.crossword[0,0].letter = nil
-            $0.layout?.crossword[2,2].letter = nil
+            $0.level!.crossword[0,0].letter = nil
+            $0.level?.crossword[2,2].letter = nil
         }
     }
 }
