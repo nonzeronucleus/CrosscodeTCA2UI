@@ -25,32 +25,47 @@ struct PlayGameCompletedTests {
         
         await store.send(.revealLetterReducer(.api(.start)))
         
-        await store.receive(\.revealLetterReducer.internal.finished){
+        await store.receive(\.revealLetterReducer.internal.finished) {
             $0.level!.attemptedLetters[25] = "M"
         }
-        await store.receive(\.revealLetterReducer.delegate.finished)
+        await store.receive(\.revealLetterReducer.delegate.finished) {
+            $0.showCompletionDialog = true
+        }
         
         await #expect(store.state.isCompleted == true)
     }
     
     @Test func testAlreadyComplete() async throws {
+        let level = createLevel(charMap: "QWERTYUIOPASDFGHJKLZXCVBNM", attemptedLetters: "QWERTYUIOPASDFGHJKLZXCVBNM")
         let store = await TestStore(
-            initialState: PlayGameFeature.State(levelID:UUID(0), level: createLevel(charMap: "QWERTYUIOPASDFGHJKLZXCVBNM", attemptedLetters: "QWERTYUIOPASDFGHJKLZXCVBNM"), selectedNumber:2 )
+            initialState: PlayGameFeature.State(levelID:UUID(0), level: level, selectedNumber:2 )
         ) {
             PlayGameFeature()
+        }
+        
+        await store.send(.loadGameLevel(.delegate(.finished(.success(level))))) {
+            $0.showCompletionDialog = true
         }
         
         await #expect(store.state.isCompleted == true)
+        
+        await #expect(store.state.showCompletionDialog == true)
     }
 
     @Test func testPopulatedAndWrong() async throws {
+        let level = createLevel(charMap: "QWERTYUIOPASDFGHJKLZXCVBNM", attemptedLetters: "QWERTYUIOPASDFGHJKLZXCVBMN") // Last two letters are different
+
         let store = await TestStore(
-            initialState: PlayGameFeature.State(levelID:UUID(0), level: createLevel(charMap: "QWERTYUIOPASDFGHJKLZXCVBNM", attemptedLetters: "QWERTYUIOPASDFGHJKLZXCVBMN"), selectedNumber:2 )
+            initialState: PlayGameFeature.State(levelID:UUID(0), level: level, selectedNumber:2 )
         ) {
             PlayGameFeature()
         }
         
+        await store.send(.loadGameLevel(.delegate(.finished(.success(level)))))
+        
         await #expect(store.state.isCompleted == false)
+        
+        await #expect(store.state.showCompletionDialog == false)
     }
 }
 

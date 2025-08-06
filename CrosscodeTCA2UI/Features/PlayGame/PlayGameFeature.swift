@@ -90,6 +90,10 @@ struct PlayGameFeature {
                     }
                     
                 case let .loadGameLevel(.delegate(delegateAction)):
+                    if state.isCompleted {
+                        state.showCompletionDialog = true
+                    }
+
                     checkDelegateError(&state, delegateAction)
                     return .none
                     

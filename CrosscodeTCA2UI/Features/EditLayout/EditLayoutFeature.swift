@@ -12,7 +12,7 @@ struct EditLayoutFeature {
     
     // MARK: - State
     @ObservableState
-    struct State: Equatable, ErrorHandling {
+    struct State: Equatable, LayoutState, ErrorHandling {
         var settings = Settings()
         var layoutID: UUID
         var layout: Layout?
@@ -33,7 +33,7 @@ struct EditLayoutFeature {
         // Child reducers
         case addLayout(AddLayoutReducer<EditLayoutFeature>.Action)
         case loadLayout(LoadLayoutReducer.Action)
-        case saveLayout(SaveLayoutReducer.Action)
+        case saveLayout(SaveLayoutReducer<EditLayoutFeature>.Action)
         case createGameLevel(CreateGameLevelReducer.Action)
         case populate(PopulationReducer.Action)
         case depopulate(DepopulationReducer.Action)
@@ -205,7 +205,7 @@ private extension EditLayoutFeature {
         }
     }
     
-    func handleSaveLayoutDelegate(_ state: inout State, _ action: SaveLayoutReducer.Action.Delegate) -> Effect<Action> {
+    func handleSaveLayoutDelegate(_ state: inout State, _ action: SaveLayoutReducer<EditLayoutFeature>.Action.Delegate) -> Effect<Action> {
         guard case .finished(let result) = action else {  return .none }
 
         // 2. Switch on the Result
