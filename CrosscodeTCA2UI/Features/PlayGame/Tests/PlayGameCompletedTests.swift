@@ -19,7 +19,12 @@ struct PlayGameCompletedTests {
             initialState: PlayGameFeature.State(levelID:UUID(0), level: createLevel(charMap: "QWERTYUIOPASDFGHJKLZXCVBNM", attemptedLetters: "QWERTYUIOPASDFGHJKLZXCVBN "), selectedNumber:2 )
         ) {
             PlayGameFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
+            $0.apiClient = .mock
         }
+        
+        
         
         await #expect(store.state.isCompleted == false)
         
@@ -41,8 +46,11 @@ struct PlayGameCompletedTests {
             initialState: PlayGameFeature.State(levelID:UUID(0), level: level, selectedNumber:2 )
         ) {
             PlayGameFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
+            $0.apiClient = .mock
         }
-        
+
         await store.send(.loadGameLevel(.delegate(.finished(.success(level))))) {
             $0.showCompletionDialog = true
         }
@@ -59,8 +67,11 @@ struct PlayGameCompletedTests {
             initialState: PlayGameFeature.State(levelID:UUID(0), level: level, selectedNumber:2 )
         ) {
             PlayGameFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
+            $0.apiClient = .mock
         }
-        
+
         await store.send(.loadGameLevel(.delegate(.finished(.success(level)))))
         
         await #expect(store.state.isCompleted == false)

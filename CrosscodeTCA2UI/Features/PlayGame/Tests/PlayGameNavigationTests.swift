@@ -48,6 +48,39 @@ struct PlayGameNavigationTests {
         )
         
         let store = await TestStore(
+            initialState: PlayGameFeature.State(levelID: mockGame.id, level: mockGame)
+        ) {
+            PlayGameFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
+            $0.apiClient = mockAPI
+        }
+        
+        await store.send(.view(.backButtonTapped)) {
+            $0.isExiting = true
+        }
+         
+        await store.receive(\.saveLevel.api.start) {
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        
+        // FIX ERROR
+        
+        await store.receive(\.saveLevel.delegate.finished)
+    }
+    
+    @Test func testErrorHandlerForDisappearOnBackButton() async throws {
+        let mockGame:GameLevel = GameLevel.shortMock
+            
+        let mockAPI:APIClient =  APIClient(
+            layoutsAPI: MockLayoutsAPI(levels: []),
+            gameLevelsAPI: MockGameLevelsAPI(levels:[mockGame])
+        )
+        
+        let store = await TestStore(
             initialState: PlayGameFeature.State(levelID: mockGame.id)
         ) {
             PlayGameFeature()
@@ -58,6 +91,20 @@ struct PlayGameNavigationTests {
         
         await store.send(.view(.backButtonTapped)) {
             $0.isExiting = true
+        }
+         
+        await store.receive(\.saveLevel.api.start) {
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        
+        // FIX ERROR
+        
+        await store.receive(\.saveLevel.delegate.finished) {
+            $0.error = EquatableError(EditLayoutError.saveLayoutError("No layout found in save level"))
+            $0.isExiting = false
         }
     }
 }

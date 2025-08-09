@@ -17,6 +17,9 @@ struct PlayGameKeyboardFeatureTests {
             initialState: PlayGameFeature.State(levelID:UUID(0), level: createLevel(charMap: "QWERTYUIOPASDFGHJKLZXCVBNM"), selectedNumber:2 )
         ) {
             PlayGameFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
+            $0.apiClient = .mock
         }
 
         // Third character (offset 0) selected, so that should be set to character
@@ -43,6 +46,9 @@ struct PlayGameKeyboardFeatureTests {
             initialState: PlayGameFeature.State(levelID:UUID(0), level: createLevel(charMap: "QWERTYUIOPASDFGHJKLZXCVBNM"), selectedNumber:2 )
         ) {
             PlayGameFeature()
+        } withDependencies: {
+            $0.uuid = .incrementing
+            $0.apiClient = .mock
         }
 
         // Third character (offset 0) selected, so that should be set to character

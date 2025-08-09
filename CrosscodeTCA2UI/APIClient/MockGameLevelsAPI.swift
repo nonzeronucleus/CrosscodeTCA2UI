@@ -55,7 +55,10 @@ class MockGameLevelsAPI: GameLevelsAPI {
     }
     
     func saveLevel(level: any Level) async throws {
-        fatalError("\(#function) not implemented")
+        guard let gameLevel = level as? GameLevel else {
+            fatalError("Trying to save a level that is not a GameLevel")
+        }
+        levels[id: level.id] = gameLevel
     }
     
     func cancel() async {

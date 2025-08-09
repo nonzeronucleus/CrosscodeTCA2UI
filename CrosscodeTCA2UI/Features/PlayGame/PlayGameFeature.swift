@@ -11,9 +11,7 @@ struct PlayGameFeature {
 
     
     @ObservableState
-    struct State: Equatable, ErrorHandling {
-//        var layout: CrosscodeDataLibrary.Layout?
-        
+    struct State: Equatable, ErrorHandling, LevelState {
         var levelID: UUID
         var level: GameLevel?
         var selectedNumber: Int?
@@ -46,6 +44,8 @@ struct PlayGameFeature {
         case playGameCell(PlayGameCellReducer.Action)
         case loadGameLevel(LoadGameLevelReducer.Action)
         case revealLetterReducer(RevealLetterReducer.Action)
+        case saveLevel(SaveLevelReducer<PlayGameFeature>.Action)
+
 
         enum View {
             case pageLoaded
@@ -62,6 +62,8 @@ struct PlayGameFeature {
         Scope(state: \.self, action: \.playGameCell) { PlayGameCellReducer() }
         Scope(state: \.self, action: \.revealLetterReducer) { RevealLetterReducer() }
         Scope(state: \.self, action: \.keyboard) { KeyboardFeature() }
+        Scope(state: \.self, action: \.saveLevel) { SaveLevelReducer(levelAPI: apiClient.gameLevelsAPI) }
+
 
         Reduce { state, action in
             switch action {
@@ -72,14 +74,7 @@ struct PlayGameFeature {
                             return .send(.loadGameLevel(.api(.start(state.levelID))))
                             
                         case .backButtonTapped:
-                            if isPresented {
-                                state.isExiting = true
-                                return .run { _ in
-                                    await dismiss()
-                                }
-                            } else {
-                                return .none
-                            }
+                            return handleBackButton(&state)
                             
                         case .checkToggled:
                             state.checking.toggle()
@@ -106,12 +101,16 @@ struct PlayGameFeature {
                     
                 case let .keyboard(.delegate(.finished(result))):
                     return handleLetterAddedDelegateFinished(&state, result)
+                    
+                case .saveLevel(.delegate(let delegateAction)):
+                    return handleSaveLevelDelegate(&state, delegateAction)
 
                     
                 case .playGameCell,
                         .keyboard(.view(_)),
                         .loadGameLevel(.api), .loadGameLevel(.internal),
-                        .revealLetterReducer(.api), .revealLetterReducer(.internal):
+                        .revealLetterReducer(.api), .revealLetterReducer(.internal), 
+                        .saveLevel(.api), .saveLevel(.internal):
                     return .none
             }
         }
@@ -125,6 +124,41 @@ struct PlayGameFeature {
                 }
                 return .none
             case .failure(let error):
+                state.error = EquatableError(error)
+                return .none
+        }
+    }
+    
+    func handleBackButton(_ state: inout State) -> Effect<Action> {
+        guard isPresented else { return .none }
+        state.isExiting = true
+        //        return state.isPopulated ? .run { _ in await dismiss() } :
+        return .send(.saveLevel(.api(.start)))
+    }
+        
+        
+        //send(.saveLeve(.api(.start)))
+//            state.isExiting = true
+//            return .run { _ in
+//                await dismiss()
+//            }
+//    }
+}
+
+extension PlayGameFeature {
+    func handleSaveLevelDelegate(_ state: inout State, _ action: SaveLevelReducer<PlayGameFeature>.Action.Delegate) -> Effect<Action> {
+        guard case .finished(let result) = action else {  return .none }
+        
+        // 2. Switch on the Result
+        switch result {
+            case .success:
+                state.isBusy = false
+                state.isDirty = false
+                return state.isExiting ? .run { _ in await dismiss() } : .none
+                
+            case .failure(let error):
+                // Handle failure
+                state.isExiting = false
                 state.error = EquatableError(error)
                 return .none
         }
