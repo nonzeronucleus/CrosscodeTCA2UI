@@ -12,14 +12,15 @@ struct RootFeature {
         var layoutsList =  LayoutsTabFeature.State()
         var gameLevelsList =  GameLevelsTabFeature.State()
         var tab: NavTab = .play
-        @Presents var settings: SettingsFeature.State?
+        @Presents var settingsScreen: SettingsFeature.State?
+        var settings = Settings()
     }
     
     enum Action {
         case layoutsList(LayoutsTabFeature.Action)
         case gameLevelsList(GameLevelsTabFeature.Action)
         case setTab(NavTab)
-        case settings(PresentationAction<SettingsFeature.Action>)
+        case settingsScreen(PresentationAction<SettingsFeature.Action>)
     }
     
     var body: some Reducer<State, Action> {
@@ -39,11 +40,11 @@ struct RootFeature {
                     return .none
                 case .gameLevelsList:
                     return .none
-                case .settings:
+                case .settingsScreen:
                     return .none
             }
         }
-        .ifLet(\.$settings, action: \.settings) {
+        .ifLet(\.$settingsScreen, action: \.settingsScreen) {
             SettingsFeature()
         }
         
@@ -55,7 +56,7 @@ struct RootFeature {
     private func handleGameLevelsListDelegate(_ state: inout State,_ action: GameLevelsTabFeature.Action.Delegate) -> Effect<Action> {
         switch action {
             case .settingsButtonPressed:
-                state.settings = .init()
+                state.settingsScreen = .init()
                 return .none
         }
     }
@@ -63,7 +64,7 @@ struct RootFeature {
     private func handleLayoutsListDelegate(_ state: inout State,_ action: LayoutsTabFeature.Action.Delegate) -> Effect<Action> {
         switch action {
             case .settingsButtonPressed:
-                state.settings = .init()
+                state.settingsScreen = .init()
                 return .none
         }
     }

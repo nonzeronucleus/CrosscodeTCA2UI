@@ -1,17 +1,6 @@
 import SwiftUI
 import ComposableArchitecture
 
-//struct SettingsView: View {
-//    @Bindable var store: StoreOf<SettingsFeature>
-//    
-//    var body: some View {
-//        Form {
-//            Toggle("Dark Mode", isOn: $store.isEditMode)
-//        }
-//        .frame(minWidth: 300, minHeight: 400)
-//        .padding()
-//    }
-//}
 
 struct SettingsView: View {
     @Bindable var store: StoreOf<SettingsFeature>
@@ -34,13 +23,12 @@ struct SettingsView: View {
             }
             
             Form {
-                Toggle("Dark Mode", isOn: $store.settings.isEditMode)
+                Toggle("Edit Mode", isOn: $store.settings.isEditMode)
             }
             .frame(minWidth: 300, minHeight: 400)
             .padding()
             .navigationTitle("Settings")
             .navigationBarTitleDisplayMode(.inline)
-            // The back button is shown automatically when pushed
         }
     }
 }

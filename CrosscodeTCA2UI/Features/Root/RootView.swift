@@ -11,25 +11,34 @@ struct RootView: View {
     
     var body: some View {
         VStack {
-            TabView(
-                selection: Binding(
-                    get: { store.tab },
-                    set: { store.send(.setTab($0)) }
-                )
-            ) {
-                // MARK: - Play Tab
+            if store.settings.isEditMode {
+                
+                TabView(
+                    selection: Binding(
+                        get: { store.tab },
+                        set: { store.send(.setTab($0)) }
+                    )
+                ) {
+                    // MARK: - Play Tab
+                    GameLevelsTabView(store:store.scope(state:\.gameLevelsList , action: \.gameLevelsList))
+                        .tabItem { Label("Play", systemImage: "gamecontroller") }
+                        .tag(NavTab.play)
+                    
+                    // MARK: - Edit Tab
+                    LayoutsTabView(store:store.scope(state:\.layoutsList , action: \.layoutsList))
+                        .tabItem { Label("Edit", systemImage: "pencil") }
+                        .tag(NavTab.edit)
+                }
+            }
+            else {
                 GameLevelsTabView(store:store.scope(state:\.gameLevelsList , action: \.gameLevelsList))
                     .tabItem { Label("Play", systemImage: "gamecontroller") }
                     .tag(NavTab.play)
-                
-                // MARK: - Edit Tab
-                LayoutsTabView(store:store.scope(state:\.layoutsList , action: \.layoutsList))
-                    .tabItem { Label("Edit", systemImage: "pencil") }
-                    .tag(NavTab.edit)
+
             }
         }
         .fullScreenCover(
-            item: $store.scope(state: \.settings, action: \.settings)
+            item: $store.scope(state: \.settingsScreen, action: \.settingsScreen)
         ) { settingsStore in
             SettingsView(store: settingsStore)
         }

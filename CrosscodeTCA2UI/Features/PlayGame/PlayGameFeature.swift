@@ -119,6 +119,7 @@ struct PlayGameFeature {
     func handleLetterAddedDelegateFinished(_ state: inout State, _ result: Result<Void, any Error>) -> Effect<Action> {
         switch result {
             case .success:
+                state.checking = false
                 if state.isCompleted {
                     state.showCompletionDialog = true
                 }
