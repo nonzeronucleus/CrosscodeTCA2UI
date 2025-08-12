@@ -123,7 +123,8 @@ struct PlayGameFeature {
                 if state.isCompleted {
                     state.showCompletionDialog = true
                 }
-                return .none
+                return .send(.saveLevel(.api(.start)))
+                
             case .failure(let error):
                 state.error = EquatableError(error)
                 return .none
@@ -133,17 +134,8 @@ struct PlayGameFeature {
     func handleBackButton(_ state: inout State) -> Effect<Action> {
         guard isPresented else { return .none }
         state.isExiting = true
-        //        return state.isPopulated ? .run { _ in await dismiss() } :
         return .send(.saveLevel(.api(.start)))
     }
-        
-        
-        //send(.saveLeve(.api(.start)))
-//            state.isExiting = true
-//            return .run { _ in
-//                await dismiss()
-//            }
-//    }
 }
 
 extension PlayGameFeature {
