@@ -28,6 +28,16 @@ struct PlayGameKeyboardFeatureTests {
         }
 
         await store.receive(\.keyboard.delegate.finished)
+        
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
+
+        
 
         await store.send(.playGameCell(.internal(.finished(.success(3))))) { state in // Seleect cell numbered 3
             state.selectedNumber = 3
@@ -39,6 +49,15 @@ struct PlayGameKeyboardFeatureTests {
         }
 
         await store.receive(\.keyboard.delegate.finished)
+        
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
+
     }
     
     @Test func testAddLetterWithMultipleSelectedSquaresAndCheckingEnabled() async throws {
@@ -60,6 +79,14 @@ struct PlayGameKeyboardFeatureTests {
             $0.checking = false // Entering a letter should disable checking mode
         }
 
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
+
         await store.send(.playGameCell(.internal(.finished(.success(3))))) { state in // Seleect cell numbered 3
             state.selectedNumber = 3
         }
@@ -70,6 +97,15 @@ struct PlayGameKeyboardFeatureTests {
         }
 
         await store.receive(\.keyboard.delegate.finished)
+        
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
+
     }
 
 
@@ -90,15 +126,34 @@ struct PlayGameKeyboardFeatureTests {
 
         await store.receive(\.keyboard.delegate.finished)
 
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
+
+        
         await store.send(.playGameCell(.internal(.finished(.success(3))))) { state in // Seleect cell numbered 3
             state.selectedNumber = 3
         }
+        
+        
 
         await store.send(.keyboard(.view(.letterInput("A")))) {
             $0.level!.attemptedLetters[3] = "A"
         }
 
         await store.receive(\.keyboard.delegate.finished)
+        
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
 
         await store.send(.playGameCell(.internal(.finished(.success(2))))) { state in // Seleect cell numbered 2 again - which should have Q in it
             state.selectedNumber = 2
@@ -109,6 +164,13 @@ struct PlayGameKeyboardFeatureTests {
         }
 
         await store.receive(\.keyboard.delegate.finished)
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
 
     }
     
@@ -130,16 +192,31 @@ struct PlayGameKeyboardFeatureTests {
         await store.receive(\.keyboard.delegate.finished) {
             $0.checking = false // Entering a letter should disable checking mode
         }
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
+
 
         await store.send(.playGameCell(.internal(.finished(.success(3))))) { state in // Seleect cell numbered 3
             state.selectedNumber = 3
         }
-
+        
         await store.send(.keyboard(.view(.letterInput("A")))) {
             $0.level!.attemptedLetters[3] = "A"
         }
 
         await store.receive(\.keyboard.delegate.finished)
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
 
         await store.send(.playGameCell(.internal(.finished(.success(2))))) { state in // Seleect cell numbered 2 again - which should have Q in it
             state.selectedNumber = 2
@@ -150,6 +227,13 @@ struct PlayGameKeyboardFeatureTests {
         }
 
         await store.receive(\.keyboard.delegate.finished)
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
 
     }
 }

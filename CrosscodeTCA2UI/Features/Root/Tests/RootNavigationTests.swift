@@ -29,13 +29,13 @@ struct RootNavigationTests {
         }
         
         await store.send(.layoutsList(.delegate(.settingsButtonPressed))) {
-            $0.settings = SettingsFeature.State()
+            $0.settingsScreen = SettingsFeature.State()
         }
         
-        await store.send(.settings(.presented(.backButtonTapped)))
+        await store.send(.settingsScreen(.presented(.backButtonTapped)))
         
-        await store.receive(\.settings.dismiss) {
-            $0.settings = nil
+        await store.receive(\.settingsScreen.dismiss) {
+            $0.settingsScreen = nil
         }
     }
     
@@ -47,13 +47,13 @@ struct RootNavigationTests {
         }
         
         await store.send(.layoutsList(.delegate(.settingsButtonPressed))) {
-            $0.settings = SettingsFeature.State()
+            $0.settingsScreen = SettingsFeature.State()
         }
         
-        await store.send(.settings(.presented(.backButtonTapped)))
+        await store.send(.settingsScreen(.presented(.backButtonTapped)))
         
-        await store.receive(\.settings.dismiss) {
-            $0.settings = nil
+        await store.receive(\.settingsScreen.dismiss) {
+            $0.settingsScreen = nil
         }
     }
 

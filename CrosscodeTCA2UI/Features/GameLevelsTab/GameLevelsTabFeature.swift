@@ -51,7 +51,6 @@ struct GameLevelsTabFeature {
     var body: some Reducer<State, Action> {
         Scope(state: \.self, action: \.loadGameLevels) { LoadGameLevelsReducer() }
         Scope(state: \.self, action: \.exportGameLevels) { ExportGameLevelsReducer() }
-        Scope(state: \.self, action: \.exportGameLevels) { ExportGameLevelsReducer() }
         Scope(state: \.pack, action: \.pack) { PackFeature() }
         
         Reduce { state, action in

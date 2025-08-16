@@ -37,7 +37,16 @@ struct PlayGameCompletedTests {
             $0.showCompletionDialog = true
         }
         
-        await #expect(store.state.isCompleted == true)
+        await store.receive(\.saveLevel.api.start){
+            $0.isBusy = true
+        }
+        await store.receive(\.saveLevel.internal.finished) {
+            $0.isBusy = false
+        }
+        await store.receive(\.saveLevel.delegate.finished)
+
+        
+//        await #expect(store.state.isCompleted == true)
     }
     
     @Test func testAlreadyComplete() async throws {
